@@ -1,8 +1,5 @@
 <!DOCTYPE html>
 <html lang="ru">
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-    <script>eruda.init();</script>
-</head>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -309,6 +306,8 @@
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
 </head>
 <body>
 
@@ -393,7 +392,7 @@
             
             <div style="margin-bottom:10px;">
                 <label style="font-size:0.8rem; color:var(--accent);">Текстовый лог / Что было сделано:</label><br>
-                <textarea id="proof-text" rows="3" style="width:100%; box-sizing:border-box; margin-top:4px;" placeholder="Пример: Написал Python скрипт / Выполнил apt update в Termux..."></textarea>
+                <textarea id="proof-text" rows="3" style="width:100%; box-sizing:border-box; margin-top:4px;" placeholder="Пример: Написал Python скрипт / Выполнил apt update..."></textarea>
             </div>
 
             <div style="margin-bottom:12px;">
@@ -412,7 +411,7 @@
     <div id="gemini-tab" class="tab-content">
         <div class="card">
             <h3 style="color:var(--accent-purple); margin-top:0;">🤖 Встроенный Gemini AI Ассистент</h3>
-            <p style="font-size:0.85rem; color:var(--text-muted);">Задавай вопросы по коду на 40 языках, Linux командам или проси проверить твои решения!</p>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Задавай вопросы по коду на 40 языках, Linux командам или проси проверить твой код:</p>
             
             <!-- Поле API Ключа -->
             <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
@@ -424,7 +423,7 @@
             <!-- Контейнер чата -->
             <div class="chat-container">
                 <div class="chat-messages" id="chat-msgs">
-                    <div class="chat-msg chat-ai">Привет! Я встроенный ИИ-ассистент Станции. Ключ активирован? Тогда задавай вопрос ниже!</div>
+                    <div class="chat-msg chat-ai">Привет! Я встроенный ИИ-ассистент Станции. Ключ активирован? Тогда задавай вопрос!</div>
                 </div>
                 <div style="display:flex; gap:8px; margin-top:10px;">
                     <input type="text" id="chat-input" placeholder="Напиши промпт для Gemini..." style="flex:1;" onkeydown="if(event.key==='Enter') sendGeminiMsg()">
@@ -462,7 +461,7 @@
         <div class="card" style="border: 1px solid var(--accent-purple);">
             <h3 style="color:var(--accent-purple); margin-top:0;">📱 Автоматизация через Shizuku (`rish`) в Termux</h3>
             <p style="font-size:0.85rem; color:var(--text-muted);">
-                Shizuku дает Termux доступ к <strong>ADB (UID 2000)</strong> без Root-прав. Выполняй системные команды, управляй пакетами и правами приложения напрямую!
+                Shizuku дает Termux доступ к <strong>ADB (UID 2000)</strong> без Root-прав. Выполняй системные команды, управляй пакетами и автоматизируй:
             </p>
 
             <h4 style="color:var(--accent); margin-bottom:6px;">🚀 Шаг 1: Авто-установка `rish` в Termux (Выполнить 1 раз)</h4>
@@ -516,4 +515,9 @@ mkdir -p ~/.termux && echo "extra-keys = [['ESC','|','/','HOME','UP','END','PGUP
                 • <code>pkg install ttyd</code> — веб-транслятор терминала в браузер.<br>
                 • <code>termux-setup-storage</code> — доступ к памяти телефона (/sdcard).<br>
                 • <code>proot-distro install debian</code> — полноценный Debian внутри Termux.<br>
-                •
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
