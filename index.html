@@ -3,328 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER COMMAND STATION v3.0</title>
-    <style>
-        :root {
-            --bg: #090d16;
-            --panel: #131b2e;
-            --border: #1e293b;
-            --accent: #38bdf8;
-            --accent-green: #22c55e;
-            --accent-purple: #a855f7;
-            --text: #f8fafc;
-            --text-muted: #64748b;
-            --term-bg: #050811;
-        }
-
-        body.theme-matrix {
-            --bg: #050b05;
-            --panel: #0d1a0d;
-            --border: #1a331a;
-            --accent: #22c55e;
-            --accent-green: #4ade80;
-            --accent-purple: #16a34a;
-            --text: #f0fdf4;
-            --text-muted: #4ade80;
-            --term-bg: #020d02;
-        }
-
-        body.theme-dracula {
-            --bg: #181825;
-            --panel: #1e1e2e;
-            --border: #313244;
-            --accent: #cba6f7;
-            --accent-green: #a6e3a1;
-            --accent-purple: #f5c2e7;
-            --text: #cdd6f4;
-            --text-muted: #a6adc8;
-            --term-bg: #11111b;
-        }
-
-        body.theme-nord {
-            --bg: #2e3440;
-            --panel: #3b4252;
-            --border: #4c566a;
-            --accent: #88c0d0;
-            --accent-green: #a3be8c;
-            --accent-purple: #b48ead;
-            --text: #eceff4;
-            --text-muted: #d8dee9;
-            --term-bg: #242933;
-        }
-
-        body {
-            font-family: 'JetBrains Mono', Consolas, monospace, system-ui;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 8px;
-            width: 100%;
-            max-width: 1100px;
-            margin-bottom: 12px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-        }
-
-        .tab-btn {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            white-space: nowrap;
-        }
-
-        .tab-btn.active {
-            color: var(--accent);
-            border-color: var(--accent);
-            background: rgba(56, 189, 248, 0.1);
-        }
-
-        .tab-content {
-            display: none;
-            width: 100%;
-            max-width: 1100px;
-        }
-
-        .tab-content.active { display: block; }
-
-        .header {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px 20px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            width: 100%;
-            max-width: 1100px;
-            box-sizing: border-box;
-        }
-
-        .header-controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        select, input[type="text"], input[type="password"], textarea {
-            background: #020617;
-            color: var(--text);
-            border: 1px solid var(--border);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-family: inherit;
-        }
-
-        .xp-bar-bg {
-            background: #020617;
-            border: 1px solid var(--border);
-            height: 8px;
-            border-radius: 4px;
-            width: 140px;
-            overflow: hidden;
-            margin-top: 4px;
-        }
-
-        .xp-bar-fill {
-            background: linear-gradient(90deg, var(--accent), var(--accent-purple));
-            height: 100%;
-            width: 0%;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 10px;
-        }
-
-        .card {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 14px;
-            margin-bottom: 10px;
-        }
-
-        .slot {
-            background: #020617;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 0 8px;
-            font-weight: bold;
-            color: var(--accent);
-            margin: 8px 0;
-            font-size: 0.9rem;
-        }
-
-        .btn {
-            padding: 10px 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .btn-main { background: #0284c7; color: #fff; }
-        .btn-green { background: var(--accent-green); color: #020617; }
-        .btn-purple { background: var(--accent-purple); color: #fff; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-
-        .buff-badge {
-            display: inline-block;
-            background: rgba(168, 85, 247, 0.15);
-            border: 1px solid var(--accent-purple);
-            color: var(--accent-purple);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            margin-right: 6px;
-            margin-top: 4px;
-        }
-
-        /* ТЕРМИНАЛ */
-        .terminal-container {
-            background: var(--term-bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 15px;
-            font-family: 'JetBrains Mono', Consolas, monospace;
-            height: 480px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .terminal-output {
-            flex: 1;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-
-        /* ЧАТ GEMINI AI */
-        .chat-container {
-            background: #020617;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            height: 420px;
-            display: flex;
-            flex-direction: column;
-            padding: 15px;
-            margin-top: 10px;
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding-right: 5px;
-        }
-
-        .chat-msg {
-            padding: 10px 14px;
-            border-radius: 8px;
-            max-width: 85%;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            white-space: pre-wrap;
-        }
-
-        .chat-user {
-            background: #1e293b;
-            color: var(--accent);
-            align-self: flex-end;
-            border: 1px solid var(--border);
-        }
-
-        .chat-ai {
-            background: #0f172a;
-            color: var(--text);
-            align-self: flex-start;
-            border: 1px solid var(--accent-purple);
-        }
-
-        #editor-container {
-            height: 500px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        .code-block {
-            background: #020617;
-            border: 1px solid var(--border);
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            color: var(--accent-green);
-            position: relative;
-            white-space: pre-wrap;
-            margin-bottom: 12px;
-            overflow-x: auto;
-        }
-
-        .copy-btn {
-            position: absolute;
-            top: 6px; right: 6px;
-            background: var(--border);
-            color: var(--text);
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-    <script>eruda.init();</script>
+    <title>CYBER COMMAND STATION v4.0 PRO</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+    <!-- ПЛАВАЮЩАЯ КНОПКА АДМИН-КОНСОЛИ -->
+    <div id="floating-menu" class="floating-menu">
+        <button class="floating-btn" onclick="toggleAdminPanel()">⚙️</button>
+    </div>
+
+    <!-- АДМИН КОНСОЛЬ / НАСТРОЙКИ ПРОФИЛЯ -->
+    <div id="admin-panel" class="admin-panel" style="display:none;">
+        <div class="admin-header">
+            <span>🔧 СИСТЕМА</span>
+            <button onclick="toggleAdminPanel()" style="background:none; border:none; color:var(--accent); cursor:pointer; font-size:1.2rem;">✕</button>
+        </div>
+        <div class="admin-content" id="admin-content">
+            <!-- Заполняется в зависимости от прав доступа -->
+        </div>
+    </div>
 
     <!-- NAV TABS -->
     <div class="nav-tabs">
         <button class="tab-btn active" onclick="openTab('terminal-tab')">📟 Web Shell</button>
-        <button class="tab-btn" onclick="openTab('quest-tab')">🎡 Quest Hub & Proofs</button>
-        <button class="tab-btn" onclick="openTab('gemini-tab')">🤖 Gemini AI Assistant</button>
-        <button class="tab-btn" onclick="openTab('code-tab')">💻 VS Code (40 Langs)</button>
-        <button class="tab-btn" onclick="openTab('linux-tab')">📱 Shizuku & Binds</button>
-        <button class="tab-btn" onclick="openTab('env-tab')">🐧 Real Linux & Detector</button>
+        <button class="tab-btn" onclick="openTab('quest-tab')">🎡 Quest Hub</button>
+        <button class="tab-btn" onclick="openTab('gemini-tab')">🤖 Gemini AI</button>
+        <button class="tab-btn" onclick="openTab('code-tab')">💻 VS Code</button>
+        <button class="tab-btn" onclick="openTab('linux-tab')">📱 Shizuku</button>
+        <button class="tab-btn" onclick="openTab('market-tab')">🛍️ Market</button>
+        <button class="tab-btn" onclick="openTab('vault-tab')">📦 Script Vault</button>
+        <button class="tab-btn" onclick="openTab('radio-tab')">🎵 Radio</button>
     </div>
 
     <!-- HEADER & THEMES & BUFFS -->
     <div class="header">
         <div>
-            <strong style="color:var(--accent);">CYBER COMMAND OS v3.0</strong>
+            <strong style="color:var(--accent);">CYBER COMMAND OS v4.0 PRO</strong>
             <div style="font-size:0.8rem; color:var(--text-muted);">CROSS-PLATFORM HUB</div>
         </div>
         
@@ -339,6 +54,7 @@
 
             <div>
                 <span id="lvl-txt">LVL 1</span> | <span id="xp-txt" style="color:var(--accent);">0 XP</span>
+                <span id="coins-txt" style="color:#fbbf24; margin-left:15px;">💰 0 CC</span>
                 <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-fill"></div></div>
             </div>
         </div>
@@ -392,7 +108,7 @@
             
             <div style="margin-bottom:10px;">
                 <label style="font-size:0.8rem; color:var(--accent);">Текстовый лог / Что было сделано:</label><br>
-                <textarea id="proof-text" rows="3" style="width:100%; box-sizing:border-box; margin-top:4px;" placeholder="Пример: Написал Python скрипт / Выполнил apt update..."></textarea>
+                <textarea id="proof-text" rows="3" style="width:100%; box-sizing:border-box; margin-top:4px;" placeholder="Пример: Написал Python скрипт / Выполнил apt update"></textarea>
             </div>
 
             <div style="margin-bottom:12px;">
@@ -411,7 +127,6 @@
     <div id="gemini-tab" class="tab-content">
         <div class="card">
             <h3 style="color:var(--accent-purple); margin-top:0;">🤖 Встроенный Gemini AI Ассистент</h3>
-            <p style="font-size:0.85rem; color:var(--text-muted);">Задавай вопросы по коду на 40 языках, Linux командам или проси проверить твой код:</p>
             
             <!-- Поле API Ключа -->
             <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
@@ -419,6 +134,31 @@
                 <button class="btn btn-purple" onclick="saveGeminiKey()">Сохранить ключ</button>
             </div>
             <div id="key-status" style="font-size:0.8rem; color:var(--text-muted);"></div>
+
+            <!-- TOKEN MONITOR -->
+            <div class="token-monitor">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                    <span style="color:var(--accent);">📊 Токены использованы:</span>
+                    <span id="token-count">0 / 32000</span>
+                </div>
+                <div class="token-bar-bg">
+                    <div class="token-bar-fill" id="token-fill"></div>
+                </div>
+                <button class="btn btn-outline" style="margin-top:8px; width:100%;" onclick="wipeContext()">🧹 Сбросить контекст</button>
+            </div>
+
+            <!-- PROMPT DECK -->
+            <div style="margin:12px 0; padding:10px; background:rgba(168, 85, 247, 0.1); border-radius:6px; border:1px solid var(--accent-purple);">
+                <label style="font-size:0.8rem; color:var(--accent); display:block; margin-bottom:6px;">📜 Библиотека промптов:</label>
+                <select id="prompt-deck" onchange="loadPrompt()" style="width:100%;">
+                    <option value="">-- Выбери шаблон --</option>
+                    <option value="refactor_cs">Рефакторинг C#</option>
+                    <option value="ui_gen">Генерация UI</option>
+                    <option value="debug">Анализ ошибок</option>
+                    <option value="optimize">Оптимизация кода</option>
+                    <option value="security">Проверка безопасности</option>
+                </select>
+            </div>
 
             <!-- Контейнер чата -->
             <div class="chat-container">
@@ -433,20 +173,45 @@
         </div>
     </div>
 
-    <!-- TAB 4: MONACO VS CODE -->
+    <!-- TAB 4: MONACO VS CODE (40+ LANGUAGES) -->
     <div id="code-tab" class="tab-content">
         <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div style="display:flex; align-items:center; gap:10px;">
                 <span>Язык программирования:</span>
                 <select id="lang-select" onchange="changeLang()">
-                    <option value="python" selected>Python</option>
+                    <option value="python">Python</option>
                     <option value="javascript">JavaScript</option>
+                    <option value="typescript">TypeScript</option>
                     <option value="c">C</option>
                     <option value="cpp">C++</option>
-                    <option value="rust">Rust</option>
                     <option value="csharp">C#</option>
+                    <option value="rust">Rust</option>
                     <option value="go">Go</option>
                     <option value="zig">Zig</option>
+                    <option value="ada">Ada</option>
+                    <option value="d">D</option>
+                    <option value="forth">Forth</option>
+                    <option value="modula2">Modula-2</option>
+                    <option value="nim">Nim</option>
+                    <option value="v">V</option>
+                    <option value="crystal">Crystal</option>
+                    <option value="julia">Julia</option>
+                    <option value="fortran">Fortran</option>
+                    <option value="pascal">Pascal</option>
+                    <option value="eiffel">Eiffel</option>
+                    <option value="ocaml">OCaml</option>
+                    <option value="haskell">Haskell</option>
+                    <option value="erlang">Erlang</option>
+                    <option value="verilog">Verilog</option>
+                    <option value="vhdl">VHDL</option>
+                    <option value="systemverilog">SystemVerilog</option>
+                    <option value="swift">Swift</option>
+                    <option value="kotlin">Kotlin</option>
+                    <option value="odin">Odin</option>
+                    <option value="chapel">Chapel</option>
+                    <option value="Ceylon">Ceylon</option>
+                    <option value="actionscript">ActionScript 3</option>
+                    <option value="pike">Pike</option>
                 </select>
             </div>
             <a href="https://vscode.dev" target="_blank" class="btn btn-outline">🔗 Полный VS Code (vscode.dev)</a>
@@ -461,7 +226,7 @@
         <div class="card" style="border: 1px solid var(--accent-purple);">
             <h3 style="color:var(--accent-purple); margin-top:0;">📱 Автоматизация через Shizuku (`rish`) в Termux</h3>
             <p style="font-size:0.85rem; color:var(--text-muted);">
-                Shizuku дает Termux доступ к <strong>ADB (UID 2000)</strong> без Root-прав. Выполняй системные команды, управляй пакетами и автоматизируй:
+                Shizuku дает Termux доступ к <strong>ADB (UID 2000)</strong> без Root-прав. Выполняй системные команды, управляй пакетами и процессами.
             </p>
 
             <h4 style="color:var(--accent); margin-bottom:6px;">🚀 Шаг 1: Авто-установка `rish` в Termux (Выполнить 1 раз)</h4>
@@ -518,6 +283,81 @@ mkdir -p ~/.termux && echo "extra-keys = [['ESC','|','/','HOME','UP','END','PGUP
             </div>
         </div>
     </div>
+
+    <!-- TAB 6: BLACK MARKET & SHOP -->
+    <div id="market-tab" class="tab-content">
+        <div class="card">
+            <h3 style="color:#fbbf24; margin-top:0;">🛍️ Чёрный рынок - Обмен XP на награды</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Потрати заработанные кибер-кредиты на реальные награды!</p>
+        </div>
+
+        <div class="grid" id="market-grid"></div>
+    </div>
+
+    <!-- TAB 7: SCRIPT VAULT -->
+    <div id="vault-tab" class="tab-content">
+        <div class="card">
+            <h3 style="color:var(--accent-green); margin-top:0;">📦 Script Vault - Твоя библиотека скриптов</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Сохраняй, управляй и быстро запускай свои скрипты и утилиты.</p>
+            
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <input type="text" id="script-name" placeholder="Имя скрипта" style="flex:1;">
+                <input type="text" id="script-path" placeholder="Путь /usr/bin/script.sh" style="flex:1;">
+                <input type="text" id="script-desc" placeholder="Описание" style="flex:1;">
+                <button class="btn btn-green" onclick="addScript()">➕ Добавить</button>
+            </div>
+        </div>
+
+        <div class="grid" id="vault-grid"></div>
+    </div>
+
+    <!-- TAB 8: RADIO & AMBIENCE -->
+    <div id="radio-tab" class="tab-content">
+        <div class="card">
+            <h3 style="color:#a855f7; margin-top:0;">🎵 Фоновая музыка для продуктивности</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Лофай, синтвейв и дарксинт для работы.</p>
+
+            <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+                <button class="btn btn-outline" onclick="playRadio('lofi')">🎹 Lofi Beats</button>
+                <button class="btn btn-outline" onclick="playRadio('synthwave')">🌌 Synthwave</button>
+                <button class="btn btn-outline" onclick="playRadio('darksynth')">🌑 Darksynth</button>
+                <button class="btn btn-outline" onclick="stopRadio()">⏹️ Стоп</button>
+            </div>
+
+            <div id="radio-player" style="margin-top:10px;">
+                <audio id="audio-player" style="width:100%;" controls></audio>
+            </div>
+        </div>
+
+        <!-- CYBER POMODORO -->
+        <div class="card" style="border:1px solid var(--accent);">
+            <h3 style="color:var(--accent); margin-top:0;">⏱️ Cyber-Pomodoro Таймер</h3>
+            
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <input type="number" id="pomodoro-min" value="25" min="1" max="60" style="width:80px;">
+                <span>минут</span>
+                <button class="btn btn-main" onclick="startPomodoro()">🚀 Взлом!</button>
+                <button class="btn btn-outline" onclick="pausePomodoro()">⏸️ Пауза</button>
+                <button class="btn btn-outline" onclick="resetPomodoro()">🔄 Reset</button>
+            </div>
+
+            <div id="pomodoro-display" style="font-size:3rem; color:var(--accent); text-align:center; font-weight:bold; margin:20px 0;">
+                25:00
+            </div>
+
+            <div id="pomodoro-progress" style="width:100%; height:8px; background:#020617; border-radius:4px; overflow:hidden;">
+                <div id="pomodoro-bar" style="height:100%; background:linear-gradient(90deg, var(--accent), var(--accent-green)); width:0%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
+    <script src="app.js"></script>
+    <script src="admin-panel.js"></script>
+    <script src="features.js"></script>
 
 </body>
 </html>
