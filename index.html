@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER OS // COMMAND STATION v2.0</title>
-    <!-- Подключаем стили и Monaco Editor (VS Code Engine) -->
+    <title>CYBER COMMAND STATION v3.0</title>
     <style>
         :root {
             --bg: #090d16;
@@ -15,10 +14,47 @@
             --accent-purple: #a855f7;
             --text: #f8fafc;
             --text-muted: #64748b;
+            --term-bg: #050811;
+        }
+
+        body.theme-matrix {
+            --bg: #050b05;
+            --panel: #0d1a0d;
+            --border: #1a331a;
+            --accent: #22c55e;
+            --accent-green: #4ade80;
+            --accent-purple: #16a34a;
+            --text: #f0fdf4;
+            --text-muted: #4ade80;
+            --term-bg: #020d02;
+        }
+
+        body.theme-dracula {
+            --bg: #181825;
+            --panel: #1e1e2e;
+            --border: #313244;
+            --accent: #cba6f7;
+            --accent-green: #a6e3a1;
+            --accent-purple: #f5c2e7;
+            --text: #cdd6f4;
+            --text-muted: #a6adc8;
+            --term-bg: #11111b;
+        }
+
+        body.theme-nord {
+            --bg: #2e3440;
+            --panel: #3b4252;
+            --border: #4c566a;
+            --accent: #88c0d0;
+            --accent-green: #a3be8c;
+            --accent-purple: #b48ead;
+            --text: #eceff4;
+            --text-muted: #d8dee9;
+            --term-bg: #242933;
         }
 
         body {
-            font-family: 'JetBrains Mono', monospace, system-ui, sans-serif;
+            font-family: 'JetBrains Mono', Consolas, monospace, system-ui;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
@@ -27,9 +63,9 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            box-sizing: border-box;
         }
 
-        /* TABS NAV */
         .nav-tabs {
             display: flex;
             gap: 8px;
@@ -37,6 +73,7 @@
             max-width: 1100px;
             margin-bottom: 12px;
             overflow-x: auto;
+            padding-bottom: 4px;
         }
 
         .tab-btn {
@@ -53,7 +90,7 @@
         .tab-btn.active {
             color: var(--accent);
             border-color: var(--accent);
-            background: #0f172a;
+            background: rgba(56, 189, 248, 0.1);
         }
 
         .tab-content {
@@ -62,11 +99,8 @@
             max-width: 1100px;
         }
 
-        .tab-content.active {
-            display: block;
-        }
+        .tab-content.active { display: block; }
 
-        /* HEADER */
         .header {
             background: var(--panel);
             border: 1px solid var(--border);
@@ -76,6 +110,26 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            width: 100%;
+            max-width: 1100px;
+            box-sizing: border-box;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        select, input[type="text"], input[type="password"], textarea {
+            background: #020617;
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: inherit;
         }
 
         .xp-bar-bg {
@@ -94,7 +148,6 @@
             width: 0%;
         }
 
-        /* GRID & CARDS */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -105,7 +158,8 @@
             background: var(--panel);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
         }
 
         .slot {
@@ -130,35 +184,118 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
         .btn-main { background: #0284c7; color: #fff; }
         .btn-green { background: var(--accent-green); color: #020617; }
+        .btn-purple { background: var(--accent-purple); color: #fff; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
 
-        /* VS CODE CONTAINER */
+        .buff-badge {
+            display: inline-block;
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid var(--accent-purple);
+            color: var(--accent-purple);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 6px;
+            margin-top: 4px;
+        }
+
+        /* ТЕРМИНАЛ */
+        .terminal-container {
+            background: var(--term-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'JetBrains Mono', Consolas, monospace;
+            height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-output {
+            flex: 1;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* ЧАТ GEMINI AI */
+        .chat-container {
+            background: #020617;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            height: 420px;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 5px;
+        }
+
+        .chat-msg {
+            padding: 10px 14px;
+            border-radius: 8px;
+            max-width: 85%;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .chat-user {
+            background: #1e293b;
+            color: var(--accent);
+            align-self: flex-end;
+            border: 1px solid var(--border);
+        }
+
+        .chat-ai {
+            background: #0f172a;
+            color: var(--text);
+            align-self: flex-start;
+            border: 1px solid var(--accent-purple);
+        }
+
         #editor-container {
             height: 500px;
             border: 1px solid var(--border);
             border-radius: 8px;
             overflow: hidden;
+            margin-top: 10px;
         }
 
-        /* LINUX CHEATS & BINDS */
         .code-block {
             background: #020617;
             border: 1px solid var(--border);
-            padding: 10px;
+            padding: 12px;
             border-radius: 6px;
             font-size: 0.85rem;
-            color: #22c55e;
+            color: var(--accent-green);
             position: relative;
             white-space: pre-wrap;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            overflow-x: auto;
         }
 
         .copy-btn {
             position: absolute;
-            top: 5px; right: 5px;
+            top: 6px; right: 6px;
             background: var(--border);
             color: var(--text);
             border: none;
@@ -168,186 +305,212 @@
             cursor: pointer;
         }
     </style>
-    <!-- Monaco Editor Script (VS Code Web) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
 </head>
 <body>
 
     <!-- NAV TABS -->
     <div class="nav-tabs">
-        <button class="tab-btn active" onclick="openTab('quest-tab')">🎡 Quest Hub</button>
-        <button class="tab-btn" onclick="openTab('code-tab')">💻 VS Code (Monaco)</button>
-        <button class="tab-btn" onclick="openTab('linux-tab')">🐧 Linux & Termux Binds</button>
-        <button class="tab-btn" onclick="openTab('env-tab')">📱 Cross-Platform Setup</button>
+        <button class="tab-btn active" onclick="openTab('terminal-tab')">📟 Web Shell</button>
+        <button class="tab-btn" onclick="openTab('quest-tab')">🎡 Quest Hub & Proofs</button>
+        <button class="tab-btn" onclick="openTab('gemini-tab')">🤖 Gemini AI Assistant</button>
+        <button class="tab-btn" onclick="openTab('code-tab')">💻 VS Code (40 Langs)</button>
+        <button class="tab-btn" onclick="openTab('linux-tab')">📱 Shizuku & Binds</button>
+        <button class="tab-btn" onclick="openTab('env-tab')">🐧 Real Linux & Detector</button>
     </div>
 
-    <!-- TAB 1: QUEST HUB -->
-    <div id="quest-tab" class="tab-content active">
-        <div class="header">
-            <div>
-                <strong style="color:var(--accent);">CYBER COMMAND CENTER</strong>
-                <div style="font-size:0.8rem; color:var(--text-muted);">CROSS-PLATFORM ENGINE</div>
-            </div>
+    <!-- HEADER & THEMES & BUFFS -->
+    <div class="header">
+        <div>
+            <strong style="color:var(--accent);">CYBER COMMAND OS v3.0</strong>
+            <div style="font-size:0.8rem; color:var(--text-muted);">CROSS-PLATFORM HUB</div>
+        </div>
+        
+        <div class="header-controls">
+            <span>Тема:</span>
+            <select id="theme-select" onchange="changeTheme()">
+                <option value="cyberpunk">Cyberpunk Dark</option>
+                <option value="matrix">Matrix Green</option>
+                <option value="dracula">Dracula Purple</option>
+                <option value="nord">Nord Cool</option>
+            </select>
+
             <div>
                 <span id="lvl-txt">LVL 1</span> | <span id="xp-txt" style="color:var(--accent);">0 XP</span>
                 <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-fill"></div></div>
             </div>
         </div>
+    </div>
 
+    <!-- ACTIVE BUFFS BAR -->
+    <div class="card" style="width:100%; max-width:1100px; box-sizing:border-box; padding:10px 15px; margin-bottom:15px;">
+        <span style="font-size:0.85rem; font-weight:bold; color:var(--accent);">⚡ Активные баффы аккаунта:</span>
+        <div id="active-buffs-list" style="margin-top:4px;">
+            <span class="buff-badge">🛡️ Стандартный агент (x1.0 XP)</span>
+        </div>
+    </div>
+
+    <!-- TAB 1: INTERACTIVE WEB TERMINAL -->
+    <div id="terminal-tab" class="tab-content active">
+        <div class="terminal-container">
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:10px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="color:var(--accent); font-weight:bold;">🖥️ INTERACTIVE OS SHELL</span>
+                    <select id="os-preset-select" onchange="changeOSPreset()" style="padding:2px 8px; font-size:0.8rem;">
+                        <option value="debian">🐧 Debian 12 Linux</option>
+                        <option value="termux">📱 Termux (Android)</option>
+                        <option value="kali">🐉 Kali Linux</option>
+                        <option value="arch">🦅 Arch Linux</option>
+                        <option value="windows">💻 Windows CMD</option>
+                    </select>
+                </div>
+                <button class="btn btn-outline" style="padding:2px 8px; font-size:0.75rem;" onclick="clearTerm()">Clear</button>
+            </div>
+            
+            <div class="terminal-output" id="term-out"></div>
+            
+            <div style="display:flex; gap:8px; margin-top:8px;">
+                <span style="color:var(--accent-green); font-weight:bold;" id="term-prompt">root@debian:~#</span>
+                <input type="text" style="flex:1; background:transparent; border:none; outline:none;" id="term-input" placeholder="Введите команду (help, cls, dir, neofetch)..." autofocus>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: QUEST HUB WITH PROOFS -->
+    <div id="quest-tab" class="tab-content">
         <div style="display:flex; gap:10px; margin-bottom:15px;">
             <button class="btn btn-main" style="flex:2;" onclick="spinAll()">🎲 ГЕНЕРИРОВАТЬ КВЕСТ</button>
-            <button class="btn btn-green" style="flex:1;" onclick="addXP(100)">✅ ВЫПОЛНЕНО (+100 XP)</button>
+            <button class="btn btn-green" style="flex:1;" onclick="toggleProofModal()">📝 СДАТЬ ДОКАЗАТЕЛЬСТВА</button>
+        </div>
+
+        <!-- ОКНО СДАЧИ ДОКАЗАТЕЛЬСТВ -->
+        <div class="card" id="proof-modal" style="display:none; border: 1px solid var(--accent-green);">
+            <h3 style="color:var(--accent-green); margin-top:0;">📝 Сдача доказательств квеста</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Прикрепи отчет или скриншот того, что задача реально выполнена:</p>
+            
+            <div style="margin-bottom:10px;">
+                <label style="font-size:0.8rem; color:var(--accent);">Текстовый лог / Что было сделано:</label><br>
+                <textarea id="proof-text" rows="3" style="width:100%; box-sizing:border-box; margin-top:4px;" placeholder="Пример: Написал Python скрипт / Выполнил apt update в Termux..."></textarea>
+            </div>
+
+            <div style="margin-bottom:12px;">
+                <label style="font-size:0.8rem; color:var(--accent);">Прикрепить скриншот (необязательно):</label><br>
+                <input type="file" id="proof-file" accept="image/*" onchange="previewProofImg(event)" style="margin-top:4px; font-size:0.8rem;">
+                <div id="proof-img-preview" style="margin-top:8px;"></div>
+            </div>
+
+            <button class="btn btn-green" onclick="submitTaskProof()">✅ ПОДТВЕРДИТЬ И ПОЛУЧИТЬ XP</button>
         </div>
 
         <div class="grid" id="grid"></div>
     </div>
 
-    <!-- TAB 2: VS CODE MONACO -->
+    <!-- TAB 3: GEMINI AI ASSISTANT -->
+    <div id="gemini-tab" class="tab-content">
+        <div class="card">
+            <h3 style="color:var(--accent-purple); margin-top:0;">🤖 Встроенный Gemini AI Ассистент</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Задавай вопросы по коду на 40 языках, Linux командам или проси проверить твои решения!</p>
+            
+            <!-- Поле API Ключа -->
+            <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+                <input type="password" id="gemini-key-input" placeholder="Вставь свой API ключ Gemini (начинается с AQ...)" style="flex:1;">
+                <button class="btn btn-purple" onclick="saveGeminiKey()">Сохранить ключ</button>
+            </div>
+            <div id="key-status" style="font-size:0.8rem; color:var(--text-muted);"></div>
+
+            <!-- Контейнер чата -->
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-msgs">
+                    <div class="chat-msg chat-ai">Привет! Я встроенный ИИ-ассистент Станции. Ключ активирован? Тогда задавай вопрос ниже!</div>
+                </div>
+                <div style="display:flex; gap:8px; margin-top:10px;">
+                    <input type="text" id="chat-input" placeholder="Напиши промпт для Gemini..." style="flex:1;" onkeydown="if(event.key==='Enter') sendGeminiMsg()">
+                    <button class="btn btn-purple" onclick="sendGeminiMsg()">Отправить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 4: MONACO VS CODE -->
     <div id="code-tab" class="tab-content">
-        <div class="card" style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
-            <span>Быстрый Редактор Кода (VS Code Engine)</span>
-            <select id="lang-select" onchange="changeLang()" style="background:#020617; color:var(--text); border:1px solid var(--border); padding:5px; border-radius:4px;">
-                <option value="python">Python</option>
-                <option value="csharp">C#</option>
-                <option value="shell">Bash / Shell</option>
-                <option value="json">JSON</option>
-            </select>
+        <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span>Язык программирования:</span>
+                <select id="lang-select" onchange="changeLang()">
+                    <option value="python" selected>Python</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="c">C</option>
+                    <option value="cpp">C++</option>
+                    <option value="rust">Rust</option>
+                    <option value="csharp">C#</option>
+                    <option value="go">Go</option>
+                    <option value="zig">Zig</option>
+                </select>
+            </div>
+            <a href="https://vscode.dev" target="_blank" class="btn btn-outline">🔗 Полный VS Code (vscode.dev)</a>
         </div>
         <div id="editor-container"></div>
     </div>
 
-    <!-- TAB 3: LINUX & TERMUX HUB -->
+    <!-- TAB 5: BINDS, CHEATSHEET & SHIZUKU (RISH) -->
     <div id="linux-tab" class="tab-content">
-        <div class="card" style="margin-bottom:15px;">
-            <h3 style="color:var(--accent); margin-top:0;">🔥 Полезные Алиасы и Горячие Клавиши (Linux / Termux)</h3>
-            <p style="font-size:0.85rem; color:var(--text-muted);">Добавь это в свой <code>~/.bashrc</code> или <code>~/.zshrc</code> на планшете/ноутбуке:</p>
-            
+        
+        <!-- SHIZUKU / RISH INTEGRATION -->
+        <div class="card" style="border: 1px solid var(--accent-purple);">
+            <h3 style="color:var(--accent-purple); margin-top:0;">📱 Автоматизация через Shizuku (`rish`) в Termux</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted);">
+                Shizuku дает Termux доступ к <strong>ADB (UID 2000)</strong> без Root-прав. Выполняй системные команды, управляй пакетами и правами приложения напрямую!
+            </p>
+
+            <h4 style="color:var(--accent); margin-bottom:6px;">🚀 Шаг 1: Авто-установка `rish` в Termux (Выполнить 1 раз)</h4>
             <div class="code-block">
                 <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-# Быстрые алиасы под работу
-alias cls='clear'
-alias update='pkg update && pkg upgrade -y || sudo apt update && sudo apt upgrade -y'
-alias py='python3'
-alias g='git status'
-alias push='git add . && git commit -m "update" && git push'
-
-# Приветственный кастомный баннер
-echo -e "\e[1;34m====================================\e[0m"
-echo -e "\e[1;32m  WELCOME TO CYBER OS TERMINAL      \e[0m"
-echo -e "\e[1;34m====================================\e[0m"
+pkg update && pkg install curl unzip -y && curl -fL "https://github.com/RikkaApps/Shizuku-API/releases/download/v3.5.0/rish-v3.5.0.zip" -o rish.zip && unzip -o rish.zip && chmod +x rish
             </div>
 
-            <h4 style="color:var(--accent-purple);">⌨️ Горячие клавиши Терминала:</h4>
-            <ul style="font-size:0.85rem; line-height:1.6; color:var(--text-muted);">
-                <li><code>Ctrl + C</code> — Прервать выполнение процесса</li>
-                <li><code>Ctrl + Z</code> — Отправить процесс в фоновый режим</li>
-                <li><code>Ctrl + R</code> — Поиск по истории команд</li>
-                <li><code>Ctrl + L</code> — Очистить экран (аналог clear)</li>
-                <li><code>Tab</code> — Автодополнение команд и путей</li>
-            </ul>
-        </div>
-    </div>
+            <h4 style="color:var(--accent); margin-bottom:6px;">⚡ Шаг 2: Вход в режим ADB Shell</h4>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+./rish
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-muted);">
+                *При первом запуске Shizuku на телефоне покажет всплывающее окно — нажми <strong>«Разрешить всегда»</strong>.
+            </p>
 
-    <!-- TAB 4: CROSS-PLATFORM -->
-    <div id="env-tab" class="tab-content">
+            <h4 style="color:var(--accent-green); margin-bottom:6px;">🔥 Полезные команды в режиме `rish` (ADB):</h4>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+# Посмотреть список всех установленных приложений
+pm list packages
+
+# Заморозить / отключить любое приложение без root
+pm disable-user --user 0 com.example.app
+
+# Выдать любое разрешение приложению
+pm grant com.example.app android.permission.WRITE_SECURE_SETTINGS
+
+# Выключить энергосбережение / ограничения фоновой работы для Termux
+dumpsys deviceidle whitelist +com.termux
+            </div>
+        </div>
+
+        <!-- TERMINAL EXTRA KEYS CONFIG -->
         <div class="card">
-            <h3 style="color:var(--accent); margin-top:0;">💻 Окружения и Эмуляторы</h3>
-            <ul style="font-size:0.85rem; line-height:1.8; color:var(--text-muted);">
-                <li><strong>Android:</strong> Termux + Termux:X11 / AnLinux (для полноценного GUI Linux)</li>
-                <li><strong>Windows (Ноут):</strong> WSL2 (Ubuntu / Debian) + Windows Terminal</li>
-                <li><strong>macOS (Макбук):</strong> Homebrew + iTerm2 / zsh + OrbStack (легкая альтернатива Docker)</li>
-                <li><strong>Локальный сервер:</strong> <code>python3 -m http.server 8080</code> в папке проекта для тестирования без инета.</li>
-            </ul>
+            <h3 style="color:var(--accent); margin-top:0;">⚡ Конфиг клавиш Termux (`termux.properties`)</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted);">
+                Вставляет стрелки, ESC, TAB и CTRL прямо над клавиатурой на смартфоне/планшете:
+            </p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+mkdir -p ~/.termux && echo "extra-keys = [['ESC','|','/','HOME','UP','END','PGUP','DEL'],['TAB','CTRL','ALT','LEFT','DOWN','RIGHT','PGDN','ENTER']]" > ~/.termux/termux.properties && termux-reload-settings
+            </div>
         </div>
-    </div>
 
-<script>
-    // TABS LOGIC
-    function openTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        event.currentTarget.classList.add('active');
-        if(tabId === 'code-tab' && !window.editorInitialized) initMonaco();
-    }
-
-    // MONACO EDITOR (VS CODE)
-    let editor;
-    function initMonaco() {
-        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs' }});
-        require(['vs/editor/editor.main'], function() {
-            editor = monaco.editor.create(document.getElementById('editor-container'), {
-                value: "# Напиши или вставь свой Python / C# скрипт сюда\nprint('Command Station Active!')",
-                language: 'python',
-                theme: 'vs-dark',
-                automaticLayout: true
-            });
-            window.editorInitialized = true;
-        });
-    }
-
-    function changeLang() {
-        const lang = document.getElementById('lang-select').value;
-        if(editor) monaco.editor.setModelLanguage(editor.getModel(), lang);
-    }
-
-    function copyCode(btn) {
-        const code = btn.parentElement.innerText.replace('Copy', '').trim();
-        navigator.clipboard.writeText(code);
-        btn.innerText = 'Copied!';
-        setTimeout(() => btn.innerText = 'Copy', 2000);
-    }
-
-    // QUEST HUB DATA & LOGIC
-    const defaultData = [
-        { title: "1. Направление", options: ["Польский бытовой", "Английский IT", "C# Кодинг", "Python / Скрипты", "Termux / Linux", "Тест софта", "Бытовуха", "Зарядка / Спорт", "Гейминг / Отдых", "Логическая задача"] },
-        { title: "2. Софт / Решение", options: ["Скачать новое прил.", "Использовать старое", "Написать свой C# скрипт", "Написать Python бот", "Web-версия", "Консоль / Termux", "Open-Source (GitHub)", "Удалить лишний софт", "Заметки на бумаге", "Без софта"] },
-        { title: "3. Формат работы", options: ["Спринт 15 мин", "Помодоро 25/5", "Глубокий погруз (1ч)", "Фоновый режим", "Карточки / Игровой", "Практика с планшета", "Теория + Конспект", "Пошаговый туториал", "Оффлайн", "Законченный мини-проект"] },
-        { title: "4. Бытовой бонус", options: ["Заварить чай/кофе", "Включить Lo-Fi", "Порядок на столе", "Зарядка для глаз", "Проветрить комнату", "Прогулка 10 мин", "Узнать 3 факта", "Мини-отчет", "Режим «Не беспокоить»", "Вкусный перекус"] },
-        { title: "5. Хардкор условие", options: ["Интерфейс на польском/англ", "Без мыши (хоткеи)", "Минимализм ресурсов", "100% фокус (без соцсетей)", "Объяснить как ребенку", "Без Гугла (из головы)", "Побить рекорд времени", "В 2 раза быстрее", "Логировать каждый шаг", "Сменить обстановку"] },
-        { title: "6. Награда (Джекпот)", options: ["+1 час к геймингу", "Просмотр серии", "Вкусняшка", "Отдых 2 часа", "Мелкий ништяк в корзину", "Свободный выбор", "Оффлайн на вечер", "Респект себе", "Гаджет в wishlist", "Двойной XP дня"] }
-    ];
-
-    let currentData = JSON.parse(localStorage.getItem('cyber_hub_data')) || defaultData;
-    let userXP = parseInt(localStorage.getItem('cyber_hub_xp')) || 0;
-
-    function updateXPUI() {
-        const lvl = Math.floor(userXP / 500) + 1;
-        const pct = ((userXP % 500) / 500) * 100;
-        document.getElementById('lvl-txt').innerText = `LVL ${lvl}`;
-        document.getElementById('xp-txt').innerText = `${userXP} XP`;
-        document.getElementById('xp-fill').style.width = `${pct}%`;
-        localStorage.setItem('cyber_hub_xp', userXP);
-    }
-
-    function addXP(amt) { userXP += amt; updateXPUI(); }
-
-    function renderCards() {
-        const grid = document.getElementById('grid');
-        grid.innerHTML = '';
-        currentData.forEach((item, i) => {
-            grid.innerHTML += `<div class="card">
-                <div style="font-size:0.75rem; color:var(--accent-purple); font-weight:bold;">${item.title}</div>
-                <div class="slot" id="slot-${i}">[ READY ]</div>
-                <button class="btn" style="background:var(--border); color:var(--text); width:100%; font-size:0.8rem;" onclick="spinSingle(${i})">Крутить</button>
-            </div>`;
-        });
-    }
-
-    function spinSingle(i) {
-        const slot = document.getElementById(`slot-${i}`);
-        const opts = currentData[i].options;
-        let count = 0;
-        const timer = setInterval(() => {
-            slot.innerText = opts[Math.floor(Math.random() * opts.length)];
-            if(++count >= 15) { clearInterval(timer); slot.innerText = opts[Math.floor(Math.random() * opts.length)]; }
-        }, 50);
-    }
-
-    function spinAll() { currentData.forEach((_, i) => setTimeout(() => spinSingle(i), i * 70)); }
-
-    renderCards();
-    updateXPUI();
-</script>
-</body>
-</html>
+        <!-- QUICK LINUX CHEATSHEET -->
+        <div class="card">
+            <h3 style="color:var(--accent-green); margin-top:0;">📚 Шпаргалка по полезным командам Linux / Termux</h3>
+            <div style="font-size:0.85rem; line-height:1.6;">
+                • <code>pkg install ttyd</code> — веб-транслятор терминала в браузер.<br>
+                • <code>termux-setup-storage</code> — доступ к памяти телефона (/sdcard).<br>
+                • <code>proot-distro install debian</code> — полноценный Debian внутри Termux.<br>
+                •
