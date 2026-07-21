@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER OS // COMMAND STATION v2.0</title>
+    <!-- Подключаем стили и Monaco Editor (VS Code Engine) -->
+    <style>
+        :root {
+            --bg: #090d16;
+            --panel: #131b2e;
+            --border: #1e293b;
+            --accent: #38bdf8;
+            --accent-green: #22c55e;
+            --accent-purple: #a855f7;
+            --text: #f8fafc;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace, system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* TABS NAV */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+            border-color: var(--accent);
+            background: #0f172a;
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* HEADER */
+        .header {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .xp-bar-bg {
+            background: #020617;
+            border: 1px solid var(--border);
+            height: 8px;
+            border-radius: 4px;
+            width: 140px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .xp-bar-fill {
+            background: linear-gradient(90deg, var(--accent), var(--accent-purple));
+            height: 100%;
+            width: 0%;
+        }
+
+        /* GRID & CARDS */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 10px;
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .slot {
+            background: #020617;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 8px;
+            font-weight: bold;
+            color: var(--accent);
+            margin: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-main { background: #0284c7; color: #fff; }
+        .btn-green { background: var(--accent-green); color: #020617; }
+
+        /* VS CODE CONTAINER */
+        #editor-container {
+            height: 500px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* LINUX CHEATS & BINDS */
+        .code-block {
+            background: #020617;
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #22c55e;
+            position: relative;
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 5px; right: 5px;
+            background: var(--border);
+            color: var(--text);
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+    </style>
+    <!-- Monaco Editor Script (VS Code Web) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
+</head>
+<body>
+
+    <!-- NAV TABS -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="openTab('quest-tab')">🎡 Quest Hub</button>
+        <button class="tab-btn" onclick="openTab('code-tab')">💻 VS Code (Monaco)</button>
+        <button class="tab-btn" onclick="openTab('linux-tab')">🐧 Linux & Termux Binds</button>
+        <button class="tab-btn" onclick="openTab('env-tab')">📱 Cross-Platform Setup</button>
+    </div>
+
+    <!-- TAB 1: QUEST HUB -->
+    <div id="quest-tab" class="tab-content active">
+        <div class="header">
+            <div>
+                <strong style="color:var(--accent);">CYBER COMMAND CENTER</strong>
+                <div style="font-size:0.8rem; color:var(--text-muted);">CROSS-PLATFORM ENGINE</div>
+            </div>
+            <div>
+                <span id="lvl-txt">LVL 1</span> | <span id="xp-txt" style="color:var(--accent);">0 XP</span>
+                <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-fill"></div></div>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <button class="btn btn-main" style="flex:2;" onclick="spinAll()">🎲 ГЕНЕРИРОВАТЬ КВЕСТ</button>
+            <button class="btn btn-green" style="flex:1;" onclick="addXP(100)">✅ ВЫПОЛНЕНО (+100 XP)</button>
+        </div>
+
+        <div class="grid" id="grid"></div>
+    </div>
+
+    <!-- TAB 2: VS CODE MONACO -->
+    <div id="code-tab" class="tab-content">
+        <div class="card" style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+            <span>Быстрый Редактор Кода (VS Code Engine)</span>
+            <select id="lang-select" onchange="changeLang()" style="background:#020617; color:var(--text); border:1px solid var(--border); padding:5px; border-radius:4px;">
+                <option value="python">Python</option>
+                <option value="csharp">C#</option>
+                <option value="shell">Bash / Shell</option>
+                <option value="json">JSON</option>
+            </select>
+        </div>
+        <div id="editor-container"></div>
+    </div>
+
+    <!-- TAB 3: LINUX & TERMUX HUB -->
+    <div id="linux-tab" class="tab-content">
+        <div class="card" style="margin-bottom:15px;">
+            <h3 style="color:var(--accent); margin-top:0;">🔥 Полезные Алиасы и Горячие Клавиши (Linux / Termux)</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Добавь это в свой <code>~/.bashrc</code> или <code>~/.zshrc</code> на планшете/ноутбуке:</p>
+            
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+# Быстрые алиасы под работу
+alias cls='clear'
+alias update='pkg update && pkg upgrade -y || sudo apt update && sudo apt upgrade -y'
+alias py='python3'
+alias g='git status'
+alias push='git add . && git commit -m "update" && git push'
+
+# Приветственный кастомный баннер
+echo -e "\e[1;34m====================================\e[0m"
+echo -e "\e[1;32m  WELCOME TO CYBER OS TERMINAL      \e[0m"
+echo -e "\e[1;34m====================================\e[0m"
+            </div>
+
+            <h4 style="color:var(--accent-purple);">⌨️ Горячие клавиши Терминала:</h4>
+            <ul style="font-size:0.85rem; line-height:1.6; color:var(--text-muted);">
+                <li><code>Ctrl + C</code> — Прервать выполнение процесса</li>
+                <li><code>Ctrl + Z</code> — Отправить процесс в фоновый режим</li>
+                <li><code>Ctrl + R</code> — Поиск по истории команд</li>
+                <li><code>Ctrl + L</code> — Очистить экран (аналог clear)</li>
+                <li><code>Tab</code> — Автодополнение команд и путей</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- TAB 4: CROSS-PLATFORM -->
+    <div id="env-tab" class="tab-content">
+        <div class="card">
+            <h3 style="color:var(--accent); margin-top:0;">💻 Окружения и Эмуляторы</h3>
+            <ul style="font-size:0.85rem; line-height:1.8; color:var(--text-muted);">
+                <li><strong>Android:</strong> Termux + Termux:X11 / AnLinux (для полноценного GUI Linux)</li>
+                <li><strong>Windows (Ноут):</strong> WSL2 (Ubuntu / Debian) + Windows Terminal</li>
+                <li><strong>macOS (Макбук):</strong> Homebrew + iTerm2 / zsh + OrbStack (легкая альтернатива Docker)</li>
+                <li><strong>Локальный сервер:</strong> <code>python3 -m http.server 8080</code> в папке проекта для тестирования без инета.</li>
+            </ul>
+        </div>
+    </div>
+
+<script>
+    // TABS LOGIC
+    function openTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+        if(tabId === 'code-tab' && !window.editorInitialized) initMonaco();
+    }
+
+    // MONACO EDITOR (VS CODE)
+    let editor;
+    function initMonaco() {
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs' }});
+        require(['vs/editor/editor.main'], function() {
+            editor = monaco.editor.create(document.getElementById('editor-container'), {
+                value: "# Напиши или вставь свой Python / C# скрипт сюда\nprint('Command Station Active!')",
+                language: 'python',
+                theme: 'vs-dark',
+                automaticLayout: true
+            });
+            window.editorInitialized = true;
+        });
+    }
+
+    function changeLang() {
+        const lang = document.getElementById('lang-select').value;
+        if(editor) monaco.editor.setModelLanguage(editor.getModel(), lang);
+    }
+
+    function copyCode(btn) {
+        const code = btn.parentElement.innerText.replace('Copy', '').trim();
+        navigator.clipboard.writeText(code);
+        btn.innerText = 'Copied!';
+        setTimeout(() => btn.innerText = 'Copy', 2000);
+    }
+
+    // QUEST HUB DATA & LOGIC
+    const defaultData = [
+        { title: "1. Направление", options: ["Польский бытовой", "Английский IT", "C# Кодинг", "Python / Скрипты", "Termux / Linux", "Тест софта", "Бытовуха", "Зарядка / Спорт", "Гейминг / Отдых", "Логическая задача"] },
+        { title: "2. Софт / Решение", options: ["Скачать новое прил.", "Использовать старое", "Написать свой C# скрипт", "Написать Python бот", "Web-версия", "Консоль / Termux", "Open-Source (GitHub)", "Удалить лишний софт", "Заметки на бумаге", "Без софта"] },
+        { title: "3. Формат работы", options: ["Спринт 15 мин", "Помодоро 25/5", "Глубокий погруз (1ч)", "Фоновый режим", "Карточки / Игровой", "Практика с планшета", "Теория + Конспект", "Пошаговый туториал", "Оффлайн", "Законченный мини-проект"] },
+        { title: "4. Бытовой бонус", options: ["Заварить чай/кофе", "Включить Lo-Fi", "Порядок на столе", "Зарядка для глаз", "Проветрить комнату", "Прогулка 10 мин", "Узнать 3 факта", "Мини-отчет", "Режим «Не беспокоить»", "Вкусный перекус"] },
+        { title: "5. Хардкор условие", options: ["Интерфейс на польском/англ", "Без мыши (хоткеи)", "Минимализм ресурсов", "100% фокус (без соцсетей)", "Объяснить как ребенку", "Без Гугла (из головы)", "Побить рекорд времени", "В 2 раза быстрее", "Логировать каждый шаг", "Сменить обстановку"] },
+        { title: "6. Награда (Джекпот)", options: ["+1 час к геймингу", "Просмотр серии", "Вкусняшка", "Отдых 2 часа", "Мелкий ништяк в корзину", "Свободный выбор", "Оффлайн на вечер", "Респект себе", "Гаджет в wishlist", "Двойной XP дня"] }
+    ];
+
+    let currentData = JSON.parse(localStorage.getItem('cyber_hub_data')) || defaultData;
+    let userXP = parseInt(localStorage.getItem('cyber_hub_xp')) || 0;
+
+    function updateXPUI() {
+        const lvl = Math.floor(userXP / 500) + 1;
+        const pct = ((userXP % 500) / 500) * 100;
+        document.getElementById('lvl-txt').innerText = `LVL ${lvl}`;
+        document.getElementById('xp-txt').innerText = `${userXP} XP`;
+        document.getElementById('xp-fill').style.width = `${pct}%`;
+        localStorage.setItem('cyber_hub_xp', userXP);
+    }
+
+    function addXP(amt) { userXP += amt; updateXPUI(); }
+
+    function renderCards() {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        currentData.forEach((item, i) => {
+            grid.innerHTML += `<div class="card">
+                <div style="font-size:0.75rem; color:var(--accent-purple); font-weight:bold;">${item.title}</div>
+                <div class="slot" id="slot-${i}">[ READY ]</div>
+                <button class="btn" style="background:var(--border); color:var(--text); width:100%; font-size:0.8rem;" onclick="spinSingle(${i})">Крутить</button>
+            </div>`;
+        });
+    }
+
+    function spinSingle(i) {
+        const slot = document.getElementById(`slot-${i}`);
+        const opts = currentData[i].options;
+        let count = 0;
+        const timer = setInterval(() => {
+            slot.innerText = opts[Math.floor(Math.random() * opts.length)];
+            if(++count >= 15) { clearInterval(timer); slot.innerText = opts[Math.floor(Math.random() * opts.length)]; }
+        }, 50);
+    }
+
+    function spinAll() { currentData.forEach((_, i) => setTimeout(() => spinSingle(i), i * 70)); }
+
+    renderCards();
+    updateXPUI();
+</script>
+</body>
+</html>
