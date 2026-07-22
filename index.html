@@ -4,304 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CYBER COMMAND STATION v4.0 PRO</title>
+    <link rel="stylesheet" href="styles_2.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>eruda.init();</script>
-    <style>
-        :root {
-            --bg: #090d16;
-            --card-bg: #0f172a;
-            --text: #e2e8f0;
-            --text-muted: #94a3b8;
-            --accent: #38bdf8;
-            --accent-green: #22c55e;
-            --accent-purple: #a855f7;
-            --border: #1e293b;
-        }
-
-        [data-theme="matrix"] {
-            --bg: #020617;
-            --card-bg: #05160f;
-            --text: #4ade80;
-            --text-muted: #166534;
-            --accent: #22c55e;
-            --accent-green: #10b981;
-            --accent-purple: #14b8a6;
-            --border: #064e3b;
-        }
-
-        [data-theme="dracula"] {
-            --bg: #1e1e2e;
-            --card-bg: #282a36;
-            --text: #f8f8f2;
-            --text-muted: #6272a4;
-            --accent: #ff79c6;
-            --accent-green: #50fa7b;
-            --accent-purple: #bd93f9;
-            --border: #44475a;
-        }
-
-        [data-theme="nord"] {
-            --bg: #2e3440;
-            --card-bg: #3b4252;
-            --text: #eceff4;
-            --text-muted: #d8dee9;
-            --accent: #88c0d0;
-            --accent-green: #a3be8c;
-            --accent-purple: #b48ead;
-            --border: #4c566a;
-        }
-
-        /* ИСПРАВЛЕНИЕ ДЛЯ ПЛАНШЕТОВ И КНОПОК ANDROID */
-        body {
-            font-family: 'JetBrains Mono', Consolas, monospace, system-ui;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 10px;
-            padding-bottom: 85px; /* 👈 Поднимает весь контент выше системных кнопок */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100dvh; /* 👈 Динамическая высота экрана под панели */
-            box-sizing: border-box;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            width: 100%;
-            max-width: 1100px;
-            box-sizing: border-box;
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 6px;
-            overflow-x: auto;
-            width: 100%;
-            max-width: 1100px;
-            padding-bottom: 8px;
-            margin-bottom: 15px;
-        }
-
-        .tab-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            white-space: nowrap;
-            font-family: inherit;
-            font-size: 0.85rem;
-        }
-
-        .tab-btn.active {
-            color: var(--accent);
-            border-color: var(--accent);
-            background: rgba(56, 189, 248, 0.1);
-        }
-
-        .tab-content {
-            display: none;
-            width: 100%;
-            max-width: 1100px;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            width: 100%;
-            max-width: 1100px;
-            margin-bottom: 15px;
-            background: var(--card-bg);
-            padding: 12px 15px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            box-sizing: border-box;
-        }
-
-        .header-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        select, input, textarea {
-            background: var(--bg);
-            color: var(--text);
-            border: 1px solid var(--border);
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-family: inherit;
-            outline: none;
-        }
-
-        .btn {
-            background: transparent;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 6px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: inherit;
-            font-weight: bold;
-        }
-
-        .btn-main { background: var(--accent); color: var(--bg); }
-        .btn-green { border-color: var(--accent-green); color: var(--accent-green); }
-        .btn-purple { border-color: var(--accent-purple); color: var(--accent-purple); }
-        .btn-outline { border-color: var(--border); color: var(--text-muted); }
-
-        .terminal-container {
-            background: #020617;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 15px;
-            font-family: monospace;
-        }
-
-        .terminal-output {
-            height: 250px;
-            overflow-y: auto;
-            color: var(--accent-green);
-            font-size: 0.9rem;
-            white-space: pre-wrap;
-            margin-bottom: 10px;
-        }
-
-        .code-block {
-            background: #020617;
-            border: 1px solid var(--border);
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            position: relative;
-            margin: 8px 0;
-            overflow-x: auto;
-        }
-
-        .copy-btn {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            background: var(--border);
-            border: none;
-            color: var(--text);
-            font-size: 0.7rem;
-            padding: 3px 6px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .floating-menu {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            z-index: 1000;
-        }
-
-        .floating-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--accent);
-            color: var(--bg);
-            border: none;
-            font-size: 1.4rem;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-        }
-
-        .admin-panel {
-            position: fixed;
-            bottom: 85px;
-            right: 25px;
-            width: 300px;
-            background: var(--card-bg);
-            border: 1px solid var(--accent);
-            border-radius: 8px;
-            padding: 15px;
-            z-index: 1000;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
-            display: none;
-        }
-
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 8px;
-            margin-bottom: 10px;
-            color: var(--accent);
-            font-weight: bold;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-        }
-
-        .xp-bar-bg, .token-bar-bg {
-            width: 120px;
-            height: 6px;
-            background: var(--bg);
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 4px;
-        }
-
-        .xp-bar-fill { height: 100%; background: var(--accent); width: 10%; }
-        .token-bar-fill { height: 100%; background: var(--accent-purple); width: 0%; }
-
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            height: 300px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 10px;
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            font-size: 0.85rem;
-        }
-
-        .chat-msg {
-            margin-bottom: 8px;
-            padding: 6px 10px;
-            border-radius: 6px;
-        }
-
-        .chat-ai {
-            background: rgba(168, 85, 247, 0.1);
-            border-left: 3px solid var(--accent-purple);
-        }
-
-        #editor-container {
-            width: 100%;
-            height: 500px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
-    </style>
 </head>
 <body>
 
@@ -316,19 +22,19 @@
             <span>🔧 СИСТЕМА</span>
             <button onclick="toggleAdminPanel()" style="background:none; border:none; color:var(--accent); cursor:pointer; font-size:1.2rem;">✕</button>
         </div>
-        <div id="admin-content"></div>
+        <div id="admin-content" class="admin-content"></div>
     </div>
 
     <!-- NAV TABS -->
     <div class="nav-tabs">
-        <button class="tab-btn active" onclick="openTab('terminal-tab')">📟 Web Shell</button>
-        <button class="tab-btn" onclick="openTab('quest-tab')">🎡 Quest Hub</button>
-        <button class="tab-btn" onclick="openTab('gemini-tab')">🤖 Gemini AI</button>
-        <button class="tab-btn" onclick="openTab('code-tab')">💻 VS Code</button>
-        <button class="tab-btn" onclick="openTab('linux-tab')">📱 Shizuku</button>
-        <button class="tab-btn" onclick="openTab('market-tab')">🛍️ Market</button>
-        <button class="tab-btn" onclick="openTab('vault-tab')">📦 Script Vault</button>
-        <button class="tab-btn" onclick="openTab('radio-tab')">🎵 Radio</button>
+        <button class="tab-btn active" onclick="openTab('terminal-tab', event)">📟 Web Shell</button>
+        <button class="tab-btn" onclick="openTab('quest-tab', event)">🎡 Quest Hub</button>
+        <button class="tab-btn" onclick="openTab('gemini-tab', event)">🤖 Gemini AI</button>
+        <button class="tab-btn" onclick="openTab('code-tab', event)">💻 VS Code</button>
+        <button class="tab-btn" onclick="openTab('linux-tab', event)">📱 Shizuku</button>
+        <button class="tab-btn" onclick="openTab('market-tab', event)">🛍️ Market</button>
+        <button class="tab-btn" onclick="openTab('vault-tab', event)">📦 Script Vault</button>
+        <button class="tab-btn" onclick="openTab('radio-tab', event)">🎵 Radio</button>
     </div>
 
     <!-- HEADER -->
@@ -380,7 +86,7 @@
                 <button class="btn btn-outline" style="padding:2px 8px; font-size:0.75rem;" onclick="clearTerm()">Clear</button>
             </div>
             
-            <div class="terminal-output" id="term-out">Cyber OS v4.0 Shell initialized. Type 'help' for available commands.\n</div>
+            <div class="terminal-output" id="term-out">Cyber OS v4.0 Shell initialized. Type 'help' for available commands.&#10;</div>
             
             <div style="display:flex; gap:8px;">
                 <span style="color:var(--accent-green); font-weight:bold;" id="term-prompt">root@debian:~#</span>
@@ -516,4 +222,61 @@ mkdir -p ~/.termux && echo "extra-keys = [['ESC','|','/','HOME','UP','END','PGUP
     <!-- TAB 8: RADIO & POMODORO -->
     <div id="radio-tab" class="tab-content">
         <div class="card">
-            <h3 style="color:#a855f7; ma
+            <h3 style="color:#a855f7; margin-top:0;">🎵 Cyber Radio & Pomodoro</h3>
+            
+            <div style="margin-bottom: 20px;">
+                <h4 style="color:var(--accent);">📻 Радиостанции</h4>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                    <button class="btn btn-purple" onclick="playRadio('lofi')">🎧 Lo-Fi Chill</button>
+                    <button class="btn btn-main" onclick="playRadio('synthwave')">⚡ Synthwave</button>
+                    <button class="btn btn-green" onclick="playRadio('darksynth')">☣️ Darksynth</button>
+                    <button class="btn btn-outline" onclick="stopRadio()">⏹ Стоп</button>
+                </div>
+                <audio id="audio-player" style="width:100%; height:32px; display:none;" controls></audio>
+            </div>
+
+            <div style="border-top:1px solid var(--border); padding-top:15px;">
+                <h4 style="color:var(--accent);">⏱️ Pomodoro Таймер</h4>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                    <label style="font-size:0.85rem;">Минуты:</label>
+                    <input type="number" id="pomodoro-min" value="25" min="1" max="120" style="width:70px;">
+                    <button class="btn btn-main" onclick="startPomodoro()">▶ Старт</button>
+                    <button class="btn btn-outline" onclick="pausePomodoro()">⏸ Пауза</button>
+                    <button class="btn btn-outline" onclick="resetPomodoro()">🔄 Сброс</button>
+                </div>
+                
+                <div style="text-align:center; margin:15px 0;">
+                    <div id="pomodoro-display" style="font-size:2.5rem; font-weight:bold; color:var(--accent-purple);">25:00</div>
+                </div>
+                
+                <div class="xp-bar-bg" style="width:100%; height:10px;">
+                    <div class="xp-bar-fill" id="pomodoro-bar" style="width:0%; background:var(--accent-purple);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS LINKING & INIT -->
+    <script src="admin-panel_2.js"></script>
+    <script src="App_2.js"></script>
+    <script src="features_2.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('cyber_theme') || localStorage.getItem('theme') || 'cyberpunk';
+            changeTheme(savedTheme);
+            
+            const savedStats = localStorage.getItem('stats');
+            if (savedStats) {
+                try {
+                    const parsed = JSON.parse(savedStats);
+                    appState.level = parsed.level || 1;
+                    appState.xp = parsed.xp || 0;
+                    appState.coins = parsed.coins || 0;
+                } catch(e){}
+            }
+            updateStatsUI();
+            initMonaco();
+        });
+    </script>
+</body>
+</html>
