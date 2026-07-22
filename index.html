@@ -3,43 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER OS || BRUTAL V4.2</title>
+    <title>CYBER OS || BRUTAL V4.5</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="styles.css">
     
-    <!-- Мобильная консоль Eruda для дебага на Android -->
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>eruda.init();</script>
 </head>
 <body>
     <div class="crt-overlay"></div>
 
-    <!-- КНОПКА ВЫЗОВА АДМИНКИ -->
     <button class="floating-btn brutal-box-sm" onclick="AdminCore.toggle()">[SYS_CORE]</button>
 
-    <!-- ОТДЕЛЬНЫЙ МОДУЛЬ: АДМИН ПАНЕЛЬ -->
+    <!-- ADMIN PANEL -->
     <div id="admin-panel" class="admin-panel brutal-box">
         <div class="admin-header">
-            <span>// ADMIN_CORE_V4</span>
+            <span>// ADMIN_CORE_V4.5</span>
             <button onclick="AdminCore.toggle()" class="btn brutal-box-sm">X</button>
         </div>
         <div class="admin-body">
             <div class="admin-section">
-                <div class="admin-title">SYSTEM METRICS</div>
+                <div class="admin-title" data-i18n="sys_metrics">SYSTEM METRICS</div>
+                <div class="metric-line"><span>UPTIME:</span> <span id="sys-uptime">00:00:00</span></div>
                 <div class="metric-line"><span>CPU LOAD:</span> <span id="sys-cpu">12%</span></div>
                 <div class="metric-line"><span>RAM USAGE:</span> <span id="sys-ram">342MB / 1024MB</span></div>
-                <div class="metric-line"><span>NET TRAFFIC:</span> <span id="sys-net">1.2 KB/s</span></div>
             </div>
-
             <div class="admin-section">
-                <div class="admin-title">QUICK ACTIONS</div>
-                <button class="btn btn-main brutal-box-sm style-full" onclick="AdminCore.addXP(50)">+50 XP BOOST</button>
-                <button class="btn btn-green brutal-box-sm style-full" onclick="AdminCore.exportConfig()">EXPORT CONFIG (JSON)</button>
-                <button class="btn brutal-box-sm style-full" style="color:#ef4444; border-color:#ef4444;" onclick="AdminCore.hardReset()">HARD RESET OS</button>
+                <div class="admin-title" data-i18n="quick_actions">QUICK ACTIONS</div>
+                <button class="btn btn-green brutal-box-sm style-full" onclick="AdminCore.exportConfig()" data-i18n="export_cfg">EXPORT CONFIG</button>
+                <button class="btn brutal-box-sm style-full" style="color:#ef4444; border-color:#ef4444;" onclick="AdminCore.hardReset()" data-i18n="hard_reset">HARD RESET</button>
             </div>
         </div>
     </div>
@@ -50,32 +45,29 @@
             <div class="status-indicator"></div>
             <div>
                 <h1 style="margin:0; font-size: 1.1rem; text-transform: uppercase;">Cyber Command OS</h1>
-                <div style="font-size:0.65rem; color:var(--text-muted);">MODULAR EDITION // V4.2</div>
+                <div id="sys-clock" style="font-size:0.65rem; color:var(--text-muted); font-weight: bold;">00:00:00</div>
             </div>
         </div>
-        
         <div class="header-controls">
+            <select id="lang-select" class="brutal-input" onchange="App.setLanguage(this.value)">
+                <option value="ru">RU</option>
+                <option value="en">EN</option>
+            </select>
             <select id="theme-select" class="brutal-input" onchange="App.changeTheme()">
                 <option value="cyberpunk">VOID_DARK</option>
                 <option value="matrix">TOXIC_GREEN</option>
                 <option value="dracula">BLOOD_PURPLE</option>
             </select>
-
-            <div class="stats-badge brutal-box-sm">
-                <span id="lvl-txt">LVL 1</span>
-                <span id="xp-txt" style="color: var(--accent);">0 XP</span>
-            </div>
         </div>
     </header>
 
     <!-- NAV TABS -->
     <nav class="nav-tabs">
-        <button class="tab-btn active brutal-box-sm" onclick="App.openTab('terminal-tab', event)">[SHELL]</button>
-        <button class="tab-btn brutal-box-sm" onclick="App.openTab('gemini-tab', event)">[AI_CORE]</button>
-        <button class="tab-btn brutal-box-sm" onclick="App.openTab('code-tab', event)">[CODE]</button>
+        <button class="tab-btn active brutal-box-sm" onclick="App.openTab('terminal-tab', event)" data-i18n="tab_shell">[SHELL]</button>
+        <button class="tab-btn brutal-box-sm" onclick="App.openTab('vscode-tab', event)">[VS_CODE]</button>
+        <button class="tab-btn brutal-box-sm" onclick="App.openTab('plugins-tab', event)" data-i18n="tab_plugins">[PLUGINS]</button>
+        <button class="tab-btn brutal-box-sm" onclick="App.openTab('chef-tab', event)">[CYBER_CHEF]</button>
         <button class="tab-btn brutal-box-sm" onclick="App.openTab('vault-tab', event)">[VAULT]</button>
-        <button class="tab-btn brutal-box-sm" onclick="App.openTab('linux-tab', event)">[TERMUX]</button>
-        <button class="tab-btn brutal-box-sm" onclick="App.openTab('dev-console-tab', event)" style="color: #ef4444; border-color: #ef4444;">[SYS_LOGS]</button>
     </nav>
 
     <!-- TAB 1: SHELL -->
@@ -84,101 +76,66 @@
             <div class="terminal-header">
                 <span style="font-weight: 800; color: var(--accent);">>_ ROOT_TERMINAL</span>
                 <select id="os-preset-select" onchange="App.changeOSPreset()" class="brutal-input" style="padding: 2px 5px; height: auto;">
-                    <option value="windows">Win11 CMD</option>
                     <option value="termux">Termux / Android</option>
+                    <option value="windows">Win11 CMD</option>
                     <option value="debian">Debian Linux</option>
                 </select>
             </div>
-            
-            <div class="terminal-output" id="term-out">SYSTEM_INITIALIZED... READY FOR INPUT.&#10;Type 'help' or 'vault' for commands.&#10;</div>
-            
+            <div class="terminal-output" id="term-out">SYSTEM_INITIALIZED... READY.&#10;</div>
             <div class="terminal-input-line">
-                <span id="term-prompt">C:\System32></span>
-                <input type="text" id="term-input" class="brutal-input" style="flex:1;" onkeydown="App.handleTermInput(event)" placeholder="cmd..." autofocus>
+                <span id="term-prompt">~$</span>
+                <input type="text" id="term-input" class="brutal-input" style="flex:1;" onkeydown="App.handleTermInput(event)" autofocus>
             </div>
         </div>
     </main>
 
-    <!-- TAB 2: AI CORE -->
-    <main id="gemini-tab" class="tab-content">
+    <!-- TAB 2: VS CODE -->
+    <main id="vscode-tab" class="tab-content">
+        <div class="brutal-box" style="padding: 0; height: 78vh; overflow: hidden; background: #000;">
+            <iframe src="https://stackblitz.com/edit/web-platform?embed=1&file=index.html&theme=dark" style="width: 100%; height: 100%; border: none;"></iframe>
+        </div>
+    </main>
+
+    <!-- TAB 3: DYNAMIC PLUGINS (NEW) -->
+    <main id="plugins-tab" class="tab-content">
         <div class="brutal-box">
-            <h3 style="margin-top: 0; color: var(--accent-purple);">// NEURAL LINK</h3>
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <input type="password" id="gemini-key-input" class="brutal-input" placeholder="INSERT_API_KEY..." style="flex:1;">
-                <button class="btn btn-purple brutal-box-sm" onclick="App.saveGeminiKey()">LINK</button>
+            <h3 style="margin-top: 0; color: var(--accent);" data-i18n="plugins_title">// EXTERNAL_MODULES_INJECTOR</h3>
+            
+            <div class="brutal-input" style="padding: 15px; margin-bottom: 15px; background: rgba(0,0,0,0.5);">
+                <p style="margin-top:0; font-size:0.8rem; color:var(--text-muted);">Введи прямой URL на внешний JS-файл для инжекта в систему.</p>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="plugin-url" class="brutal-input" placeholder="https://cdn.jsdelivr.net/npm/..." style="flex:1;">
+                    <button class="btn btn-main brutal-box-sm" onclick="App.injectExternalPlugin()">INJECT</button>
+                </div>
             </div>
 
-            <div class="chat-container">
-                <div class="chat-messages" id="chat-msgs">
-                    <div style="color: var(--accent-purple);">> NEURAL_LINK_ESTABLISHED. Awaiting query...</div>
-                </div>
-                <div style="display:flex; gap:10px; margin-top: 10px;">
-                    <input type="text" id="chat-input" class="brutal-input" placeholder="Query..." style="flex:1;" onkeydown="if(event.key==='Enter') App.sendGeminiMsg()">
-                    <button class="btn btn-purple brutal-box-sm" onclick="App.sendGeminiMsg()">EXEC</button>
-                </div>
+            <div id="active-plugins" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                <!-- Сюда будут падать установленные плагины -->
             </div>
         </div>
     </main>
 
-    <!-- TAB 3: CODE -->
-    <main id="code-tab" class="tab-content">
-        <div class="brutal-box" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
-            <select id="lang-select" class="brutal-input" onchange="App.changeLang()">
-                <option value="python">Python</option>
-                <option value="javascript">JavaScript</option>
-                <option value="rust">Rust</option>
-            </select>
-            <button class="btn btn-main brutal-box-sm" onclick="App.initMonacoDelayed()">LOAD_EDITOR_ENGINE</button>
-        </div>
-        <div id="editor-container" class="brutal-box" style="height: 380px; padding: 0; background: #000; display: flex; align-items: center; justify-content: center;">
-            <div style="color: var(--text-muted);">Editor offline. Click LOAD_EDITOR_ENGINE to initialize.</div>
+    <!-- TAB 4: CYBERCHEF -->
+    <main id="chef-tab" class="tab-content">
+        <div class="brutal-box" style="padding: 0; height: 78vh; overflow: hidden; background: #000;">
+            <iframe src="https://gchq.github.io/CyberChef/" style="width: 100%; height: 100%; border: none;"></iframe>
         </div>
     </main>
 
-    <!-- TAB 4: VAULT -->
+    <!-- TAB 5: VAULT -->
     <main id="vault-tab" class="tab-content">
         <div class="brutal-box">
             <h3 style="margin-top: 0; color: var(--accent-green);">// SCRIPT_VAULT</h3>
             <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
-                <input type="text" id="script-name" class="brutal-input" placeholder="Alias (e.g. SIGMA_PROJECT)" style="flex:1; min-width: 150px;">
-                <input type="text" id="script-path" class="brutal-input" placeholder="Path: D:\HARVESTER.py" style="flex:2; min-width: 200px;">
+                <input type="text" id="script-name" class="brutal-input" placeholder="Alias" value="SIGMA_PROJECT" style="flex:1; min-width: 120px;">
+                <input type="text" id="script-path" class="brutal-input" placeholder="Path" value="C:\Users\oksen\OneDrive\CYBER_TOOLS\SIGMA_PROJECT" style="flex:2; min-width: 250px;">
                 <button class="btn btn-green brutal-box-sm" onclick="App.addScript()">ADD</button>
             </div>
             <div id="vault-grid" style="display: flex; flex-direction: column; gap: 10px;"></div>
         </div>
     </main>
 
-    <!-- TAB 5: TERMUX -->
-    <main id="linux-tab" class="tab-content">
-        <div class="brutal-box">
-            <h3 style="margin-top: 0; color: var(--accent);">// TERMUX_PAYLOADS & SHORTCUTS</h3>
-            <div class="brutal-input" style="padding: 10px; background: #000; font-size: 0.8rem; word-break: break-all;">
-mkdir -p ~/.termux && echo "extra-keys = [['ESC','|','/','HOME','UP','END','PGUP','DEL'],['TAB','CTRL','ALT','LEFT','DOWN','RIGHT','PGDN','ENTER']]" > ~/.termux/termux.properties && termux-reload-settings
-            </div>
-        </div>
-    </main>
-
-    <!-- TAB 6: DEV CONSOLE -->
-    <main id="dev-console-tab" class="tab-content">
-        <div class="brutal-box" style="border-color: #ef4444; box-shadow: 5px 5px 0px #ef4444;">
-            <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #ef4444; padding-bottom: 10px; margin-bottom: 10px;">
-                <h3 style="margin: 0; color: #ef4444;">// SYSTEM_DEBUG_CONSOLE</h3>
-                <button class="btn brutal-box-sm" onclick="App.clearDevConsole()" style="color: #ef4444; border-color: #ef4444;">CLEAR_LOGS</button>
-            </div>
-            
-            <div id="custom-dev-console" style="background: #000; height: 280px; overflow-y: auto; padding: 12px; font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px;">
-                <div style="color: var(--text-muted);">> LOGGER INITIALIZED...</div>
-            </div>
-            
-            <div style="display:flex; gap:10px; margin-top:15px; align-items: center;">
-                <span style="color:#ef4444; font-weight:bold;">EXEC></span>
-                <input type="text" id="dev-eval-input" class="brutal-input" placeholder="JS Command (e.g. console.log('test'))" style="flex:1; border-color: #ef4444;" onkeydown="if(event.key==='Enter') App.evalDevCode()">
-            </div>
-        </div>
-    </main>
-
-    <!-- Замени строку подключения на вариант с дефисом -->
-<script src="admin-panel.js"></script>
-<script src="app.js"></script>
+    <script src="admin-panel.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
