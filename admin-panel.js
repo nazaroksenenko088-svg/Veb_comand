@@ -1,6 +1,5 @@
 // ============================================================
 // ADMIN-PANEL.JS - СИСТЕМНАЯ ПАНЕЛЬ
-// Все функции ГЛОБАЛЬНЫЕ
 // ============================================================
 
 let adminPanelOpen = false;
@@ -54,10 +53,9 @@ function renderDeveloperConsole(container) {
                 <label style="color: var(--accent); font-size: 0.8rem;">System Info:</label>
                 <div style="background: #020617; border: 1px solid var(--border); padding: 8px; border-radius: 4px; margin-top: 4px; font-size: 0.75rem;">
                     <div>Version: v4.0 PRO</div>
-                    <div>OS: ${navigator.userAgent.substring(0, 50)}...</div>
+                    <div>OS: ${navigator.userAgent.substring(0, 40)}...</div>
                     <div>Memory: ${navigator.deviceMemory || 'N/A'} GB</div>
                     <div>Cores: ${navigator.hardwareConcurrency || 'N/A'}</div>
-                    <div>Timestamp: ${new Date().toISOString()}</div>
                 </div>
             </div>
             
@@ -81,16 +79,6 @@ function renderDeveloperConsole(container) {
                 </div>
             </div>
             
-            <div style="margin-bottom: 12px;">
-                <label style="color: #fbbf24; font-size: 0.8rem;">API Endpoints:</label>
-                <div style="background: #020617; border: 1px solid var(--border); padding: 8px; border-radius: 4px; margin-top: 4px; font-size: 0.7rem;">
-                    <div>/api/user/stats</div>
-                    <div>/api/quests/generate</div>
-                    <div>/api/gemini/chat</div>
-                    <div>/api/vault/scripts</div>
-                </div>
-            </div>
-            
             <div style="border-top: 1px solid var(--border); padding-top: 8px;">
                 <button class="btn btn-outline" style="width: 100%; padding: 6px; font-size: 0.8rem;" onclick="devLogout()">🚪 Logout Dev</button>
             </div>
@@ -98,7 +86,7 @@ function renderDeveloperConsole(container) {
     `;
 }
 
-// === НАСТРОЙКИ ПРОФИЛЯ (ДЛЯ ОБЫЧНЫХ ПОЛЬЗОВАТЕЛЕЙ) ===
+// === НАСТРОЙКИ ПРОФИЛЯ ===
 function renderProfileSettings(container) {
     container.innerHTML = `
         <div style="font-size: 0.85rem;">
@@ -128,39 +116,31 @@ function renderProfileSettings(container) {
             
             <div style="margin-bottom: 12px;">
                 <label style="color: var(--accent-purple); font-size: 0.8rem;">🔐 Dev Mode (пароль):</label>
-                <input type="password" id="dev-password" placeholder="Введи пароль для разработчика" style="width: 100%; margin-top: 4px; padding: 6px; border-radius: 4px;">
+                <input type="password" id="dev-password" placeholder="Пароль разработчика" style="width: 100%; margin-top: 4px; padding: 6px; border-radius: 4px;">
                 <button class="btn btn-purple" style="width: 100%; margin-top: 6px; padding: 6px; font-size: 0.8rem;" onclick="unlockDevMode()">Unlock Dev</button>
             </div>
             
             <div style="border-top: 1px solid var(--border); padding-top: 8px;">
                 <button class="btn btn-main" style="width: 100%; padding: 6px; font-size: 0.8rem;" onclick="saveProfileSettings()">💾 Сохранить</button>
-                <button class="btn btn-outline" style="width: 100%; padding: 6px; font-size: 0.8rem; margin-top: 4px;" onclick="resetProfileSettings()">🔄 Сброс</button>
             </div>
         </div>
     `;
     
-    // Загрузить сохраненную тему в селект
     const select = container.querySelector('#admin-theme');
-    if (select) {
+    if (select && window.appState) {
         select.value = appState.theme;
     }
 }
 
 // === DEVELOPER ФУНКЦИИ ===
 function devAddXP(amount) {
-    if (!isDeveloper) {
-        showNotification('❌ Access Denied');
-        return;
-    }
+    if (!isDeveloper) return showNotification('❌ Access Denied');
     updateXP(amount);
     showNotification(`✅ +${amount} XP`);
 }
 
 function devAddCoins(amount) {
-    if (!isDeveloper) {
-        showNotification('❌ Access Denied');
-        return;
-    }
+    if (!isDeveloper) return showNotification('❌ Access Denied');
     appState.coins += amount;
     updateStatsUI();
     saveStats();
@@ -168,10 +148,7 @@ function devAddCoins(amount) {
 }
 
 function devResetStats() {
-    if (!isDeveloper) {
-        showNotification('❌ Access Denied');
-        return;
-    }
+    if (!isDeveloper) return showNotification('❌ Access Denied');
     appState.level = 1;
     appState.xp = 0;
     appState.coins = 0;
@@ -181,10 +158,7 @@ function devResetStats() {
 }
 
 function devLevelUp() {
-    if (!isDeveloper) {
-        showNotification('❌ Access Denied');
-        return;
-    }
+    if (!isDeveloper) return showNotification('❌ Access Denied');
     appState.level++;
     appState.xp = 0;
     updateStatsUI();
@@ -194,39 +168,27 @@ function devLevelUp() {
 
 function devShowStorage() {
     if (!isDeveloper) return;
-    
-    const storage = {
+    console.table({
         stats: localStorage.getItem('stats'),
-        scripts: localStorage.getItem('scripts'),
-        theme: localStorage.getItem('theme'),
-        gemini_key: localStorage.getItem('gemini_key') ? '***SET***' : 'NOT SET'
-    };
-    
-    console.table(storage);
+        cyber_theme: localStorage.getItem('cyber_theme'),
+        gemini_key: localStorage.getItem('gemini_api_key') ? '***SET***' : 'NOT SET'
+    });
     showNotification('📊 Storage logged to console');
 }
 
 function devClearStorage() {
     if (!isDeveloper) return;
-    
     if (confirm('⚠️ Это удалит ВСЕ данные! Продолжить?')) {
         localStorage.clear();
-        appState = {
-            level: 1, xp: 0, coins: 0,
-            currentOS: 'debian',
-            currentLang: 'python',
-            theme: 'cyberpunk',
-            geminiKey: '',
-            scripts: []
-        };
+        appState.level = 1;
+        appState.xp = 0;
+        appState.coins = 0;
         updateStatsUI();
         showNotification('✅ All data cleared');
     }
 }
 
 function devLogout() {
-    if (!isDeveloper) return;
-    
     localStorage.removeItem('dev_password');
     isDeveloper = false;
     adminPanelOpen = false;
@@ -234,42 +196,26 @@ function devLogout() {
     showNotification('✅ Dev mode disabled');
 }
 
-// === PROFILE ФУНКЦИИ ===
 function saveProfileSettings() {
-    const name = document.getElementById('profile-name').value;
-    const email = document.getElementById('profile-email').value;
-    
-    localStorage.setItem('profile_name', name);
-    localStorage.setItem('profile_email', email);
-    
+    const name = document.getElementById('profile-name')?.value;
+    const email = document.getElementById('profile-email')?.value;
+    if (name !== undefined) localStorage.setItem('profile_name', name);
+    if (email !== undefined) localStorage.setItem('profile_email', email);
     showNotification('✅ Профиль сохранен');
-}
-
-function resetProfileSettings() {
-    if (confirm('Сбросить профиль на значения по умолчанию?')) {
-        localStorage.removeItem('profile_name');
-        localStorage.removeItem('profile_email');
-        renderAdminContent();
-        showNotification('✅ Профиль сброшен');
-    }
 }
 
 function changeThemeFromAdmin() {
     const select = document.getElementById('admin-theme');
-    if (select) {
-        document.getElementById('theme-select').value = select.value;
-        changeTheme();
+    if (select && typeof changeTheme === 'function') {
+        changeTheme(select.value);
     }
 }
 
 function unlockDevMode() {
     const passwordInput = document.getElementById('dev-password');
     if (!passwordInput) return;
-    
-    const password = passwordInput.value;
-    
-    if (password === 'CYBER_ADMIN_2024') {
-        localStorage.setItem('dev_password', password);
+    if (passwordInput.value === 'CYBER_ADMIN_2024') {
+        localStorage.setItem('dev_password', passwordInput.value);
         isDeveloper = true;
         renderAdminContent();
         showNotification('✅ Dev Mode Activated!');
@@ -277,14 +223,3 @@ function unlockDevMode() {
         showNotification('❌ Неправильный пароль');
     }
 }
-
-// === ЗАКРЫТИЕ ПАНЕЛИ ПРИ КЛИКЕ СНАРУЖИ ===
-document.addEventListener('click', function(e) {
-    const panel = document.getElementById('admin-panel');
-    const btn = document.querySelector('.floating-btn');
-    
-    if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target) && adminPanelOpen) {
-        // Опционально: можно закрыть при клике снаружи
-        // toggleAdminPanel();
-    }
-});
