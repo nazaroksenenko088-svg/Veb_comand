@@ -3,139 +3,349 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER OS || BRUTAL V4.5</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-    <script>eruda.init();</script>
+    <title>Cyber OS v5.0 // Core Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --panel-bg: #0a0a0c;
+            --border-color: #1a1a24;
+            --accent: #00ff66;
+            --accent-glow: rgba(0, 255, 102, 0.2);
+            --text-main: #00ff66;
+            --text-dim: #555566;
+            --danger: #ff3333;
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-mono);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 2px solid var(--border-color);
+        }
+
+        header {
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .status-bar {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        aside {
+            width: 260px;
+            background: var(--panel-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            padding: 15px 20px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 0.9rem;
+            border-left: 3px solid transparent;
+            transition: 0.2s;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            color: var(--text-main);
+            background: rgba(0, 255, 102, 0.03);
+            border-left-color: var(--accent);
+        }
+
+        content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: var(--bg-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        .panel-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        input, select, textarea {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 12px;
+            width: 100%;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 5px var(--accent-glow);
+        }
+
+        button.cyber-btn {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        button.cyber-btn:hover {
+            background: var(--accent);
+            color: var(--bg-color);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .driver-item, .key-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.85rem;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border: 1px solid var(--text-dim);
+            color: var(--text-dim);
+        }
+
+        .tag.active {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+    </style>
 </head>
 <body>
-    <div class="crt-overlay"></div>
 
-    <button class="floating-btn brutal-box-sm" onclick="AdminCore.toggle()">[SYS_CORE]</button>
-
-    <!-- ADMIN PANEL -->
-    <div id="admin-panel" class="admin-panel brutal-box">
-        <div class="admin-header">
-            <span>// ADMIN_CORE_V4.5</span>
-            <button onclick="AdminCore.toggle()" class="btn brutal-box-sm">X</button>
-        </div>
-        <div class="admin-body">
-            <div class="admin-section">
-                <div class="admin-title" data-i18n="sys_metrics">SYSTEM METRICS</div>
-                <div class="metric-line"><span>UPTIME:</span> <span id="sys-uptime">00:00:00</span></div>
-                <div class="metric-line"><span>CPU LOAD:</span> <span id="sys-cpu">12%</span></div>
-                <div class="metric-line"><span>RAM USAGE:</span> <span id="sys-ram">342MB / 1024MB</span></div>
-            </div>
-            <div class="admin-section">
-                <div class="admin-title" data-i18n="quick_actions">QUICK ACTIONS</div>
-                <button class="btn btn-green brutal-box-sm style-full" onclick="AdminCore.exportConfig()" data-i18n="export_cfg">EXPORT CONFIG</button>
-                <button class="btn brutal-box-sm style-full" style="color:#ef4444; border-color:#ef4444;" onclick="AdminCore.hardReset()" data-i18n="hard_reset">HARD RESET</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- HEADER -->
-    <header class="header brutal-box">
-        <div class="header-brand">
-            <div class="status-indicator"></div>
-            <div>
-                <h1 style="margin:0; font-size: 1.1rem; text-transform: uppercase;">Cyber Command OS</h1>
-                <div id="sys-clock" style="font-size:0.65rem; color:var(--text-muted); font-weight: bold;">00:00:00</div>
-            </div>
-        </div>
-        <div class="header-controls">
-            <select id="lang-select" class="brutal-input" onchange="App.setLanguage(this.value)">
-                <option value="ru">RU</option>
-                <option value="en">EN</option>
-            </select>
-            <select id="theme-select" class="brutal-input" onchange="App.changeTheme()">
-                <option value="cyberpunk">VOID_DARK</option>
-                <option value="matrix">TOXIC_GREEN</option>
-                <option value="dracula">BLOOD_PURPLE</option>
-            </select>
-        </div>
+    <header>
+        <div class="logo">// CYBER_OS_V5.0 // CORE</div>
+        <div class="status-bar" id="sys-status">STATUS: SECURE [OFFLINE]</div>
     </header>
 
-    <!-- NAV TABS -->
-    <nav class="nav-tabs">
-        <button class="tab-btn active brutal-box-sm" onclick="App.openTab('terminal-tab', event)" data-i18n="tab_shell">[SHELL]</button>
-        <button class="tab-btn brutal-box-sm" onclick="App.openTab('vscode-tab', event)">[VS_CODE]</button>
-        <button class="tab-btn brutal-box-sm" onclick="App.openTab('plugins-tab', event)" data-i18n="tab_plugins">[PLUGINS]</button>
-        <button class="tab-btn brutal-box-sm" onclick="App.openTab('chef-tab', event)">[CYBER_CHEF]</button>
-        <button class="tab-btn brutal-box-sm" onclick="App.openTab('vault-tab', event)">[VAULT]</button>
-    </nav>
+    <div class="main-container">
+        <aside>
+            <button class="nav-btn active" onclick="switchTab('admin', this)">> Admin Core</button>
+            <button class="nav-btn" onclick="switchTab('ai', this)">> AI Key Pool</button>
+            <button class="nav-btn" onclick="switchTab('drivers', this)">> Drivers & Scripts</button>
+            <button class="nav-btn" onclick="switchTab('storage', this)">> JSON Storage</button>
+        </aside>
 
-    <!-- TAB 1: SHELL -->
-    <main id="terminal-tab" class="tab-content active">
-        <div class="terminal-container brutal-box">
-            <div class="terminal-header">
-                <span style="font-weight: 800; color: var(--accent);">>_ ROOT_TERMINAL</span>
-                <select id="os-preset-select" onchange="App.changeOSPreset()" class="brutal-input" style="padding: 2px 5px; height: auto;">
-                    <option value="termux">Termux / Android</option>
-                    <option value="windows">Win11 CMD</option>
-                    <option value="debian">Debian Linux</option>
-                </select>
-            </div>
-            <div class="terminal-output" id="term-out">SYSTEM_INITIALIZED... READY.&#10;</div>
-            <div class="terminal-input-line">
-                <span id="term-prompt">~$</span>
-                <input type="text" id="term-input" class="brutal-input" style="flex:1;" onkeydown="App.handleTermInput(event)" autofocus>
-            </div>
-        </div>
-    </main>
-
-    <!-- TAB 2: VS CODE -->
-    <main id="vscode-tab" class="tab-content">
-        <div class="brutal-box" style="padding: 0; height: 78vh; overflow: hidden; background: #000;">
-            <iframe src="https://stackblitz.com/edit/web-platform?embed=1&file=index.html&theme=dark" style="width: 100%; height: 100%; border: none;"></iframe>
-        </div>
-    </main>
-
-    <!-- TAB 3: DYNAMIC PLUGINS (NEW) -->
-    <main id="plugins-tab" class="tab-content">
-        <div class="brutal-box">
-            <h3 style="margin-top: 0; color: var(--accent);" data-i18n="plugins_title">// EXTERNAL_MODULES_INJECTOR</h3>
-            
-            <div class="brutal-input" style="padding: 15px; margin-bottom: 15px; background: rgba(0,0,0,0.5);">
-                <p style="margin-top:0; font-size:0.8rem; color:var(--text-muted);">Введи прямой URL на внешний JS-файл для инжекта в систему.</p>
-                <div style="display:flex; gap:10px;">
-                    <input type="text" id="plugin-url" class="brutal-input" placeholder="https://cdn.jsdelivr.net/npm/..." style="flex:1;">
-                    <button class="btn btn-main brutal-box-sm" onclick="App.injectExternalPlugin()">INJECT</button>
+        <content>
+            <!-- ADMIN CORE -->
+            <div id="admin" class="tab-content active">
+                <h2>Admin Control & Identity</h2>
+                <div class="panel-card">
+                    <label>System Account / Handle:</label>
+                    <input type="text" id="account-name" value="RootOperator">
+                    <label>Security Clearance Level:</label>
+                    <select id="clearance-level">
+                        <option value="MAX">Level 5 (Full Autonomous)</option>
+                        <option value="MID">Level 3 (Restricted)</option>
+                    </select>
+                    <button class="cyber-btn" onclick="saveAccountSettings()">Save Identity</button>
                 </div>
             </div>
 
-            <div id="active-plugins" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
-                <!-- Сюда будут падать установленные плагины -->
+            <!-- AI KEY POOL -->
+            <div id="ai" class="tab-content">
+                <h2>AI Models & API Gateways</h2>
+                <div class="panel-card">
+                    <label>Provider:</label>
+                    <select id="ai-provider">
+                        <option value="OpenAI">OpenAI (GPT-4o / Custom)</option>
+                        <option value="Anthropic">Anthropic (Claude 3.5)</option>
+                        <option value="Google">Google Gemini API</option>
+                        <option value="CustomLocal">Local Endpoint (Ollama / LM Studio)</option>
+                    </select>
+                    <label>API Key / Endpoint URL:</label>
+                    <input type="password" id="api-key-input" placeholder="sk-...">
+                    <button class="cyber-btn" onclick="addApiKey()">Register Key</button>
+                </div>
+                <div class="panel-card">
+                    <h3>Active Gateways</h3>
+                    <div id="keys-list"></div>
+                </div>
             </div>
-        </div>
-    </main>
 
-    <!-- TAB 4: CYBERCHEF -->
-    <main id="chef-tab" class="tab-content">
-        <div class="brutal-box" style="padding: 0; height: 78vh; overflow: hidden; background: #000;">
-            <iframe src="https://gchq.github.io/CyberChef/" style="width: 100%; height: 100%; border: none;"></iframe>
-        </div>
-    </main>
-
-    <!-- TAB 5: VAULT -->
-    <main id="vault-tab" class="tab-content">
-        <div class="brutal-box">
-            <h3 style="margin-top: 0; color: var(--accent-green);">// SCRIPT_VAULT</h3>
-            <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
-                <input type="text" id="script-name" class="brutal-input" placeholder="Alias" value="SIGMA_PROJECT" style="flex:1; min-width: 120px;">
-                <input type="text" id="script-path" class="brutal-input" placeholder="Path" value="C:\Users\oksen\OneDrive\CYBER_TOOLS\SIGMA_PROJECT" style="flex:2; min-width: 250px;">
-                <button class="btn btn-green brutal-box-sm" onclick="App.addScript()">ADD</button>
+            <!-- DRIVERS & SCRIPTS -->
+            <div id="drivers" class="tab-content">
+                <h2>Virtual Drivers & JS Modules</h2>
+                <div class="panel-card">
+                    <label>Driver / Module Name:</label>
+                    <input type="text" id="driver-name" placeholder="e.g. MemoryScraper.js">
+                    <label>Execution Mode:</label>
+                    <select id="driver-mode">
+                        <option value="background">Background Daemon</option>
+                        <option value="manual">Manual Trigger</option>
+                    </select>
+                    <button class="cyber-btn" onclick="registerDriver()">Deploy Driver</button>
+                </div>
+                <div class="panel-card">
+                    <h3>Loaded System Drivers</h3>
+                    <div id="drivers-list"></div>
+                </div>
             </div>
-            <div id="vault-grid" style="display: flex; flex-direction: column; gap: 10px;"></div>
-        </div>
-    </main>
 
-    <script src="admin-panel.js"></script>
-    <script src="app.js"></script>
+            <!-- JSON STORAGE -->
+            <div id="storage" class="tab-content">
+                <h2>Local .JSON Database Engine</h2>
+                <div class="panel-card">
+                    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 10px;">
+                        All core states are serialized and dumped into local storage structure.
+                    </p>
+                    <button class="cyber-btn" onclick="exportDataJson()">Export System State (.json)</button>
+                    <textarea id="json-dump" rows="8" style="margin-top: 15px;" readonly></textarea>
+                </div>
+            </div>
+        </content>
+    </div>
+
+    <script>
+        // Инициализация локального хранилища состояния ОС
+        let cyberState = JSON.parse(localStorage.getItem('CYBER_OS_STATE')) || {
+            account: { name: "RootOperator", level: "MAX" },
+            aiKeys: [],
+            drivers: [
+                { name: "CoreMemoryMonitor.js", mode: "background", status: "active" },
+                { name: "LocalClipboardHook.js", mode: "manual", status: "active" }
+            ]
+        };
+
+        function saveState() {
+            localStorage.setItem('CYBER_OS_STATE', JSON.stringify(cyberState, null, 2));
+            updateJsonDump();
+        }
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+            if(tabId === 'storage') updateJsonDump();
+        }
+
+        function saveAccountSettings() {
+            cyberState.account.name = document.getElementById('account-name').value;
+            cyberState.account.level = document.getElementById('clearance-level').value;
+            saveState();
+            alert("Identity profile updated successfully.");
+        }
+
+        function addApiKey() {
+            const provider = document.getElementById('ai-provider').value;
+            const key = document.getElementById('api-key-input').value;
+            if(!key) return;
+            cyberState.aiKeys.push({ provider, key: key.slice(0, 6) + '...' });
+            document.getElementById('api-key-input').value = '';
+            saveState();
+            renderKeys();
+        }
+
+        function renderKeys() {
+            const container = document.getElementById('keys-list');
+            container.innerHTML = cyberState.aiKeys.map((item, idx) => `
+                <div class="key-item">
+                    <span>${item.provider} (${item.key})</span>
+                    <span class="tag active">CONNECTED</span>
+                </div>
+            `).join('') || '<span style="color:var(--text-dim)">No keys registered.</span>';
+        }
+
+        function registerDriver() {
+            const name = document.getElementById('driver-name').value;
+            const mode = document.getElementById('driver-mode').value;
+            if(!name) return;
+            cyberState.drivers.push({ name, mode, status: "active" });
+            document.getElementById('driver-name').value = '';
+            saveState();
+            renderDrivers();
+        }
+
+        function renderDrivers() {
+            const container = document.getElementById('drivers-list');
+            container.innerHTML = cyberState.drivers.map(d => `
+                <div class="driver-item">
+                    <span>${d.name} [${d.mode}]</span>
+                    <span class="tag ${d.status === 'active' ? 'active' : ''}">${d.status.toUpperCase()}</span>
+                </div>
+            `).join('');
+        }
+
+        function updateJsonDump() {
+            document.getElementById('json-dump').value = JSON.stringify(cyberState, null, 2);
+        }
+
+        function exportDataJson() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cyberState, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "cyber_os_state.json");
+            dlAnchorElem.click();
+        }
+
+        // Первичный рендер при старте
+        document.getElementById('account-name').value = cyberState.account.name;
+        document.getElementById('clearance-level').value = cyberState.account.level;
+        renderKeys();
+        renderDrivers();
+        updateJsonDump();
+    </script>
 </body>
 </html>
