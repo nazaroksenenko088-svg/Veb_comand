@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CYBER COMMAND STATION v4.0 PRO</title>
-    <link rel="stylesheet" href="styles_2.css">
+    <!-- Подключаем современные шрифты -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="styles_3.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>eruda.init();</script>
@@ -13,102 +18,111 @@
 
     <!-- ПЛАВАЮЩАЯ КНОПКА АДМИН-КОНСОЛИ -->
     <div class="floating-menu">
-        <button class="floating-btn" onclick="toggleAdminPanel()">⚙️</button>
+        <button class="floating-btn" onclick="toggleAdminPanel()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+        </button>
     </div>
 
     <!-- АДМИН ПАНЕЛЬ -->
     <div id="admin-panel" class="admin-panel">
         <div class="admin-header">
             <span>🔧 СИСТЕМА</span>
-            <button onclick="toggleAdminPanel()" style="background:none; border:none; color:var(--accent); cursor:pointer; font-size:1.2rem;">✕</button>
+            <button onclick="toggleAdminPanel()" class="icon-btn">✕</button>
         </div>
         <div id="admin-content" class="admin-content"></div>
     </div>
 
-    <!-- NAV TABS -->
-    <div class="nav-tabs">
-        <button class="tab-btn active" onclick="openTab('terminal-tab', event)">📟 Web Shell</button>
-        <button class="tab-btn" onclick="openTab('quest-tab', event)">🎡 Quest Hub</button>
-        <button class="tab-btn" onclick="openTab('gemini-tab', event)">🤖 Gemini AI</button>
-        <button class="tab-btn" onclick="openTab('code-tab', event)">💻 VS Code</button>
-        <button class="tab-btn" onclick="openTab('linux-tab', event)">📱 Shizuku</button>
-        <button class="tab-btn" onclick="openTab('market-tab', event)">🛍️ Market</button>
-        <button class="tab-btn" onclick="openTab('vault-tab', event)">📦 Script Vault</button>
-        <button class="tab-btn" onclick="openTab('radio-tab', event)">🎵 Radio</button>
-    </div>
-
     <!-- HEADER -->
-    <div class="header">
-        <div>
-            <strong style="color:var(--accent);">CYBER COMMAND OS v4.0 PRO</strong>
-            <div style="font-size:0.8rem; color:var(--text-muted);">CROSS-PLATFORM HUB</div>
+    <div class="header glass-panel">
+        <div class="header-brand">
+            <div class="glow-dot"></div>
+            <div>
+                <strong style="color:var(--accent); font-size: 1.1rem; letter-spacing: 0.5px;">CYBER COMMAND OS</strong>
+                <div style="font-size:0.75rem; color:var(--text-muted); font-weight: 500; margin-top: 2px;">PRO WORKSPACE HUB</div>
+            </div>
         </div>
         
         <div class="header-controls">
-            <span>Тема:</span>
-            <select id="theme-select" onchange="changeTheme()">
-                <option value="cyberpunk">Cyberpunk Dark</option>
-                <option value="matrix">Matrix Green</option>
-                <option value="dracula">Dracula Purple</option>
-                <option value="nord">Nord Cool</option>
-            </select>
+            <div class="theme-wrapper">
+                <select id="theme-select" onchange="changeTheme()">
+                    <option value="cyberpunk">Cyberpunk Dark</option>
+                    <option value="matrix">Matrix Green</option>
+                    <option value="dracula">Dracula Purple</option>
+                    <option value="nord">Nord Cool</option>
+                </select>
+            </div>
 
-            <div>
-                <span id="lvl-txt">LVL 1</span> | <span id="xp-txt" style="color:var(--accent);">0 XP</span>
-                <span id="coins-txt" style="color:#fbbf24; margin-left:15px;">💰 0 CC</span>
+            <div class="stats-badge">
+                <span id="lvl-txt" class="lvl-badge">LVL 1</span>
+                <span id="xp-txt" class="xp-text">0 XP</span>
+                <span id="coins-txt" class="coins-text">💰 0 CC</span>
                 <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-fill"></div></div>
             </div>
         </div>
     </div>
 
     <!-- ACTIVE BUFFS -->
-    <div class="card" style="padding:10px 15px; margin-bottom:15px;">
-        <span style="font-size:0.85rem; font-weight:bold; color:var(--accent);">⚡ Активные баффы аккаунта:</span>
-        <div id="active-buffs-list" style="margin-top:4px;">
-            <span style="font-size:0.8rem; background:rgba(56,189,248,0.1); padding:2px 8px; border-radius:4px; border:1px solid var(--accent);">🛡️ Стандартный агент (x1.0 XP)</span>
+    <div class="card glass-panel" style="padding:12px 20px; margin-bottom:20px; display: flex; align-items: center; gap: 10px;">
+        <span style="font-size:0.85rem; font-weight:600; color:var(--accent);">⚡ Баффы:</span>
+        <div id="active-buffs-list" style="display: flex; gap: 8px;">
+            <span class="buff-badge">🛡️ Агент (x1.0 XP)</span>
         </div>
+    </div>
+
+    <!-- NAV TABS -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="openTab('terminal-tab', event)">📟 Shell</button>
+        <button class="tab-btn" onclick="openTab('quest-tab', event)">🎡 Quests</button>
+        <button class="tab-btn" onclick="openTab('gemini-tab', event)">🤖 AI</button>
+        <button class="tab-btn" onclick="openTab('code-tab', event)">💻 Code</button>
+        <button class="tab-btn" onclick="openTab('linux-tab', event)">📱 Shizuku</button>
+        <button class="tab-btn" onclick="openTab('market-tab', event)">🛍️ Market</button>
+        <button class="tab-btn" onclick="openTab('vault-tab', event)">📦 Vault</button>
+        <button class="tab-btn" onclick="openTab('radio-tab', event)">🎵 Focus</button>
     </div>
 
     <!-- TAB 1: TERMINAL -->
     <div id="terminal-tab" class="tab-content active">
-        <div class="terminal-container">
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:10px;">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="color:var(--accent); font-weight:bold;">🖥️ INTERACTIVE OS SHELL</span>
-                    <select id="os-preset-select" onchange="changeOSPreset()" style="padding:2px 8px; font-size:0.8rem;">
-                        <option value="debian">🐧 Debian 12 Linux</option>
-                        <option value="termux">📱 Termux (Android)</option>
-                        <option value="kali">🐉 Kali Linux</option>
-                        <option value="arch">🦅 Arch Linux</option>
-                        <option value="windows">💻 Windows CMD</option>
+        <div class="terminal-container glass-panel">
+            <div class="terminal-header">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="mac-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <span style="color:var(--text-muted); font-size: 0.8rem; font-family: 'Inter', sans-serif;">bash - interactive</span>
+                    <select id="os-preset-select" onchange="changeOSPreset()" class="term-select">
+                        <option value="debian">Debian</option>
+                        <option value="termux">Termux</option>
+                        <option value="kali">Kali</option>
+                        <option value="arch">Arch</option>
+                        <option value="windows">CMD</option>
                     </select>
                 </div>
-                <button class="btn btn-outline" style="padding:2px 8px; font-size:0.75rem;" onclick="clearTerm()">Clear</button>
+                <button class="btn btn-outline btn-sm" onclick="clearTerm()">Clear</button>
             </div>
             
             <div class="terminal-output" id="term-out">Cyber OS v4.0 Shell initialized. Type 'help' for available commands.&#10;</div>
             
-            <div style="display:flex; gap:8px;">
+            <div class="terminal-input-line">
                 <span style="color:var(--accent-green); font-weight:bold;" id="term-prompt">root@debian:~#</span>
-                <input type="text" style="flex:1; background:transparent; border:none; outline:none; color:var(--accent-green);" id="term-input" onkeydown="handleTermInput(event)" placeholder="help, cls, neofetch...">
+                <input type="text" id="term-input" onkeydown="handleTermInput(event)" placeholder="Type a command...">
             </div>
         </div>
     </div>
 
     <!-- TAB 2: QUEST HUB -->
     <div id="quest-tab" class="tab-content">
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
+        <div style="display:flex; gap:12px; margin-bottom:20px;">
             <button class="btn btn-main" style="flex:2;" onclick="spinAll()">🎲 ГЕНЕРИРОВАТЬ КВЕСТ</button>
-            <button class="btn btn-green" style="flex:1;" onclick="toggleProofModal()">📝 СДАТЬ ДОКАЗАТЕЛЬСТВА</button>
+            <button class="btn btn-green" style="flex:1;" onclick="toggleProofModal()">📝 СДАТЬ ОТЧЕТ</button>
         </div>
 
-        <div class="card" id="proof-modal" style="display:none; border: 1px solid var(--accent-green);">
-            <h3 style="color:var(--accent-green); margin-top:0;">📝 Сдача доказательств квеста</h3>
-            <div style="margin-bottom:10px;">
-                <label style="font-size:0.8rem; color:var(--accent);">Текстовый отчет:</label><br>
-                <textarea id="proof-text" rows="3" style="width:100%; box-sizing:border-box; margin-top:4px;" placeholder="Что было сделано..."></textarea>
+        <div class="card glass-panel" id="proof-modal" style="display:none; border-color: var(--accent-green);">
+            <h3 style="color:var(--accent-green); margin-top:0;">📝 Сдача доказательств</h3>
+            <div style="margin-bottom:15px;">
+                <textarea id="proof-text" rows="3" class="modern-input" placeholder="Опиши, что было сделано..."></textarea>
             </div>
-            <button class="btn btn-green" onclick="submitTaskProof()">✅ ПОДТВЕРДИТЬ И ПОЛУЧИТЬ XP</button>
+            <button class="btn btn-green w-100" onclick="submitTaskProof()">✅ ПОДТВЕРДИТЬ И ПОЛУЧИТЬ XP</button>
         </div>
 
         <div class="grid" id="grid"></div>
@@ -116,24 +130,24 @@
 
     <!-- TAB 3: GEMINI AI -->
     <div id="gemini-tab" class="tab-content">
-        <div class="card">
-            <h3 style="color:var(--accent-purple); margin-top:0;">🤖 Встроенный Gemini AI Ассистент</h3>
-            <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
-                <input type="password" id="gemini-key-input" placeholder="Вставь API ключ Gemini (AQ...)" style="flex:1;">
-                <button class="btn btn-purple" onclick="saveGeminiKey()">Сохранить ключ</button>
+        <div class="card glass-panel">
+            <h3 class="gradient-text purple-gradient">🤖 Встроенный Gemini AI</h3>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <input type="password" id="gemini-key-input" class="modern-input" placeholder="API ключ Gemini (AQ...)" style="flex:1;">
+                <button class="btn btn-purple" onclick="saveGeminiKey()">Сохранить</button>
             </div>
-            <div id="key-status" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;"></div>
+            <div id="key-status" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px;"></div>
 
-            <div class="card" style="margin-bottom:10px; background:rgba(168,85,247,0.05);">
-                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                    <span style="color:var(--accent);">📊 Токены:</span>
-                    <span id="token-count">0 / 32000</span>
+            <div class="glass-inner" style="margin-bottom:15px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size: 0.85rem;">
+                    <span style="color:var(--accent);">📊 Загрузка контекста:</span>
+                    <span id="token-count" style="color:var(--text-muted);">0 / 32000</span>
                 </div>
                 <div class="token-bar-bg"><div class="token-bar-fill" id="token-fill"></div></div>
-                <button class="btn btn-outline" style="margin-top:8px; width:100%; font-size:0.8rem;" onclick="wipeContext()">🧹 Сбросить контекст</button>
+                <button class="btn btn-outline w-100" style="margin-top:12px; font-size:0.8rem;" onclick="wipeContext()">🧹 Сбросить память</button>
             </div>
 
-            <select id="prompt-deck" onchange="loadPrompt()" style="width:100%; margin-bottom:10px;">
+            <select id="prompt-deck" class="modern-input" onchange="loadPrompt()" style="width:100%; margin-bottom:15px;">
                 <option value="">-- Библиотека промптов --</option>
                 <option value="refactor_cs">Рефакторинг кода</option>
                 <option value="ui_gen">Генерация UI</option>
@@ -145,9 +159,11 @@
                 <div class="chat-messages" id="chat-msgs">
                     <div class="chat-msg chat-ai">Привет! Задай вопрос или отправь промпт.</div>
                 </div>
-                <div style="display:flex; gap:8px; margin-top:10px;">
-                    <input type="text" id="chat-input" placeholder="Сообщение..." style="flex:1;" onkeydown="if(event.key==='Enter') sendGeminiMsg()">
-                    <button class="btn btn-purple" onclick="sendGeminiMsg()">Отправить</button>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" class="modern-input" placeholder="Написать сообщение..." onkeydown="if(event.key==='Enter') sendGeminiMsg()">
+                    <button class="btn btn-purple" onclick="sendGeminiMsg()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -155,10 +171,10 @@
 
     <!-- TAB 4: VS CODE -->
     <div id="code-tab" class="tab-content">
-        <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div class="card glass-panel" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom: 15px;">
             <div style="display:flex; align-items:center; gap:10px;">
-                <span>Язык:</span>
-                <select id="lang-select" onchange="changeLang()">
+                <span style="font-weight: 500; font-size: 0.9rem;">Язык:</span>
+                <select id="lang-select" class="modern-input" style="padding: 6px 12px;" onchange="changeLang()">
                     <option value="python">Python</option>
                     <option value="javascript">JavaScript</option>
                     <option value="typescript">TypeScript</option>
@@ -168,28 +184,24 @@
                     <option value="go">Go</option>
                 </select>
             </div>
-            <a href="https://vscode.dev" target="_blank" class="btn btn-outline">🔗 vscode.dev</a>
+            <a href="https://vscode.dev" target="_blank" class="btn btn-outline">🔗 Открыть vscode.dev</a>
         </div>
-        <div id="editor-container"></div>
+        <div id="editor-container" class="glass-panel"></div>
     </div>
 
     <!-- TAB 5: SHIZUKU -->
     <div id="linux-tab" class="tab-content">
-        <div class="card" style="border: 1px solid var(--accent-purple);">
-            <h3 style="color:var(--accent-purple); margin-top:0;">📱 Автоматизация через Shizuku (`rish`)</h3>
-            <h4 style="color:var(--accent); margin-bottom:6px;">🚀 Шаг 1: Установка rish в Termux</h4>
+        <div class="card glass-panel">
+            <h3 class="gradient-text main-gradient">📱 Автоматизация (Shizuku + Termux)</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Скрипты для быстрой настройки окружения.</p>
+            
+            <h4 style="color:var(--accent); margin-bottom:8px; font-weight: 500;">🚀 Установка rish</h4>
             <div class="code-block">
                 <button class="copy-btn" onclick="copyCode(this)">Copy</button>
 pkg update && pkg install curl unzip -y && curl -fL "https://github.com/RikkaApps/Shizuku-API/releases/download/v3.5.0/rish-v3.5.0.zip" -o rish.zip && unzip -o rish.zip && chmod +x rish
             </div>
-            <h4 style="color:var(--accent); margin-bottom:6px;">⚡ Шаг 2: Запуск</h4>
-            <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-./rish
-            </div>
-        </div>
-        <div class="card">
-            <h3 style="color:var(--accent); margin-top:0;">⚡ Бинды Termux</h3>
+            
+            <h4 style="color:var(--accent); margin:15px 0 8px 0; font-weight: 500;">⚡ Бинды Termux (Быстрые клавиши)</h4>
             <div class="code-block">
                 <button class="copy-btn" onclick="copyCode(this)">Copy</button>
 mkdir -p ~/.termux && echo "extra-keys = [['ESC','|','/','HOME','UP','END','PGUP','DEL'],['TAB','CTRL','ALT','LEFT','DOWN','RIGHT','PGDN','ENTER']]" > ~/.termux/termux.properties && termux-reload-settings
@@ -199,20 +211,20 @@ mkdir -p ~/.termux && echo "extra-keys = [['ESC','|','/','HOME','UP','END','PGUP
 
     <!-- TAB 6: MARKET -->
     <div id="market-tab" class="tab-content">
-        <div class="card">
-            <h3 style="color:#fbbf24; margin-top:0;">🛍️ Чёрный рынок</h3>
-            <p style="font-size:0.85rem; color:var(--text-muted);">Обмен кибер-кредитов на апгрейды.</p>
+        <div class="card glass-panel" style="text-align: center; padding: 25px;">
+            <h2 style="color:#fbbf24; margin: 0 0 10px 0; font-size: 1.8rem;">🛍️ Чёрный рынок</h2>
+            <p style="font-size:0.9rem; color:var(--text-muted); margin:0;">Обмен кибер-кредитов на системные апгрейды.</p>
         </div>
         <div class="grid" id="market-grid"></div>
     </div>
 
     <!-- TAB 7: VAULT -->
     <div id="vault-tab" class="tab-content">
-        <div class="card">
-            <h3 style="color:var(--accent-green); margin-top:0;">📦 Script Vault</h3>
+        <div class="card glass-panel">
+            <h3 class="gradient-text green-gradient">📦 Script Vault</h3>
             <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
-                <input type="text" id="script-name" placeholder="Имя скрипта" style="flex:1;">
-                <input type="text" id="script-path" placeholder="Путь" style="flex:1;">
+                <input type="text" id="script-name" class="modern-input" placeholder="Имя скрипта (напр. HARVESTER)" style="flex:1; min-width: 200px;">
+                <input type="text" id="script-path" class="modern-input" placeholder="Путь (D:\scripts\...)" style="flex:2; min-width: 200px;">
                 <button class="btn btn-green" onclick="addScript()">➕ Добавить</button>
             </div>
         </div>
@@ -221,36 +233,36 @@ mkdir -p ~/.termux && echo "extra-keys = [['ESC','|','/','HOME','UP','END','PGUP
 
     <!-- TAB 8: RADIO & POMODORO -->
     <div id="radio-tab" class="tab-content">
-        <div class="card">
-            <h3 style="color:#a855f7; margin-top:0;">🎵 Cyber Radio & Pomodoro</h3>
+        <div class="card glass-panel">
+            <h3 class="gradient-text purple-gradient" style="text-align: center; font-size: 1.5rem;">🎵 Focus Hub</h3>
             
-            <div style="margin-bottom: 20px;">
-                <h4 style="color:var(--accent);">📻 Радиостанции</h4>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-                    <button class="btn btn-purple" onclick="playRadio('lofi')">🎧 Lo-Fi Chill</button>
+            <div style="background: var(--bg-inner); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border);">
+                <h4 style="margin:0 0 15px 0; color:var(--accent); text-align: center;">📻 Нейроволны</h4>
+                <div style="display:flex; gap:10px; justify-content: center; flex-wrap:wrap; margin-bottom:15px;">
+                    <button class="btn btn-purple" onclick="playRadio('lofi')">🎧 Lo-Fi</button>
                     <button class="btn btn-main" onclick="playRadio('synthwave')">⚡ Synthwave</button>
                     <button class="btn btn-green" onclick="playRadio('darksynth')">☣️ Darksynth</button>
                     <button class="btn btn-outline" onclick="stopRadio()">⏹ Стоп</button>
                 </div>
-                <audio id="audio-player" style="width:100%; height:32px; display:none;" controls></audio>
+                <audio id="audio-player" style="width:100%; height:40px; border-radius: 8px;" controls></audio>
             </div>
 
-            <div style="border-top:1px solid var(--border); padding-top:15px;">
-                <h4 style="color:var(--accent);">⏱️ Pomodoro Таймер</h4>
-                <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-                    <label style="font-size:0.85rem;">Минуты:</label>
-                    <input type="number" id="pomodoro-min" value="25" min="1" max="120" style="width:70px;">
-                    <button class="btn btn-main" onclick="startPomodoro()">▶ Старт</button>
-                    <button class="btn btn-outline" onclick="pausePomodoro()">⏸ Пауза</button>
-                    <button class="btn btn-outline" onclick="resetPomodoro()">🔄 Сброс</button>
+            <div style="background: var(--bg-inner); border-radius: 12px; padding: 20px; border: 1px solid var(--border);">
+                <h4 style="margin:0 0 15px 0; color:var(--accent); text-align: center;">⏱️ Pomodoro Таймер</h4>
+                <div style="display:flex; align-items:center; justify-content: center; gap:10px; margin-bottom:20px;">
+                    <input type="number" id="pomodoro-min" class="modern-input" value="25" min="1" max="120" style="width:80px; text-align: center;">
+                    <span style="color: var(--text-muted);">мин.</span>
+                    <button class="btn btn-main" onclick="startPomodoro()">▶</button>
+                    <button class="btn btn-outline" onclick="pausePomodoro()">⏸</button>
+                    <button class="btn btn-outline" onclick="resetPomodoro()">🔄</button>
                 </div>
                 
-                <div style="text-align:center; margin:15px 0;">
-                    <div id="pomodoro-display" style="font-size:2.5rem; font-weight:bold; color:var(--accent-purple);">25:00</div>
+                <div style="text-align:center; margin:20px 0;">
+                    <div id="pomodoro-display" style="font-size:3.5rem; font-family: 'JetBrains Mono', monospace; font-weight:bold; color:var(--accent-purple); text-shadow: 0 0 20px rgba(168,85,247,0.4);">25:00</div>
                 </div>
                 
-                <div class="xp-bar-bg" style="width:100%; height:10px;">
-                    <div class="xp-bar-fill" id="pomodoro-bar" style="width:0%; background:var(--accent-purple);"></div>
+                <div class="xp-bar-bg" style="width:100%; height:8px; border-radius: 4px;">
+                    <div class="xp-bar-fill" id="pomodoro-bar" style="width:0%; background:var(--accent-purple); border-radius: 4px;"></div>
                 </div>
             </div>
         </div>
@@ -280,3 +292,4 @@ mkdir -p ~/.termux && echo "extra-keys = [['ESC','|','/','HOME','UP','END','PGUP
     </script>
 </body>
 </html>
+
