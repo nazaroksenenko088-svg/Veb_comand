@@ -1,40 +1,61 @@
--- ==========================================
--- Chaos Engine: Full Stealth Payload v1.0
--- Target: Roblox Vulnerable Games
--- ==========================================
-
-local Players = game:GetService("Players")
+-- Разведывательный модуль (Scout & Test Engine)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalPlayer = Players.LocalPlayer
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
 
--- Функция безопасного выполнения с подавлением киков/крашей
-local function safeExecute(name, func)
-    local success, err = pcall(func)
-    if not success then
-        warn("[Chaos Engine] Ошибка в модуле " .. name .. ": " .. tostring(err))
-    else
-        print("[Chaos Engine] Модуль " .. name .. " выполнен успешно.")
+print("[*] Запуск сканирования уязвимых Remote-объектов...")
+
+local foundRemotes = {}
+
+-- Функция рекурсивного поиска дырявых эвентов
+local function scanFolder(parentFolder)
+    for _, item in ipairs(parentFolder:GetChildren()) do
+        if item:IsA("RemoteEvent") or item:IsA("RemoteFunction") then
+            table.insert(foundRemotes, item)
+            print(("[+] Найден Remote: %s (%s)"):format(item.Name, item.ClassName))
+        end
+        -- Уходим вглубь по структуре
+        if #item:GetChildren() > 0 then
+            scanFolder(item)
+        end
     end
 end
 
--- 1. Обход базовых таймингов античита
-safeExecute("AntiCheatBypass", function()
-    print("[Chaos Engine] Инициализация скрытого окружения...")
-    -- Рандомная задержка сбивает детекты по мгновенной активности после инжекта
-    task.wait(math.random(1, 2) + math.random())
+-- Сканируем основные зоны хранения сетевых данных
+pcall(function()
+    scanFolder(ReplicatedStorage)
 end)
 
--- 2. Логика взаимодействия и накрутки (пример для RemoteEvent)
-safeExecute("ResourceInjection", function()
-    -- Ищем нужный эвент в игре (замени путь на актуальный для игры)
-    local remoteFolder = ReplicatedStorage:FindFirstChild("Events") or ReplicatedStorage
+print(("[*] Сканирование завершено. Найдено целей: %d"):format(#foundRemotes))
+
+-- Функция зондирования и тест-драйва найденного эвента
+local function probeEvent(remoteInstance, ...)
+    local args = {...}
+    print(("[~] Зондируем цель: %s"):format(remoteInstance.Name))
     
-    -- Пример отправки пакета с имитацией легитимного действия
-    -- Настрой аргументы под конкретный функционал игры ("Steal a Brainrot" / "Escape tsunami")
-    -- local targetRemote = remoteFolder:FindFirstChild("UpdateMoney") 
-    -- if targetRemote then
-    --     -- Делаем паузы между запросами, чтобы не триггерить BAC (Basic Anti-Cheat)
-    --     for i = 1, 5 do
+    local success, err = pcall(function()
+        if remoteInstance:IsA("RemoteEvent") then
+            remoteInstance:FireServer(unpack(args))
+        elseif remoteInstance:IsA("RemoteFunction") then
+            remoteInstance:InvokeServer(unpack(args))
+        end
+    end)
+    
+    if success then
+        print(("[+] Успех! Запрос принят сервером для: %s"):format(remoteInstance.Name))
+    else
+        print(("[-] Сервер отклонил или заблокировал: %s | Ошибка: %s"):format(remoteInstance.Name, tostring(err)))
+    end
+end
+
+-- Пример тестового вызова первого попавшегося эвента (можно заменить аргументы под нужные нужды)
+if #foundRemotes > 0 then
+    task.spawn(function()
+        task.wait(1)
+        -- Пробуем дернуть первую найденную цель с тестовым аргументом
+        probeEvent(foundRemotes[1], "TestPayload", 1337)
+    end)
+end    --     for i = 1, 5 do
     --         targetRemote:FireServer(999999)
     --         task.wait(0.5 + math.random() * 0.3)
     --     end
