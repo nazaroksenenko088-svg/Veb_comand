@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cyber OS v5.2 // Custom DevTools Suite</title>
+    <title>Cyber OS v5.3 // Modular Safe Core</title>
     
     <!-- Monaco Editor Loader -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
@@ -23,145 +23,82 @@
             --font-mono: 'Courier New', Courier, monospace;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: var(--font-mono);
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-        
-        input, textarea, .console-output-line, pre {
-            -webkit-user-select: text;
-            user-select: text;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-mono); -webkit-touch-callout: none; user-select: none; }
+        input, textarea, pre, .c-text { user-select: text; -webkit-user-select: text; }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            height: 100vh;
-            width: 100vw;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+        body { background-color: var(--bg-color); color: var(--text-main); height: 100vh; width: 100vw; display: flex; flex-direction: column; overflow: hidden; }
 
-        header {
-            background: var(--panel-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 8px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 45px;
-            flex-shrink: 0;
-        }
-
+        header { background: var(--panel-bg); border-bottom: 1px solid var(--border-color); padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; height: 45px; flex-shrink: 0; }
         .logo { font-weight: bold; font-size: 1rem; color: var(--accent); text-shadow: 0 0 6px var(--accent-glow); }
         .status-bar { font-size: 0.75rem; color: var(--text-dim); }
 
         .main-container { display: flex; flex: 1; overflow: hidden; }
+        aside { width: 220px; background: var(--panel-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; }
 
-        aside {
-            width: 220px; background: var(--panel-bg); border-right: 1px solid var(--border-color);
-            display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto;
-        }
-
-        .nav-btn {
-            background: transparent; border: none; color: var(--text-dim); padding: 14px 15px;
-            text-align: left; cursor: pointer; font-size: 0.85rem; border-left: 3px solid transparent;
-            transition: 0.2s; text-transform: uppercase;
-        }
+        .nav-btn { background: transparent; border: none; color: var(--text-dim); padding: 14px 15px; text-align: left; cursor: pointer; font-size: 0.85rem; border-left: 3px solid transparent; text-transform: uppercase; }
         .nav-btn:hover, .nav-btn.active { color: var(--accent); background: rgba(0, 255, 102, 0.04); border-left-color: var(--accent); }
 
-        .content-area { flex: 1; background: var(--bg-color); position: relative; display: flex; flex-direction: column; overflow: hidden; }
+        .content-area { flex: 1; background: var(--bg-color); display: flex; flex-direction: column; overflow: hidden; position: relative; }
         .tab-content { display: none; height: 100%; width: 100%; flex-direction: column; overflow-y: auto; padding: 20px; }
-        #ide.tab-content { padding: 0; overflow: hidden; }
+        #ide.tab-content { padding: 0; overflow: hidden; display: flex; }
         .tab-content.active { display: flex; }
 
         h2 { font-size: 1.1rem; margin-bottom: 12px; border-bottom: 1px dashed var(--border-color); padding-bottom: 5px; color: var(--info); }
         .panel-card { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 12px; margin-bottom: 12px; }
 
-        input, select, textarea {
-            background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main);
-            padding: 8px 10px; width: 100%; margin-top: 5px; margin-bottom: 12px; font-size: 0.95rem;
-        }
-        input:focus, select:focus { outline: none; border-color: var(--accent); }
+        input, select { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 10px; width: 100%; margin-top: 5px; margin-bottom: 12px; font-size: 0.95rem; }
+        input:focus { outline: none; border-color: var(--accent); }
 
-        button.cyber-btn {
-            background: transparent; border: 1px solid var(--accent); color: var(--accent);
-            padding: 8px 15px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.8rem;
-        }
-        button.cyber-btn:hover { background: var(--accent); color: var(--bg-color); box-shadow: 0 0 8px var(--accent-glow); }
+        button.cyber-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 8px 15px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; }
+        button.cyber-btn:hover { background: var(--accent); color: var(--bg-color); }
         button.cyber-btn.danger { border-color: var(--danger); color: var(--danger); }
         button.cyber-btn.danger:hover { background: var(--danger); color: var(--bg-color); }
-        button.btn-sm { padding: 4px 10px; font-size: 0.7rem; margin-left: 4px; }
+        .btn-sm { padding: 4px 10px; font-size: 0.7rem; }
 
-        #monaco-editor-container { flex: 1; min-height: 0; width: 100%; }
+        #monaco-editor-container { flex: 1; min-height: 100px; width: 100%; }
 
-        /* TOUCH MACRO BAR */
-        #touch-macro-bar {
-            background: var(--panel-bg); border-top: 1px solid var(--border-color);
-            display: flex; overflow-x: auto; padding: 5px 8px; gap: 6px; flex-shrink: 0; white-space: nowrap;
-        }
-        .macro-key {
-            background: var(--bg-color); border: 1px solid var(--border-color); color: var(--info);
-            padding: 6px 12px; border-radius: 3px; font-size: 0.85rem; cursor: pointer; font-weight: bold; flex-shrink: 0;
-        }
-        .macro-key:active { background: var(--info); color: var(--bg-color); }
+        #touch-macro-bar { background: var(--panel-bg); border-top: 1px solid var(--border-color); display: flex; overflow-x: auto; padding: 5px 8px; gap: 6px; flex-shrink: 0; }
+        .macro-key { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--info); padding: 6px 12px; border-radius: 3px; font-size: 0.85rem; cursor: pointer; font-weight: bold; flex-shrink: 0; }
 
-        /* CUSTOM DEVTOOLS SUITE (CHROME STYLE) */
-        #custom-devtools {
-            height: 34vh; min-height: 170px; background: var(--panel-bg); display: flex; flex-direction: column; border-top: 2px solid var(--border-color);
-        }
-        .dt-tabs {
-            background: #0d1117; display: flex; border-bottom: 1px solid var(--border-color); height: 32px; flex-shrink: 0; align-items: center; padding-left: 5px; gap: 2px;
-        }
-        .dt-tab-btn {
-            background: transparent; border: none; color: var(--text-dim); padding: 0 12px; height: 100%; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; border-bottom: 2px solid transparent;
-        }
+        /* DEVTOOLS */
+        #custom-devtools { height: 32vh; min-height: 150px; background: var(--panel-bg); display: flex; flex-direction: column; border-top: 2px solid var(--border-color); flex-shrink: 0; }
+        .dt-tabs { background: #0d1117; display: flex; border-bottom: 1px solid var(--border-color); height: 32px; align-items: center; padding-left: 5px; gap: 2px; }
+        .dt-tab-btn { background: transparent; border: none; color: var(--text-dim); padding: 0 12px; height: 100%; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; border-bottom: 2px solid transparent; }
         .dt-tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--panel-bg); }
-        .dt-panel-body { flex: 1; overflow-y: auto; display: none; position: relative; flex-direction: column; }
+        .dt-panel-body { flex: 1; overflow-y: auto; display: none; flex-direction: column; }
         .dt-panel-body.active { display: flex; }
 
-        /* Sub-panels layout */
         #dt-console-output { flex: 1; overflow-y: auto; padding: 8px; font-size: 0.8rem; }
         .console-line { display: flex; margin-bottom: 3px; border-bottom: 1px solid rgba(48, 54, 61, 0.4); padding-bottom: 2px; }
         .c-time { color: var(--text-dim); width: 60px; flex-shrink: 0; }
         .c-type { width: 50px; font-weight: bold; flex-shrink: 0; }
-        .c-text { flex: 1; white-space: pre-wrap; word-break: break-all; }
-        .log .c-type { color: var(--text-dim); } .log .c-text { color: var(--text-main); }
+        .c-text { flex: 1; word-break: break-all; }
+        .log .c-type { color: var(--text-dim); }
         .error .c-type, .error .c-text { color: var(--danger); }
-        .warn .c-type, .warn .c-text { color: var(--warning); }
-        .system .c-type { color: var(--info); } .system .c-text { color: var(--info); }
+        .system .c-type, .system .c-text { color: var(--info); }
 
-        .dt-console-input-row { height: 34px; display: flex; background: #0d1117; border-top: 1px solid var(--border-color); align-items: center; flex-shrink: 0; }
+        .dt-console-input-row { height: 32px; display: flex; background: #0d1117; border-top: 1px solid var(--border-color); align-items: center; }
         #dt-js-input { flex: 1; background: transparent; border: none; margin: 0; height: 100%; font-size: 0.85rem; padding: 0 10px; color: var(--accent); }
-
         .dt-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
         .dt-table th, .dt-table td { border: 1px solid var(--border-color); padding: 6px 10px; text-align: left; }
         .dt-table th { background: #0d1117; color: var(--info); }
-
+        
         #toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
         .cyber-toast { background: var(--panel-bg); border-left: 4px solid var(--accent); color: white; padding: 10px 18px; font-size: 0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.8); }
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid var(--border-color); font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">// CYBER_OS_V5.2</div>
-        <div class="status-bar" id="sys-status">CUSTOM DEVTOOLS SUITE ACTIVE</div>
+        <div class="logo">// CYBER_OS_V5.3</div>
+        <div class="status-bar" id="sys-status">SECURE ISOLATED MODULES ACTIVE</div>
     </header>
 
     <div class="main-container">
         <aside>
-            <button class="nav-btn active" onclick="switchTab('ide', this)">> IDE Core</button>
-            <button class="nav-btn" onclick="switchTab('ai', this)">> AI Core</button>
-            <button class="nav-btn" onclick="switchTab('plugins', this)">> Plugins</button>
-            <button class="nav-btn" onclick="switchTab('settings', this)">> Settings</button>
+            <button class="nav-btn active" onclick="CyberUI.switchTab('ide', this)">> IDE Core</button>
+            <button class="nav-btn" onclick="CyberUI.switchTab('ai', this)">> AI Core</button>
+            <button class="nav-btn" onclick="CyberUI.switchTab('settings', this)">> Settings</button>
         </aside>
 
         <div class="content-area">
@@ -169,56 +106,39 @@
             <div id="ide" class="tab-content active">
                 <div id="monaco-editor-container"></div>
                 
-                <!-- TOUCH MACRO BAR -->
                 <div id="touch-macro-bar">
-                    <button class="macro-key" onclick="insertCode('{')">{ }</button>
-                    <button class="macro-key" onclick="insertCode(';')">;</button>
-                    <button class="macro-key" onclick="insertCode('->')">-&gt;</button>
-                    <button class="macro-key" onclick="insertCode('::')">::</button>
-                    <button class="macro-key" onclick="insertCode('std::cout &lt;&lt; &quot;&quot; &lt;&lt; std::endl;')">cout</button>
-                    <button class="macro-key" onclick="insertCode('()')">( )</button>
-                    <button class="macro-key" onclick="insertCode('[]')">[ ]</button>
-                    <button class="macro-key" onclick="insertCode('=')">=</button>
-                    <button class="macro-key" onclick="insertCode('\t')">TAB</button>
+                    <button class="macro-key" onclick="CyberEditor.insert('{')">{ }</button>
+                    <button class="macro-key" onclick="CyberEditor.insert(';')">;</button>
+                    <button class="macro-key" onclick="CyberEditor.insert('->')">-&gt;</button>
+                    <button class="macro-key" onclick="CyberEditor.insert('::')">::</button>
+                    <button class="macro-key" onclick="CyberEditor.insert('\t')">TAB</button>
                 </div>
 
-                <!-- CUSTOM CHROME-LIKE DEVTOOLS -->
+                <!-- DEVTOOLS -->
                 <div id="custom-devtools">
                     <div class="dt-tabs">
-                        <button class="dt-tab-btn active" onclick="switchDtTab('console', this)">Console</button>
-                        <button class="dt-tab-btn" onclick="switchDtTab('elements', this)">Elements</button>
-                        <button class="dt-tab-btn" onclick="switchDtTab('network', this)">Network</button>
-                        <button class="dt-tab-btn" onclick="switchDtTab('storage', this)">Application</button>
-                        <button class="dt-tab-btn" style="margin-left:auto; color:var(--danger);" onclick="clearDtConsole()">Clear</button>
+                        <button class="dt-tab-btn active" onclick="CyberDevTools.switchTab('console', this)">Console</button>
+                        <button class="dt-tab-btn" onclick="CyberDevTools.switchTab('network', this)">Network</button>
+                        <button class="dt-tab-btn" onclick="CyberDevTools.switchTab('storage', this)">Storage</button>
+                        <button class="dt-tab-btn" style="margin-left:auto; color:var(--danger);" onclick="CyberDevTools.clearConsole()">Clear</button>
                     </div>
 
-                    <!-- 1. Console -->
                     <div id="dt-panel-console" class="dt-panel-body active">
                         <div id="dt-console-output"></div>
                         <div class="dt-console-input-row">
                             <span style="color:var(--accent); font-weight:bold; padding:0 8px;">></span>
-                            <input type="text" id="dt-js-input" placeholder="Evaluate JavaScript...">
-                            <button class="cyber-btn btn-sm" onclick="runDtCmd()" style="margin-right:5px;">EXEC</button>
+                            <input type="text" id="dt-js-input" placeholder="Evaluate JS...">
+                            <button class="cyber-btn btn-sm" onclick="CyberDevTools.runCmd()" style="margin-right:5px;">EXEC</button>
                         </div>
                     </div>
 
-                    <!-- 2. Elements (DOM Tree) -->
-                    <div id="dt-panel-elements" class="dt-panel-body" style="padding: 10px;">
-                        <div style="font-size:0.8rem; color:var(--text-dim); margin-bottom: 5px;">// Live DOM Root Structure</div>
-                        <pre id="dom-inspector-tree" style="font-size:0.75rem; color:var(--info); overflow:auto; flex:1;"></pre>
-                    </div>
-
-                    <!-- 3. Network Interceptor -->
                     <div id="dt-panel-network" class="dt-panel-body" style="padding: 10px;">
-                        <div style="font-size:0.8rem; color:var(--text-dim); margin-bottom: 5px;">// Active Network Requests (Fetch / XHR)</div>
                         <table class="dt-table" id="network-table">
                             <tr><th>Time</th><th>Method</th><th>URL</th><th>Status</th></tr>
                         </table>
                     </div>
 
-                    <!-- 4. Application (Storage) -->
                     <div id="dt-panel-storage" class="dt-panel-body" style="padding: 10px;">
-                        <div style="font-size:0.8rem; color:var(--text-dim); margin-bottom: 5px;">// LocalStorage Manager</div>
                         <table class="dt-table" id="storage-table">
                             <tr><th>Key</th><th>Value</th></tr>
                         </table>
@@ -228,36 +148,18 @@
 
             <!-- AI TAB -->
             <div id="ai" class="tab-content">
-                <h2>AI Gateways & Quota</h2>
+                <h2>AI Engine Configuration</h2>
                 <div class="panel-card">
-                    <select id="ai-provider">
-                        <option value="OpenAI">OpenAI API</option>
-                        <option value="Anthropic">Anthropic Claude</option>
-                    </select>
-                    <input type="password" id="api-key-input" placeholder="API Key...">
-                    <button class="cyber-btn" onclick="addKey()">Register Key</button>
+                    <input type="text" id="api-key-input" placeholder="API Key...">
+                    <button class="cyber-btn" onclick="CyberAI.saveKey()">Save Key</button>
                 </div>
-                <div class="panel-card" id="keys-list"></div>
-            </div>
-
-            <!-- PLUGINS TAB -->
-            <div id="plugins" class="tab-content">
-                <h2>System Plugins</h2>
-                <div class="panel-card">
-                    <input type="text" id="plugin-name" placeholder="Plugin Name...">
-                    <button class="cyber-btn" onclick="addPlugin()">Deploy Plugin</button>
-                </div>
-                <div class="panel-card" id="plugins-list"></div>
             </div>
 
             <!-- SETTINGS TAB -->
             <div id="settings" class="tab-content">
                 <h2>System Settings</h2>
                 <div class="panel-card">
-                    <label>Operator:</label>
-                    <input type="text" id="account-name" value="Root">
-                    <button class="cyber-btn" onclick="saveSettings()">Save Config</button>
-                    <button class="cyber-btn danger" style="margin-top: 15px; width: 100%;" onclick="clearData()">WIPE SYSTEM DATA</button>
+                    <button class="cyber-btn danger" onclick="localStorage.clear(); location.reload();">WIPE SYSTEM DATA</button>
                 </div>
             </div>
         </div>
@@ -266,125 +168,183 @@
     <div id="toast-container"></div>
 
     <script>
-        // State Management
-        let storedState = JSON.parse(localStorage.getItem('CYBER_OS_STATE')) || {};
-        let cyberState = {
-            operator: storedState.operator || "Root",
-            keys: Array.isArray(storedState.keys) ? storedState.keys : [],
-            plugins: Array.isArray(storedState.plugins) ? storedState.plugins : []
-        };
+        // --- 1. UI MODULE (Изолировано) ---
+        const CyberUI = (() => {
+            try {
+                return {
+                    switchTab(tabId, btn) {
+                        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+                        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+                        document.getElementById(tabId).classList.add('active');
+                        btn.classList.add('active');
+                        if (tabId === 'ide') CyberEditor.layout();
+                    },
+                    toast(msg) {
+                        const container = document.getElementById('toast-container');
+                        if(!container) return;
+                        const toast = document.createElement('div');
+                        toast.className = 'cyber-toast';
+                        toast.innerText = `>> ${msg}`;
+                        container.appendChild(toast);
+                        setTimeout(() => toast.remove(), 2500);
+                    }
+                };
+            } catch(e) {
+                console.error("UI Module Error:", e);
+                return { switchTab(){}, toast(){} };
+            }
+        })();
 
-        function saveState() {
-            localStorage.setItem('CYBER_OS_STATE', JSON.stringify(cyberState));
-            updateStorageTable();
-        }
+        // --- 2. CONSOLE & DEVTOOLS MODULE (Изолировано) ---
+        const CyberDevTools = (() => {
+            try {
+                const getTime = () => {
+                    const d = new Date();
+                    return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
+                };
 
-        function showToast(msg) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'cyber-toast';
-            toast.innerText = `>> ${msg}`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 2500);
-        }
+                const print = (msg, type = 'log') => {
+                    const area = document.getElementById('dt-console-output');
+                    if(!area) return;
+                    const div = document.createElement('div');
+                    div.className = `console-line ${type}`;
+                    div.innerHTML = `<span class="c-time">${getTime()}</span><span class="c-type">[${type.toUpperCase()}]</span><span class="c-text">${msg}</span>`;
+                    area.appendChild(div);
+                    area.scrollTop = area.scrollHeight;
+                };
 
-        function switchTab(tabId, btn) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            btn.classList.add('active');
-            if (tabId === 'ide' && window.editor) setTimeout(() => window.editor.layout(), 100);
-        }
+                // Перехват стандартного вывода безопасно
+                const origLog = console.log;
+                console.log = function(...args) { print(args.join(' '), 'log'); origLog.apply(console, args); };
 
-        function switchDtTab(dtId, btn) {
-            document.querySelectorAll('.dt-panel-body').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.dt-tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(`dt-panel-${dtId}`).classList.add('active');
-            btn.classList.add('active');
-            if (dtId === 'elements') updateDomInspector();
-            if (dtId === 'storage') updateStorageTable();
-        }
+                return {
+                    switchTab(dtId, btn) {
+                        document.querySelectorAll('.dt-panel-body').forEach(el => el.classList.remove('active'));
+                        document.querySelectorAll('.dt-tab-btn').forEach(el => el.classList.remove('active'));
+                        document.getElementById(`dt-panel-${dtId}`).classList.add('active');
+                        btn.classList.add('active');
+                        if(dtId === 'storage') CyberDevTools.updateStorage();
+                    },
+                    print,
+                    clearConsole() { document.getElementById('dt-console-output').innerHTML = ''; },
+                    runCmd() {
+                        const input = document.getElementById('dt-js-input');
+                        if(!input || !input.value) return;
+                        const cmd = input.value;
+                        print(`> ${cmd}`, 'system');
+                        try {
+                            const res = eval(cmd);
+                            if(res !== undefined) print(JSON.stringify(res), 'log');
+                        } catch(e) { print(e.message, 'error'); }
+                        input.value = '';
+                    },
+                    updateStorage() {
+                        const table = document.getElementById('storage-table');
+                        if(!table) return;
+                        let html = '<tr><th>Key</th><th>Value</th></tr>';
+                        for (let i = 0; i < localStorage.length; i++) {
+                            const k = localStorage.key(i);
+                            html += `<tr><td>${k}</td><td style="word-break:break-all;">${localStorage.getItem(k)}</td></tr>`;
+                        }
+                        table.innerHTML = html;
+                    }
+                };
+            } catch(e) {
+                console.error("DevTools Module Error:", e);
+                return { print(){}, switchTab(){}, clearConsole(){}, runCmd(){}, updateStorage(){} };
+            }
+        })();
 
-        // --- DEVTOOLS: CONSOLE INTERCEPTOR ---
-        const origLog = console.log, origErr = console.error, origWarn = console.warn;
-        function getTime() {
-            const d = new Date();
-            return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
-        }
+        // --- 3. NETWORK MONITOR MODULE (Изолировано) ---
+        const CyberNetwork = (() => {
+            try {
+                const origFetch = window.fetch;
+                window.fetch = async function(...args) {
+                    const url = args[0];
+                    const method = (args[1] && args[1].method) ? args[1].method : 'GET';
+                    const time = new Date().toLocaleTimeString();
+                    try {
+                        const res = await origFetch.apply(this, args);
+                        const table = document.getElementById('network-table');
+                        if(table) {
+                            table.insertRow(-1).innerHTML = `<td style="color:var(--text-dim);">${time}</td><td style="color:var(--info);">${method}</td><td>${url}</td><td style="color:var(--accent);">${res.status}</td>`;
+                        }
+                        return res;
+                    } catch (err) {
+                        const table = document.getElementById('network-table');
+                        if(table) {
+                            table.insertRow(-1).innerHTML = `<td style="color:var(--text-dim);">${time}</td><td style="color:var(--info);">${method}</td><td>${url}</td><td style="color:var(--danger);">FAIL</td>`;
+                        }
+                        throw err;
+                    }
+                };
+            } catch(e) {
+                console.error("Network Module Error:", e);
+            }
+        })();
 
-        function printDtLog(msg, type) {
-            const area = document.getElementById('dt-console-output');
-            if(!area) return;
-            const div = document.createElement('div');
-            div.className = `console-line ${type}`;
-            div.innerHTML = `<span class="c-time">${getTime()}</span><span class="c-type">[${type.toUpperCase()}]</span><span class="c-text">${msg}</span>`;
-            area.appendChild(div);
-            area.scrollTop = area.scrollHeight;
-        }
+        // --- 4. EDITOR MODULE (Изолировано) ---
+        let editorInstance = null;
+        const CyberEditor = (() => {
+            try {
+                require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+                require(['vs/editor/editor.main'], function() {
+                    try {
+                        editorInstance = monaco.editor.create(document.getElementById('monaco-editor-container'), {
+                            value: '// Cyber OS v5.3 Modular Core Ready\nint main() {\n    return 0;\n}',
+                            language: 'cpp',
+                            theme: 'vs-dark',
+                            automaticLayout: false, // Отключаем автоматический ресайз, чтобы не вешать планшет
+                            fontSize: 15,
+                            minimap: { enabled: false }
+                        });
+                        CyberDevTools.print("Editor module loaded safely.", "system");
+                    } catch(innerErr) {
+                        console.error("Monaco create error:", innerErr);
+                    }
+                });
 
-        console.log = function(...args) { printDtLog(args.join(' '), 'log'); origLog.apply(console, args); };
-        console.error = function(...args) { printDtLog(args.join(' '), 'error'); origErr.apply(console, args); };
-        console.warn = function(...args) { printDtLog(args.join(' '), 'warn'); origWarn.apply(console, args); };
-        window.onerror = function(msg, url, line) { printDtLog(`${msg} (Line ${line})`, 'error'); };
+                return {
+                    layout() {
+                        if(editorInstance) {
+                            setTimeout(() => editorInstance.layout(), 50);
+                        }
+                    },
+                    insert(text) {
+                        if(!editorInstance) return;
+                        const selection = editorInstance.getSelection();
+                        editorInstance.executeEdits("macro", [{ range: selection, text: text, forceMoveMarkers: true }]);
+                        editorInstance.focus();
+                    }
+                };
+            } catch(e) {
+                console.error("Editor Module Error:", e);
+                return { layout(){}, insert(){} };
+            }
+        })();
 
-        function clearDtConsole() { document.getElementById('dt-console-output').innerHTML = ''; }
+        // --- 5. AI MODULE (Изолировано) ---
+        const CyberAI = (() => {
+            return {
+                saveKey() {
+                    const keyInput = document.getElementById('api-key-input');
+                    if(!keyInput || !keyInput.value) return;
+                    localStorage.setItem('CYBER_AI_KEY', keyInput.value);
+                    keyInput.value = '';
+                    CyberUI.toast("AI Key saved securely.");
+                }
+            };
+        })();
 
-        function runDtCmd() {
+        // Обработчик нажатия Enter в консоли
+        document.addEventListener('DOMContentLoaded', () => {
             const input = document.getElementById('dt-js-input');
-            const cmd = input.value;
-            if(!cmd) return;
-            printDtLog(`> ${cmd}`, 'system');
-            try {
-                const res = eval(cmd);
-                if(res !== undefined) printDtLog(JSON.stringify(res), 'log');
-            } catch(e) { printDtLog(e.message, 'error'); }
-            input.value = '';
-        }
-
-        document.getElementById('dt-js-input').addEventListener('keypress', e => {
-            if(e.key === 'Enter') runDtCmd();
+            if(input) {
+                input.addEventListener('keypress', e => {
+                    if(e.key === 'Enter') CyberDevTools.runCmd();
+                });
+            }
         });
-
-        // --- DEVTOOLS: DOM INSPECTOR ---
-        function updateDomInspector() {
-            const pre = document.getElementById('dom-inspector-tree');
-            pre.innerText = document.documentElement.outerHTML.substring(0, 1500) + "\n... [HTML Document Root Captured]";
-        }
-
-        // --- DEVTOOLS: NETWORK MONITOR INTERCEPTOR ---
-        const originalFetch = window.fetch;
-        window.fetch = async function(...args) {
-            const url = args[0];
-            const method = (args[1] && args[1].method) ? args[1].method : 'GET';
-            const startTime = getTime();
-            try {
-                const response = await originalFetch.apply(this, args);
-                addNetworkRecord(startTime, method, url, response.status);
-                return response;
-            } catch (err) {
-                addNetworkRecord(startTime, method, url, 'FAILED');
-                throw err;
-            }
-        };
-
-        function addNetworkRecord(time, method, url, status) {
-            const table = document.getElementById('network-table');
-            if(!table) return;
-            const row = table.insertRow(-1);
-            row.innerHTML = `<td style="color:var(--text-dim);">${time}</td><td style="color:var(--info); font-weight:bold;">${method}</td><td style="word-break:break-all;">${url}</td><td style="color:${status === 200 || status === 'OK' ? 'var(--accent)' : 'var(--danger)'};">${status}</td>`;
-        }
-
-        // --- DEVTOOLS: STORAGE MANAGER ---
-        function updateStorageTable() {
-            const table = document.getElementById('storage-table');
-            if(!table) return;
-            let html = '<tr><th>Key</th><th>Value</th></tr>';
-            for (let i = 0; i < localStorage.length; i++) {
-                const k = localStorage.key(i);
-                html += `<tr><td>${k}</td><td style="word-break:break-all;">${localStorage.getItem(k)}</td></tr>`;
-            }
-            table.innerHTML = html;
-        }
-
-        // Monaco Editor Setup + Touch Macros
-        require.config({ paths: { 'vs': 'https://
+    </script>
+</body>
+</html>
