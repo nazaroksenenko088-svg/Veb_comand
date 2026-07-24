@@ -14,6 +14,7 @@
             --text-main: #00ff66;
             --text-dim: #555566;
             --danger: #ff3333;
+            --warning: #ffcc00;
             --font-mono: 'Courier New', Courier, monospace;
         }
 
@@ -52,6 +53,13 @@
         .status-bar {
             font-size: 0.8rem;
             color: var(--text-dim);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; text-shadow: 0 0 5px var(--accent); }
+            100% { opacity: 0.7; }
         }
 
         .main-container {
@@ -95,6 +103,12 @@
 
         .tab-content {
             display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .tab-content.active {
@@ -124,6 +138,7 @@
             margin-top: 5px;
             margin-bottom: 10px;
             font-size: 0.9rem;
+            transition: 0.2s;
         }
 
         input:focus, select:focus, textarea:focus {
@@ -149,14 +164,46 @@
             color: var(--bg-color);
             box-shadow: 0 0 10px var(--accent-glow);
         }
+        
+        button.cyber-btn.danger {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        button.cyber-btn.danger:hover {
+            background: var(--danger);
+            color: var(--bg-color);
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
+        }
+
+        button.btn-sm {
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            margin-left: 5px;
+        }
 
         .driver-item, .key-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px;
+            padding: 10px;
             border-bottom: 1px solid var(--border-color);
             font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        
+        .driver-item:hover, .key-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .item-actions {
+            display: flex;
+            align-items: center;
         }
 
         .tag {
@@ -164,11 +211,53 @@
             padding: 2px 6px;
             border: 1px solid var(--text-dim);
             color: var(--text-dim);
+            display: inline-block;
+            margin-top: 2px;
         }
 
         .tag.active {
             border-color: var(--accent);
             color: var(--accent);
+        }
+        
+        .tag.inactive {
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        /* Система кибер-уведомлений (Toasts) */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 9999;
+        }
+
+        .cyber-toast {
+            background: var(--panel-bg);
+            border-left: 4px solid var(--accent);
+            color: white;
+            padding: 12px 20px;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            animation: slideIn 0.3s forwards, fadeOut 0.5s forwards 2.5s;
+        }
+
+        .cyber-toast.error {
+            border-left-color: var(--danger);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
         }
     </style>
 </head>
@@ -176,14 +265,14 @@
 
     <header>
         <div class="logo">// CYBER_OS_V5.0 // CORE</div>
-        <div class="status-bar" id="sys-status">STATUS: SECURE [OFFLINE]</div>
+        <div class="status-bar" id="sys-status">STATUS: SECURE [ONLINE]</div>
     </header>
 
     <div class="main-container">
         <aside>
             <button class="nav-btn active" onclick="switchTab('admin', this)">> Admin Core</button>
             <button class="nav-btn" onclick="switchTab('ai', this)">> AI Key Pool</button>
-            <button class="nav-btn" onclick="switchTab('drivers', this)">> Drivers & Scripts</button>
+            <button class="nav-btn" onclick="switchTab('drivers', this)">> Drivers & Plugins</button>
             <button class="nav-btn" onclick="switchTab('storage', this)">> JSON Storage</button>
         </aside>
 
@@ -212,10 +301,10 @@
                         <option value="OpenAI">OpenAI (GPT-4o / Custom)</option>
                         <option value="Anthropic">Anthropic (Claude 3.5)</option>
                         <option value="Google">Google Gemini API</option>
-                        <option value="CustomLocal">Local Endpoint (Ollama / LM Studio)</option>
+                        <option value="CustomLocal">Local Endpoint (Ollama)</option>
                     </select>
                     <label>API Key / Endpoint URL:</label>
-                    <input type="password" id="api-key-input" placeholder="sk-...">
+                    <input type="password" id="api-key-input" placeholder="Введите токен...">
                     <button class="cyber-btn" onclick="addApiKey()">Register Key</button>
                 </div>
                 <div class="panel-card">
@@ -228,8 +317,8 @@
             <div id="drivers" class="tab-content">
                 <h2>Virtual Drivers & JS Modules</h2>
                 <div class="panel-card">
-                    <label>Driver / Module Name:</label>
-                    <input type="text" id="driver-name" placeholder="e.g. MemoryScraper.js">
+                    <label>Driver / Plugin Name:</label>
+                    <input type="text" id="driver-name" placeholder="e.g. MonacoAutocomplete.js">
                     <label>Execution Mode:</label>
                     <select id="driver-mode">
                         <option value="background">Background Daemon</option>
@@ -251,23 +340,41 @@
                         All core states are serialized and dumped into local storage structure.
                     </p>
                     <button class="cyber-btn" onclick="exportDataJson()">Export System State (.json)</button>
-                    <textarea id="json-dump" rows="8" style="margin-top: 15px;" readonly></textarea>
+                    <textarea id="json-dump" rows="12" style="margin-top: 15px;" readonly></textarea>
                 </div>
             </div>
         </content>
     </div>
 
+    <!-- Контейнер для всплывающих уведомлений -->
+    <div id="toast-container"></div>
+
     <script>
-        // Инициализация локального хранилища состояния ОС
+        // Инициализация хранилища (база для нашей IDE)
         let cyberState = JSON.parse(localStorage.getItem('CYBER_OS_STATE')) || {
             account: { name: "RootOperator", level: "MAX" },
             aiKeys: [],
             drivers: [
                 { name: "CoreMemoryMonitor.js", mode: "background", status: "active" },
-                { name: "LocalClipboardHook.js", mode: "manual", status: "active" }
+                { name: "VSCodeCompatLayer.js", mode: "background", status: "inactive" }
             ]
         };
 
+        // --- СИСТЕМА УВЕДОМЛЕНИЙ ---
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `cyber-toast ${type}`;
+            toast.innerText = `>> ${message}`;
+            container.appendChild(toast);
+            
+            // Удаляем элемент после завершения анимации
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // --- УПРАВЛЕНИЕ СОСТОЯНИЕМ ---
         function saveState() {
             localStorage.setItem('CYBER_OS_STATE', JSON.stringify(cyberState, null, 2));
             updateJsonDump();
@@ -281,63 +388,147 @@
             if(tabId === 'storage') updateJsonDump();
         }
 
+        // --- ПРОФИЛЬ ---
         function saveAccountSettings() {
-            cyberState.account.name = document.getElementById('account-name').value;
+            const newName = document.getElementById('account-name').value;
+            if(!newName.trim()) {
+                showToast("Error: Account handle cannot be empty", "error");
+                return;
+            }
+            cyberState.account.name = newName;
             cyberState.account.level = document.getElementById('clearance-level').value;
             saveState();
-            alert("Identity profile updated successfully.");
+            showToast("Identity profile updated successfully.");
         }
 
+        // --- ИИ КЛЮЧИ ---
         function addApiKey() {
             const provider = document.getElementById('ai-provider').value;
             const key = document.getElementById('api-key-input').value;
-            if(!key) return;
-            cyberState.aiKeys.push({ provider, key: key.slice(0, 6) + '...' });
+            
+            if(!key.trim()) {
+                showToast("Error: API Key is required", "error");
+                return;
+            }
+            
+            // Маскировка ключа (показываем первые 4 и последние 4 символа)
+            const maskedKey = key.length > 8 ? 
+                `${key.slice(0, 4)}...${key.slice(-4)}` : 
+                `***MASKED***`;
+
+            cyberState.aiKeys.push({ provider, key: maskedKey, raw: key });
             document.getElementById('api-key-input').value = '';
             saveState();
             renderKeys();
+            showToast(`Gateway [${provider}] registered.`);
+        }
+
+        function deleteKey(index) {
+            const provider = cyberState.aiKeys[index].provider;
+            cyberState.aiKeys.splice(index, 1);
+            saveState();
+            renderKeys();
+            showToast(`Gateway [${provider}] removed.`, "error");
         }
 
         function renderKeys() {
             const container = document.getElementById('keys-list');
+            if (cyberState.aiKeys.length === 0) {
+                container.innerHTML = '<span style="color:var(--text-dim)">No gateways registered.</span>';
+                return;
+            }
+            
             container.innerHTML = cyberState.aiKeys.map((item, idx) => `
                 <div class="key-item">
-                    <span>${item.provider} (${item.key})</span>
-                    <span class="tag active">CONNECTED</span>
-                </div>
-            `).join('') || '<span style="color:var(--text-dim)">No keys registered.</span>';
-        }
-
-        function registerDriver() {
-            const name = document.getElementById('driver-name').value;
-            const mode = document.getElementById('driver-mode').value;
-            if(!name) return;
-            cyberState.drivers.push({ name, mode, status: "active" });
-            document.getElementById('driver-name').value = '';
-            saveState();
-            renderDrivers();
-        }
-
-        function renderDrivers() {
-            const container = document.getElementById('drivers-list');
-            container.innerHTML = cyberState.drivers.map(d => `
-                <div class="driver-item">
-                    <span>${d.name} [${d.mode}]</span>
-                    <span class="tag ${d.status === 'active' ? 'active' : ''}">${d.status.toUpperCase()}</span>
+                    <div class="item-info">
+                        <strong>${item.provider}</strong>
+                        <span class="tag active">${item.key}</span>
+                    </div>
+                    <div class="item-actions">
+                        <button class="cyber-btn danger btn-sm" onclick="deleteKey(${idx})">DEL</button>
+                    </div>
                 </div>
             `).join('');
         }
 
+        // --- ДРАЙВЕРЫ И ПЛАГИНЫ ---
+        function registerDriver() {
+            const name = document.getElementById('driver-name').value;
+            const mode = document.getElementById('driver-mode').value;
+            
+            if(!name.trim()) {
+                showToast("Error: Driver name is required", "error");
+                return;
+            }
+
+            cyberState.drivers.push({ name, mode, status: "active" });
+            document.getElementById('driver-name').value = '';
+            saveState();
+            renderDrivers();
+            showToast(`Driver [${name}] deployed.`);
+        }
+
+        function toggleDriver(index) {
+            const driver = cyberState.drivers[index];
+            driver.status = driver.status === 'active' ? 'inactive' : 'active';
+            saveState();
+            renderDrivers();
+            showToast(`Driver [${driver.name}] status changed to ${driver.status.toUpperCase()}`);
+        }
+
+        function deleteDriver(index) {
+            const name = cyberState.drivers[index].name;
+            cyberState.drivers.splice(index, 1);
+            saveState();
+            renderDrivers();
+            showToast(`Driver [${name}] deleted.`, "error");
+        }
+
+        function renderDrivers() {
+            const container = document.getElementById('drivers-list');
+            if (cyberState.drivers.length === 0) {
+                container.innerHTML = '<span style="color:var(--text-dim)">System memory empty. No drivers loaded.</span>';
+                return;
+            }
+
+            container.innerHTML = cyberState.drivers.map((d, idx) => `
+                <div class="driver-item">
+                    <div class="item-info">
+                        <strong>${d.name}</strong>
+                        <span style="font-size: 0.7rem; color: var(--text-dim)">MODE: ${d.mode.toUpperCase()}</span>
+                        <span class="tag ${d.status}">${d.status.toUpperCase()}</span>
+                    </div>
+                    <div class="item-actions">
+                        <button class="cyber-btn btn-sm" onclick="toggleDriver(${idx})">
+                            ${d.status === 'active' ? 'STOP' : 'START'}
+                        </button>
+                        <button class="cyber-btn danger btn-sm" onclick="deleteDriver(${idx})">DEL</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- ЭКСПОРТ ДАННЫХ ---
         function updateJsonDump() {
-            document.getElementById('json-dump').value = JSON.stringify(cyberState, null, 2);
+            // Создаем копию состояния без сырых API ключей для безопасного отображения
+            const safeState = JSON.parse(JSON.stringify(cyberState));
+            if(safeState.aiKeys) {
+                safeState.aiKeys.forEach(k => delete k.raw);
+            }
+            document.getElementById('json-dump').value = JSON.stringify(safeState, null, 2);
         }
 
         function exportDataJson() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cyberState, null, 2));
+            const safeState = JSON.parse(JSON.stringify(cyberState));
+            if(safeState.aiKeys) {
+                safeState.aiKeys.forEach(k => delete k.raw); // Удаляем приватные ключи перед экспортом
+            }
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(safeState, null, 2));
             const dlAnchorElem = document.createElement('a');
             dlAnchorElem.setAttribute("href", dataStr);
             dlAnchorElem.setAttribute("download", "cyber_os_state.json");
             dlAnchorElem.click();
+            showToast("System state exported successfully.");
         }
 
         // Первичный рендер при старте
