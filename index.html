@@ -130,7 +130,6 @@
             padding: 20px;
         }
 
-        /* Особый стиль для вкладки IDE, чтобы она занимала весь экран без отступов */
         #ide.tab-content {
             padding: 0;
             overflow: hidden;
@@ -160,15 +159,14 @@
         button.cyber-btn.danger:hover { background: var(--danger); color: var(--bg-color); }
         button.btn-sm { padding: 6px 12px; font-size: 0.75rem; margin-left: 5px; }
 
-        /* --- IDE & CONSOLE STYLES --- */
         #monaco-editor-container {
-            flex: 1; /* Занимает всё свободное место */
-            min-height: 0; /* Обязательно для правильного Flexbox на мобилках */
+            flex: 1;
+            min-height: 0;
             width: 100%;
         }
 
         #cyber-dev-console {
-            height: 30vh; /* Консоль занимает 30% высоты экрана */
+            height: 30vh;
             min-height: 150px;
             background: #050505;
             display: flex;
@@ -202,13 +200,11 @@
         
         #console-js-input { flex: 1; background: transparent; border: none; margin: 0; height: 100%; font-size: 0.9rem; padding: 0 10px; }
 
-        /* Toasts */
         #toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
         .cyber-toast { background: var(--panel-bg); border-left: 4px solid var(--accent); color: white; padding: 12px 20px; font-size: 0.85rem; box-shadow: 0 4px 12px rgba(0,0,0,0.8); animation: slideIn 0.3s forwards; }
         .cyber-toast.error { border-left-color: var(--danger); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* Lists */
         .list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
     </style>
 </head>
@@ -287,11 +283,12 @@
     <div id="toast-container"></div>
 
     <script>
-        // --- 1. STATE MANAGEMENT ---
-        let cyberState = JSON.parse(localStorage.getItem('CYBER_OS_STATE')) || {
-            operator: "Root",
-            keys: [],
-            plugins: []
+        // --- 1. STATE MANAGEMENT WITH SAFETY DEFAULTS ---
+        let storedState = JSON.parse(localStorage.getItem('CYBER_OS_STATE')) || {};
+        let cyberState = {
+            operator: storedState.operator || "Root",
+            keys: Array.isArray(storedState.keys) ? storedState.keys : [],
+            plugins: Array.isArray(storedState.plugins) ? storedState.plugins : []
         };
 
         function saveState() {
@@ -314,7 +311,6 @@
             document.getElementById(tabId).classList.add('active');
             btn.classList.add('active');
             
-            // Fix Monaco layout when switching back to IDE tab
             if (tabId === 'ide' && window.editor) {
                 setTimeout(() => window.editor.layout(), 100);
             }
@@ -365,29 +361,38 @@
         // --- 4. MONACO EDITOR INIT ---
         require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
         require(['vs/editor/editor.main'], function() {
-            window.editor = monaco.editor.create(document.getElementById('monaco-editor-container'), {
-                value: '#include <iostream>\n\nint main() {\n    std::cout << "Cyber IDE Active" << std::endl;\n    return 0;\n}',
-                language: 'cpp',
-                theme: 'vs-dark',
-                automaticLayout: true,
-                fontSize: 16,
-                minimap: { enabled: false },
-                scrollBeyondLastLine: true
-            });
-            printLog("Monaco Engine v0.45.0 loaded successfully.", "system");
+            if (!window.editor) {
+                window.editor = monaco.editor.create(document.getElementById('monaco-editor-container'), {
+                    value: '#include <iostream>\n\nint main() {\n    std::cout << "Cyber IDE Active" << std::endl;\n    return 0;\n}',
+                    language: 'cpp',
+                    theme: 'vs-dark',
+                    automaticLayout: true,
+                    fontSize: 16,
+                    minimap: { enabled: false },
+                    scrollBeyondLastLine: true
+                });
+                printLog("Monaco Engine v0.45.0 loaded successfully.", "system");
+            }
         });
 
         // --- 5. DATA MANAGEMENT ---
         function renderUI() {
-            document.getElementById('account-name').value = cyberState.operator;
+            const accountInput = document.getElementById('account-name');
+            if (accountInput) accountInput.value = cyberState.operator;
             
-            document.getElementById('keys-list').innerHTML = cyberState.keys.map((k, i) => 
-                `<div class="list-item"><span>${k.prov} [***]</span><button class="cyber-btn danger btn-sm" onclick="delKey(${i})">X</button></div>`
-            ).join('') || '<span style="color:var(--text-dim)">No keys.</span>';
+            const keysList = document.getElementById('keys-list');
+            if (keysList) {
+                keysList.innerHTML = (cyberState.keys || []).map((k, i) => 
+                    `<div class="list-item"><span>${k.prov} [***]</span><button class="cyber-btn danger btn-sm" onclick="delKey(${i})">X</button></div>`
+                ).join('') || '<span style="color:var(--text-dim)">No keys.</span>';
+            }
 
-            document.getElementById('plugins-list').innerHTML = cyberState.plugins.map((p, i) => 
-                `<div class="list-item"><span>${p.name}</span><button class="cyber-btn danger btn-sm" onclick="delPlugin(${i})">X</button></div>`
-            ).join('') || '<span style="color:var(--text-dim)">No plugins loaded.</span>';
+            const pluginsList = document.getElementById('plugins-list');
+            if (pluginsList) {
+                pluginsList.innerHTML = (cyberState.plugins || []).map((p, i) => 
+                    `<div class="list-item"><span>${p.name}</span><button class="cyber-btn danger btn-sm" onclick="delPlugin(${i})">X</button></div>`
+                ).join('') || '<span style="color:var(--text-dim)">No plugins loaded.</span>';
+            }
         }
 
         function addKey() {
@@ -420,7 +425,6 @@
             }
         }
 
-        // Init
         renderUI();
     </script>
 </body>
