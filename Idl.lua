@@ -1,70 +1,105 @@
--- Разведывательный модуль (Scout & Test Engine)
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+-- Bypass Editor, Scout & Brainrot Looter - Full Suite
 local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
 local localPlayer = Players.LocalPlayer
 
-print("[*] Запуск сканирования уязвимых Remote-объектов...")
+print("[*] Инициализация защищенного ядра и сканера...")
 
-local foundRemotes = {}
+-- Таблица для хранения найденных уязвимых эвентов
+local vulnerableEvents = {}
 
--- Функция рекурсивного поиска дырявых эвентов
-local function scanFolder(parentFolder)
-    for _, item in ipairs(parentFolder:GetChildren()) do
-        if item:IsA("RemoteEvent") or item:IsA("RemoteFunction") then
-            table.insert(foundRemotes, item)
-            print(("[+] Найден Remote: %s (%s)"):format(item.Name, item.ClassName))
-        end
-        -- Уходим вглубь по структуре
-        if #item:GetChildren() > 0 then
-            scanFolder(item)
-        end
-    end
-end
-
--- Сканируем основные зоны хранения сетевых данных
-pcall(function()
-    scanFolder(ReplicatedStorage)
-end)
-
-print(("[*] Сканирование завершено. Найдено целей: %d"):format(#foundRemotes))
-
--- Функция зондирования и тест-драйва найденного эвента
-local function probeEvent(remoteInstance, ...)
-    local args = {...}
-    print(("[~] Зондируем цель: %s"):format(remoteInstance.Name))
-    
-    local success, err = pcall(function()
-        if remoteInstance:IsA("RemoteEvent") then
-            remoteInstance:FireServer(unpack(args))
-        elseif remoteInstance:IsA("RemoteFunction") then
-            remoteInstance:InvokeServer(unpack(args))
+-- Автоматический поиск дырявых эвентов в ReplicatedStorage
+local function deepScan(parent)
+    pcall(function()
+        for _, child in ipairs(parent:GetChildren()) do
+            if child:IsA("RemoteEvent") or child:IsA("RemoteFunction") then
+                table.insert(vulnerableEvents, child)
+                print(("[+] Цель захвачена: %s [%s]"):format(child.Name, child.ClassName))
+            end
+            if #child:GetChildren() > 0 then
+                deepScan(child)
+            end
         end
     end)
-    
-    if success then
-        print(("[+] Успех! Запрос принят сервером для: %s"):format(remoteInstance.Name))
-    else
-        print(("[-] Сервер отклонил или заблокировал: %s | Ошибка: %s"):format(remoteInstance.Name, tostring(err)))
-    end
 end
 
--- Пример тестового вызова первого попавшегося эвента (можно заменить аргументы под нужные нужды)
-if #foundRemotes > 0 then
-    task.spawn(function()
-        task.wait(1)
-        -- Пробуем дернуть первую найденную цель с тестовым аргументом
-        probeEvent(foundRemotes[1], "TestPayload", 1337)
-    end)
-end    --     for i = 1, 5 do
-    --         targetRemote:FireServer(999999)
-    --         task.wait(0.5 + math.random() * 0.3)
-    --     end
-    -- end
+deepScan(ReplicatedStorage)
+
+-- Создаем кастомный графический интерфейс (GUI)
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "BypassMasterGUI"
+ScreenGui.Parent = CoreGui
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 280, 0, 220)
+MainFrame.Position = UDim2.new(0.15, 0, 0.15, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Text = "Roblox Bypass Editor & Looter"
+Title.TextScaled = true
+Title.Font = Enum.Font.SourceSansBold
+Title.Parent = MainFrame
+
+-- Кнопка запуска кражи / автосбора
+local LootButton = Instance.new("TextButton")
+LootButton.Size = UDim2.new(0.9, 0, 0, 50)
+LootButton.Position = UDim2.new(0.05, 0, 0.25, 0)
+LootButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+LootButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+LootButton.Text = "Запустить кражу ценностей"
+LootButton.TextScaled = true
+LootButton.Parent = MainFrame
+
+-- Кнопка активации анимаций / редактора
+local EditorButton = Instance.new("TextButton")
+EditorButton.Size = UDim2.new(0.9, 0, 0, 50)
+EditorButton.Position = UDim2.new(0.05, 0, 0.6, 0)
+EditorButton.BackgroundColor3 = Color3.fromRGB(0, 160, 220)
+EditorButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+EditorButton.Text = "Включить редактор анимаций"
+EditorButton.TextScaled = true
+EditorButton.Parent = MainFrame
+
+-- Логика кнопки сбора (перебор найденных эвентов и отправка триггеров)
+LootButton.MouseButton1Click:Connect(function()
+    print("[*] Инициируем процедуру сбора через открытые каналы...")
     
-    print("[Chaos Engine] Симуляция пакетов завершена. Проверяем баланс...")
+    local triggeredCount = 0
+    for _, remote in ipairs(vulnerableEvents) do
+        pcall(function()
+            -- Пробуем мягко дернуть эвент с аргументами на выдачу/сбор
+            if remote:IsA("RemoteEvent") then
+                remote:FireServer("ClaimReward", localPlayer.Character.HumanoidRootPart.Position, true)
+                remote:FireServer("StealBrainrot")
+                triggeredCount = triggeredCount + 1
+            end
+        end)
+    end
+    
+    print(("[+] Пройдено целей: %d. Сигналы ушли на сервер без киков."):format(triggeredCount))
 end)
 
--- 3. Финальный отчёт о готовности
-safeExecute("Finalizer", function()
-    print("[Chaos Engine] Все системы в норме. Сервер готов к перформансу!")
+-- Логика кастомного редактора / пака анимаций
+EditorButton.MouseButton1Click:Connect(function()
+    print("[*] Активация кастомного слоя анимаций...")
+    pcall(function()
+        local character = localPlayer.Character
+        if character and character:FindFirstChild("Humanoid") then
+            -- Пример изменения скорости для теста автономности клиента
+            character.Humanoid.WalkSpeed = 25
+            print("[+] Скорость и мувики перехвачены клиентом!")
+        end
+    end)
 end)
+
+print("[+] Полный комплекс загружен. Окно готово к использованию.")
