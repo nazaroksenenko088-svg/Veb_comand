@@ -2,11 +2,20 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <!-- Мета-теги для адаптации на планшетах (Android/iPad) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cyber OS v5.0 // IDE Edition</title>
-    <!-- Подключаем Monaco Editor Loader -->
+    <title>Cyber OS v5.0 // Core IDE</title>
+    
+    <!-- Monaco Editor Loader -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    
+    <!-- Eruda DevTools (Мобильный F12) -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+        eruda.init({
+            defaults: { displaySize: 45, theme: 'Dark' }
+        });
+    </script>
+
     <style>
         :root {
             --bg-color: #050505;
@@ -26,14 +35,12 @@
             margin: 0;
             padding: 0;
             font-family: var(--font-mono);
-            /* Отключаем стандартные выделения при долгом тапе (для тачскринов) */
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
         }
         
-        /* Разрешаем выделение текста в инпутах, текстовых зонах и редакторе */
-        input, textarea, #monaco-editor-container, .console-output-line {
+        input, textarea, .console-output-line {
             -webkit-user-select: text;
             user-select: text;
         }
@@ -42,10 +49,10 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             height: 100vh;
+            width: 100vw;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            border: 2px solid var(--border-color);
         }
 
         header {
@@ -56,6 +63,7 @@
             justify-content: space-between;
             align-items: center;
             height: 50px;
+            flex-shrink: 0;
         }
 
         .logo {
@@ -67,36 +75,29 @@
         .status-bar {
             font-size: 0.8rem;
             color: var(--text-dim);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.7; }
-            50% { opacity: 1; text-shadow: 0 0 5px var(--accent); }
-            100% { opacity: 0.7; }
         }
 
         .main-container {
             display: flex;
             flex: 1;
             overflow: hidden;
-            height: calc(100vh - 50px);
         }
 
         aside {
-            width: 260px;
+            width: 240px;
             background: var(--panel-bg);
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
+            overflow-y: auto;
         }
 
         .nav-btn {
             background: transparent;
             border: none;
             color: var(--text-dim);
-            padding: 15px 20px;
+            padding: 15px 15px;
             text-align: left;
             cursor: pointer;
             font-size: 0.9rem;
@@ -107,469 +108,320 @@
 
         .nav-btn:hover, .nav-btn.active {
             color: var(--text-main);
-            background: rgba(0, 255, 102, 0.03);
+            background: rgba(0, 255, 102, 0.05);
             border-left-color: var(--accent);
         }
 
-        content {
+        .content-area {
             flex: 1;
-            padding: 20px;
-            overflow-y: auto;
             background: var(--bg-color);
             position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .tab-content {
             display: none;
-            animation: fadeIn 0.3s ease-in-out;
             height: 100%;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        h2 {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            border-bottom: 1px dashed var(--border-color);
-            padding-bottom: 5px;
-        }
-
-        .panel-card {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        input, select, textarea {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 10px 12px; /* Увеличили padding для тача */
             width: 100%;
-            margin-top: 5px;
-            margin-bottom: 10px;
-            font-size: 1rem; /* Увеличили шрифт для тача */
-            transition: 0.2s;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 5px var(--accent-glow);
-        }
-
-        button.cyber-btn {
-            background: transparent;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 10px 20px; /* Увеличили padding для тача */
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-        }
-
-        button.cyber-btn:hover {
-            background: var(--accent);
-            color: var(--bg-color);
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-        
-        button.cyber-btn.danger {
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-        button.cyber-btn.danger:hover {
-            background: var(--danger);
-            color: var(--bg-color);
-            box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
-        }
-
-        button.btn-sm {
-            padding: 6px 12px;
-            font-size: 0.75rem;
-            margin-left: 5px;
-        }
-
-        /* --- СТИЛИ ДЛЯ ИНТЕРФЕЙСА IDE И КОНСОЛИ --- */
-        #ide {
-            display: flex;
             flex-direction: column;
-            height: 100%;
-            padding: 0; /* Убираем стандартные отступы контента */
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* Особый стиль для вкладки IDE, чтобы она занимала весь экран без отступов */
+        #ide.tab-content {
+            padding: 0;
             overflow: hidden;
         }
 
-        /* Контейнер редактора Monaco */
-        #monaco-editor-container {
-            flex: 1; /* Занимает все место до консоли */
-            border-bottom: 2px solid var(--border-color);
+        .tab-content.active {
+            display: flex;
         }
 
-        /* Наша супер-консоль (DevTools) */
+        h2 { font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px dashed var(--border-color); padding-bottom: 5px; }
+
+        .panel-card { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 15px; margin-bottom: 15px; }
+
+        input, select, textarea {
+            background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main);
+            padding: 10px; width: 100%; margin-top: 5px; margin-bottom: 15px; font-size: 1rem;
+        }
+
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+
+        button.cyber-btn {
+            background: transparent; border: 1px solid var(--accent); color: var(--accent);
+            padding: 10px 20px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.9rem;
+        }
+        button.cyber-btn:hover { background: var(--accent); color: var(--bg-color); box-shadow: 0 0 10px var(--accent-glow); }
+        button.cyber-btn.danger { border-color: var(--danger); color: var(--danger); }
+        button.cyber-btn.danger:hover { background: var(--danger); color: var(--bg-color); }
+        button.btn-sm { padding: 6px 12px; font-size: 0.75rem; margin-left: 5px; }
+
+        /* --- IDE & CONSOLE STYLES --- */
+        #monaco-editor-container {
+            flex: 1; /* Занимает всё свободное место */
+            min-height: 0; /* Обязательно для правильного Flexbox на мобилках */
+            width: 100%;
+        }
+
         #cyber-dev-console {
-            height: 250px; /* Фиксированная высота консоли внизу */
+            height: 30vh; /* Консоль занимает 30% высоты экрана */
+            min-height: 150px;
             background: #050505;
             display: flex;
             flex-direction: column;
-            font-size: 0.85rem;
-            border-top: 1px solid var(--border-color);
+            border-top: 2px solid var(--border-color);
         }
 
         .console-header {
-            background: var(--panel-bg);
-            padding: 5px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            height: 35px;
+            background: var(--panel-bg); padding: 5px 15px; display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 1px solid var(--border-color); height: 35px; flex-shrink: 0;
         }
 
-        .console-title {
-            color: #4ec9b0;
-            font-size: 0.8rem;
-        }
-
-        .console-tools {
-            display: flex;
-            gap: 5px;
-        }
-
-        /* Область вывода логов */
         #console-output-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-            scroll-behavior: smooth;
+            flex: 1; overflow-y: auto; padding: 10px; font-size: 0.85rem;
         }
 
-        .console-output-line {
-            display: flex;
-            margin-bottom: 4px;
-            border-bottom: 1px solid rgba(26, 26, 36, 0.3);
-            padding-bottom: 2px;
-        }
+        .console-output-line { display: flex; margin-bottom: 4px; border-bottom: 1px solid rgba(26, 26, 36, 0.3); padding-bottom: 2px; }
+        .msg-time { color: var(--text-dim); width: 65px; flex-shrink: 0; }
+        .msg-type { width: 50px; font-weight: bold; flex-shrink: 0; }
+        .msg-text { flex: 1; white-space: pre-wrap; word-break: break-all; }
 
-        .console-output-line.log .msg-type { color: #888; }
-        .console-output-line.log .msg-text { color: var(--text-main); }
-        
-        .console-output-line.error .msg-type { color: var(--danger); }
-        .console-output-line.error .msg-text { color: var(--danger); font-weight: bold; }
-        
-        .console-output-line.warn .msg-type { color: var(--warning); }
-        .console-output-line.warn .msg-text { color: var(--warning); }
+        .log .msg-type { color: #888; } .log .msg-text { color: var(--text-main); }
+        .error .msg-type, .error .msg-text { color: var(--danger); }
+        .warn .msg-type, .warn .msg-text { color: var(--warning); }
+        .system .msg-type { color: #00ccff; } .system .msg-text { color: #888; }
 
-        .console-output-line.system .msg-type { color: #00ccff; }
-        .console-output-line.system .msg-text { color: #888; }
-
-        .msg-time { color: var(--text-dim); width: 60px; flex-shrink: 0; }
-        .msg-type { width: 40px; text-align: center; font-weight: bold; flex-shrink: 0; }
-        .msg-text { flex: 1; white-space: pre-wrap; overflow-x: auto; }
-
-        /* Командная строка консоли */
         .console-input-area {
-            height: 40px;
-            display: flex;
-            background: var(--panel-bg);
-            border-top: 1px solid var(--border-color);
-            padding: 0 5px;
-            align-items: center;
+            height: 40px; display: flex; background: var(--panel-bg); border-top: 1px solid var(--border-color);
+            align-items: center; flex-shrink: 0;
         }
         
-        .console-prompt {
-            color: var(--accent);
-            font-weight: bold;
-            padding: 0 10px;
-        }
+        #console-js-input { flex: 1; background: transparent; border: none; margin: 0; height: 100%; font-size: 0.9rem; padding: 0 10px; }
 
-        #console-js-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 0.95rem;
-            margin: 0;
-            padding: 0 10px;
-            height: 100%;
-        }
+        /* Toasts */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .cyber-toast { background: var(--panel-bg); border-left: 4px solid var(--accent); color: white; padding: 12px 20px; font-size: 0.85rem; box-shadow: 0 4px 12px rgba(0,0,0,0.8); animation: slideIn 0.3s forwards; }
+        .cyber-toast.error { border-left-color: var(--danger); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        #console-js-input:focus {
-            box-shadow: none;
-            border: none;
-            color: var(--accent);
-        }
-
-        /* Системные элементы */
-        .driver-item, .key-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.85rem;
-        }
-        
-        .tag {
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border: 1px solid var(--text-dim);
-            color: var(--text-dim);
-            display: inline-block;
-        }
-
-        .tag.active {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-        
-        .tag.inactive {
-            border-color: var(--warning);
-            color: var(--warning);
-        }
-
-        #toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 9999;
-        }
-
-        .cyber-toast {
-            background: var(--panel-bg);
-            border-left: 4px solid var(--accent);
-            color: white;
-            padding: 12px 20px;
-            font-size: 0.85rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            animation: slideIn 0.3s forwards;
-            min-width: 250px;
-        }
-
-        .cyber-toast.error {
-            border-left-color: var(--danger);
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
+        /* Lists */
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">// CYBER_OS_V5.0 // IDE</div>
-        <div class="status-bar" id="sys-status">STATUS: ONLINE / DEVELOPER MODE</div>
+        <div class="logo">// CYBER_OS_V5.0</div>
+        <div class="status-bar" id="sys-status">SYS.OK</div>
     </header>
 
     <div class="main-container">
         <aside>
-            <!-- Новая главная кнопка IDE -->
             <button class="nav-btn active" onclick="switchTab('ide', this)">> IDE Core</button>
-            <button class="nav-btn" onclick="switchTab('admin', this)">> Admin Core</button>
-            <button class="nav-btn" onclick="switchTab('ai', this)">> AI Key Pool</button>
-            <button class="nav-btn" onclick="switchTab('drivers', this)">> Drivers & Plugins</button>
-            <button class="nav-btn" onclick="switchTab('storage', this)">> JSON Storage</button>
+            <button class="nav-btn" onclick="switchTab('ai', this)">> AI Core</button>
+            <button class="nav-btn" onclick="switchTab('plugins', this)">> Plugins</button>
+            <button class="nav-btn" onclick="switchTab('settings', this)">> Settings</button>
         </aside>
 
-        <content>
-            <!-- --- ВКЛАДКА IDE CORE --- -->
+        <div class="content-area">
+            <!-- IDE TAB -->
             <div id="ide" class="tab-content active">
-                <!-- Контейнер для Monaco Editor -->
                 <div id="monaco-editor-container"></div>
                 
-                <!-- Наша кастомная консоль (DevTools) -->
                 <div id="cyber-dev-console">
                     <div class="console-header">
-                        <span class="console-title">// DEV CONSOLE / TERMINAL</span>
-                        <div class="console-tools">
-                            <!-- Кнопки управления консолью -->
-                            <button class="cyber-btn danger btn-sm" style="padding: 2px 6px; font-size: 0.7rem;" onclick="clearCustomConsole()">CLEAR</button>
-                        </div>
+                        <span style="color:#4ec9b0; font-size:0.8rem;">// DEV TERMINAL</span>
+                        <button class="cyber-btn danger btn-sm" onclick="clearConsole()">CLEAR</button>
                     </div>
-                    
-                    <!-- Область вывода -->
                     <div id="console-output-area"></div>
-                    
-                    <!-- Командная строка для выполнения JS прямо на планшете -->
                     <div class="console-input-area">
-                        <span class="console-prompt">>_</span>
-                        <input type="text" id="console-js-input" placeholder="Введите JavaScript код или команду и нажмите RUN -->">
-                        <button class="cyber-btn btn-sm" onclick="runJsCommand()">RUN</button>
+                        <span style="color:var(--accent); font-weight:bold; padding:0 10px;">>_</span>
+                        <input type="text" id="console-js-input" placeholder="Execute JS command...">
+                        <button class="cyber-btn btn-sm" onclick="runConsoleCmd()">RUN</button>
                     </div>
                 </div>
             </div>
 
-            <!-- --- ОСТАЛЬНЫЕ ВКЛАДКИ (Без изменений) --- -->
-            <div id="admin" class="tab-content">
-                <h2>Admin Control & Identity</h2>
-                <div class="panel-card">
-                    <label>System Account / Handle:</label>
-                    <input type="text" id="account-name" value="RootOperator">
-                    <label>Security Clearance Level:</label>
-                    <select id="clearance-level">
-                        <option value="MAX">Level 5 (Full Autonomous)</option>
-                        <option value="MID">Level 3 (Restricted)</option>
-                    </select>
-                    <button class="cyber-btn" onclick="saveAccountSettings()">Save Identity</button>
-                </div>
-            </div>
-
+            <!-- AI TAB -->
             <div id="ai" class="tab-content">
-                <h2>AI Models & API Gateways</h2>
+                <h2>AI Gateways</h2>
                 <div class="panel-card">
-                    <label>Provider:</label>
                     <select id="ai-provider">
-                        <option value="OpenAI">OpenAI (GPT-4o)</option>
-                        <option value="Anthropic">Anthropic (Claude)</option>
-                        <option value="Ollama">Ollama (Local Localhost)</option>
+                        <option value="OpenAI">OpenAI</option>
+                        <option value="Anthropic">Anthropic</option>
+                        <option value="Local">Local Endpoint</option>
                     </select>
-                    <label>API Key / Endpoint URL:</label>
-                    <input type="password" id="api-key-input" placeholder="sk-...">
-                    <button class="cyber-btn" onclick="addApiKey()">Register Key</button>
+                    <input type="password" id="api-key-input" placeholder="API Key...">
+                    <button class="cyber-btn" onclick="addKey()">Add Key</button>
                 </div>
-                <div class="panel-card">
-                    <h3>Active Gateways</h3>
-                    <div id="keys-list"></div>
-                </div>
+                <div class="panel-card" id="keys-list"></div>
             </div>
 
-            <div id="drivers" class="tab-content">
-                <h2>Virtual Drivers & Plugins</h2>
+            <!-- PLUGINS TAB -->
+            <div id="plugins" class="tab-content">
+                <h2>System Plugins</h2>
                 <div class="panel-card">
-                    <label>Plugin Name:</label>
-                    <input type="text" id="driver-name" placeholder="e.g. GitIntegration.js">
-                    <label>Execution Mode:</label>
-                    <select id="driver-mode">
-                        <option value="background">Background Daemon</option>
-                        <option value="manual">Manual</option>
-                    </select>
-                    <button class="cyber-btn" onclick="registerDriver()">Deploy</button>
+                    <input type="text" id="plugin-name" placeholder="Plugin Name...">
+                    <button class="cyber-btn" onclick="addPlugin()">Deploy</button>
                 </div>
-                <div class="panel-card">
-                    <h3>Loaded Drivers</h3>
-                    <div id="drivers-list"></div>
-                </div>
+                <div class="panel-card" id="plugins-list"></div>
             </div>
 
-            <div id="storage" class="tab-content">
-                <h2>JSON Database State</h2>
+            <!-- SETTINGS TAB -->
+            <div id="settings" class="tab-content">
+                <h2>System Settings</h2>
                 <div class="panel-card">
-                    <button class="cyber-btn" onclick="exportDataJson()">Export State</button>
-                    <textarea id="json-dump" rows="12" style="margin-top: 15px;" readonly></textarea>
+                    <label>Operator Name:</label>
+                    <input type="text" id="account-name" value="Root">
+                    <button class="cyber-btn" onclick="saveSettings()">Save</button>
+                    <button class="cyber-btn danger" style="margin-top: 15px; width: 100%;" onclick="clearData()">WIPE ALL DATA</button>
                 </div>
             </div>
-        </content>
+        </div>
     </div>
 
     <div id="toast-container"></div>
 
     <script>
-        // --- 1. ПЕРЕХВАТ КОНСОЛИ (ОЧЕНЬ ВАЖНО) ---
-        const originalLog = console.log;
-        const originalError = console.error;
-        const originalWarn = console.warn;
-        
-        let monacoEditor; // Глобальная переменная для редактора
-
-        // Глобальный перехват ошибок
-        window.onerror = function(message, source, lineno, colno, error) {
-            printToCustomConsole(`EXCEPTION: ${message} (Линия: ${lineno})`, 'error');
+        // --- 1. STATE MANAGEMENT ---
+        let cyberState = JSON.parse(localStorage.getItem('CYBER_OS_STATE')) || {
+            operator: "Root",
+            keys: [],
+            plugins: []
         };
 
-        // Заменяем стандартные логи своими функциями
-        console.log = function(...args) {
-            printToCustomConsole(args.join(' '), 'log');
-            originalLog.apply(console, args);
-        };
-        console.error = function(...args) {
-            printToCustomConsole(args.join(' '), 'error');
-            originalError.apply(console, args);
-        };
-        console.warn = function(...args) {
-            printToCustomConsole(args.join(' '), 'warn');
-            originalWarn.apply(console, args);
-        };
-
-        function getCurrentTime() {
-            const now = new Date();
-            return now.getHours().toString().padStart(2, '0') + ':' + 
-                   now.getMinutes().toString().padStart(2, '0') + ':' + 
-                   now.getSeconds().toString().padStart(2, '0');
+        function saveState() {
+            localStorage.setItem('CYBER_OS_STATE', JSON.stringify(cyberState));
         }
 
-        // --- 2. ЛОГИКА КАСТОМНОЙ КОНСОЛИ ( DevTools ) ---
-        function printToCustomConsole(message, type = 'log') {
-            const container = document.getElementById('console-output-area');
-            if (!container) return; // Если вкладка IDE не загружена
-            
-            const line = document.createElement('div');
-            line.className = `console-output-line ${type}`;
-            
-            line.innerHTML = `
-                <span class="msg-time">${getCurrentTime()}</span>
-                <span class="msg-type">[${type.toUpperCase()}]</span>
-                <span class="msg-text">${message}</span>
-            `;
-            
-            container.appendChild(line);
-            
-            // Автоматический скролл вниз
-            container.scrollTop = container.scrollHeight;
+        // --- 2. UI UTILS ---
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `cyber-toast ${type}`;
+            toast.innerText = `>> ${msg}`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
-        function clearCustomConsole() {
-            document.getElementById('console-output-area').innerHTML = '';
-            showToast("Console cleared.", "success");
-        }
-
-        // Выполнение JS кода из командной строки консоли
-        function runJsCommand() {
-            const input = document.getElementById('console-js-input');
-            const command = input.value;
-            if (!command) return;
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
             
-            printToCustomConsole(`> ${command}`, 'system');
-            
-            try {
-                // Пытаемся выполнить код через eval
-                const result = eval(command);
-                if (result !== undefined) {
-                    printToCustomConsole(JSON.stringify(result, null, 2), 'log');
-                }
-            } catch (error) {
-                printToCustomConsole(`Command Error: ${error.message}`, 'error');
+            // Fix Monaco layout when switching back to IDE tab
+            if (tabId === 'ide' && window.editor) {
+                setTimeout(() => window.editor.layout(), 100);
             }
-            
-            input.value = ''; // Очистить ввод
         }
+
+        // --- 3. CUSTOM CONSOLE LOGIC ---
+        const originalLog = console.log, originalError = console.error, originalWarn = console.warn;
         
-        // Поддержка Enter в командной строке консоли
-        document.getElementById('console-js-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') runJsCommand();
+        function getTime() {
+            const d = new Date();
+            return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
+        }
+
+        function printLog(msg, type) {
+            const area = document.getElementById('console-output-area');
+            if(!area) return;
+            const div = document.createElement('div');
+            div.className = `console-output-line ${type}`;
+            div.innerHTML = `<span class="msg-time">${getTime()}</span><span class="msg-type">[${type.toUpperCase()}]</span><span class="msg-text">${msg}</span>`;
+            area.appendChild(div);
+            area.scrollTop = area.scrollHeight;
+        }
+
+        console.log = function(...args) { printLog(args.join(' '), 'log'); originalLog.apply(console, args); };
+        console.error = function(...args) { printLog(args.join(' '), 'error'); originalError.apply(console, args); };
+        console.warn = function(...args) { printLog(args.join(' '), 'warn'); originalWarn.apply(console, args); };
+        
+        window.onerror = function(msg, url, line) { printLog(`${msg} (Line ${line})`, 'error'); };
+
+        function clearConsole() { document.getElementById('console-output-area').innerHTML = ''; }
+
+        function runConsoleCmd() {
+            const input = document.getElementById('console-js-input');
+            const cmd = input.value;
+            if(!cmd) return;
+            printLog(`> ${cmd}`, 'system');
+            try { 
+                const res = eval(cmd); 
+                if(res !== undefined) printLog(JSON.stringify(res), 'log');
+            } catch(e) { printLog(e.message, 'error'); }
+            input.value = '';
+        }
+
+        document.getElementById('console-js-input').addEventListener('keypress', e => {
+            if(e.key === 'Enter') runConsoleCmd();
         });
 
-        // --- 3. ЛОГИКА MONACO EDITOR (IDE) ---
-        function initMonacoEditor() {
-            require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+        // --- 4. MONACO EDITOR INIT ---
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+        require(['vs/editor/editor.main'], function() {
+            window.editor = monaco.editor.create(document.getElementById('monaco-editor-container'), {
+                value: '#include <iostream>\n\nint main() {\n    std::cout << "Cyber IDE Active" << std::endl;\n    return 0;\n}',
+                language: 'cpp',
+                theme: 'vs-dark',
+                automaticLayout: true,
+                fontSize: 16,
+                minimap: { enabled: false },
+                scrollBeyondLastLine: true
+            });
+            printLog("Monaco Engine v0.45.0 loaded successfully.", "system");
+        });
 
-            require(['vs/editor/editor.main'], function() {
-                // Создаем редактор C++ по умолчанию
-                monacoEditor = monaco.editor.create(document.getElementById('monaco-editor-container'), {
-                    value: '#include <iostream>\n\nint main() {\n    // Cyber OS IDE V5.0 initialized.\n    std::cout << "Hello from Cyber Core!" << std::endl;\n    return 0;\n}',
-                    language: 'cpp',
-              
+        // --- 5. DATA MANAGEMENT ---
+        function renderUI() {
+            document.getElementById('account-name').value = cyberState.operator;
+            
+            document.getElementById('keys-list').innerHTML = cyberState.keys.map((k, i) => 
+                `<div class="list-item"><span>${k.prov} [***]</span><button class="cyber-btn danger btn-sm" onclick="delKey(${i})">X</button></div>`
+            ).join('') || '<span style="color:var(--text-dim)">No keys.</span>';
+
+            document.getElementById('plugins-list').innerHTML = cyberState.plugins.map((p, i) => 
+                `<div class="list-item"><span>${p.name}</span><button class="cyber-btn danger btn-sm" onclick="delPlugin(${i})">X</button></div>`
+            ).join('') || '<span style="color:var(--text-dim)">No plugins loaded.</span>';
+        }
+
+        function addKey() {
+            const p = document.getElementById('ai-provider').value, k = document.getElementById('api-key-input').value;
+            if(!k) return;
+            cyberState.keys.push({ prov: p, key: k });
+            document.getElementById('api-key-input').value = '';
+            saveState(); renderUI(); showToast("Key registered.");
+        }
+        function delKey(i) { cyberState.keys.splice(i, 1); saveState(); renderUI(); }
+
+        function addPlugin() {
+            const n = document.getElementById('plugin-name').value;
+            if(!n) return;
+            cyberState.plugins.push({ name: n });
+            document.getElementById('plugin-name').value = '';
+            saveState(); renderUI(); showToast("Plugin deployed.");
+        }
+        function delPlugin(i) { cyberState.plugins.splice(i, 1); saveState(); renderUI(); }
+
+        function saveSettings() {
+            cyberState.operator = document.getElementById('account-name').value;
+            saveState(); showToast("Settings saved.");
+        }
+
+        function clearData() {
+            if(confirm("Wipe all system data?")) {
+                localStorage.removeItem('CYBER_OS_STATE');
+                location.reload();
+            }
+        }
+
+        // Init
+        renderUI();
+    </script>
+</body>
+</html>
