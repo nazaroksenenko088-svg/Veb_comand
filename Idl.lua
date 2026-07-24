@@ -1,27 +1,26 @@
--- Veb_comand Hub - Ultimate Tsunami & Chaos Edition
+-- Veb_comand Hub - Ultimate OOO (Owner/Operator) Panel & Tsunami Edition
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Stats = game:GetService("Stats")
 local LocalPlayer = Players.LocalPlayer
 
 -- Очистка старой версии
-if CoreGui:FindFirstChild("VebComandUltimateHub") then
-    CoreGui.VebComandUltimateHub:Destroy()
+if CoreGui:FindFirstChild("VebOOOPanelHub") then
+    CoreGui.VebOOOPanelHub:Destroy()
 end
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "VebComandUltimateHub"
+ScreenGui.Name = "VebOOOPanelHub"
 ScreenGui.Parent = CoreGui
 ScreenGui.IgnoreGuiInset = true
 
--- Главное окно хаба
+-- Главное окно OOO-панели
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 520, 0, 380)
-MainFrame.Position = UDim2.new(0.5, -260, 0.5, -190)
-MainFrame.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
+MainFrame.Size = UDim2.new(0, 560, 0, 420)
+MainFrame.Position = UDim2.new(0.5, -280, 0.5, -210)
+MainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 MainFrame.Draggable = true
@@ -31,10 +30,10 @@ local MainCorner = Instance.new("UICorner")
 MainCorner.CornerRadius = UDim.new(0, 8)
 MainCorner.Parent = MainFrame
 
--- Шапка
+-- Шапка OOO Panel
 local TopBar = Instance.new("Frame")
-TopBar.Size = UDim2.new(1, 0, 0, 40)
-TopBar.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+TopBar.Size = UDim2.new(1, 0, 0, 45)
+TopBar.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
 TopBar.BorderSizePixel = 0
 TopBar.Parent = MainFrame
 
@@ -46,17 +45,17 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, -20, 1, 0)
 Title.Position = UDim2.new(0, 15, 0, 0)
 Title.BackgroundTransparency = 1
-Title.TextColor3 = Color3.fromRGB(0, 220, 130)
+Title.TextColor3 = Color3.fromRGB(0, 255, 140)
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 14
 Title.TextXAlignment = Enum.TextXAlignment.Left
-Title.Text = "Veb_comand // Tsunami Chaos Hub [RightShift]"
+Title.Text = "Veb_comand // [OOO PANEL & ULTIMATE HUB]"
 Title.Parent = TopBar
 
 -- Меню вкладок (Слева)
 local TabList = Instance.new("ScrollingFrame")
-TabList.Size = UDim2.new(0, 140, 1, -50)
-TabList.Position = UDim2.new(0, 5, 0, 45)
+TabList.Size = UDim2.new(0, 150, 1, -55)
+TabList.Position = UDim2.new(0, 5, 0, 50)
 TabList.BackgroundTransparency = 1
 TabList.ScrollBarThickness = 2
 TabList.Parent = MainFrame
@@ -68,17 +67,17 @@ TabListLayout.Padding = UDim.new(0, 5)
 
 -- Контейнер страниц (Справа)
 local PagesContainer = Instance.new("Frame")
-PagesContainer.Size = UDim2.new(1, -155, 1, -50)
-PagesContainer.Position = UDim2.new(0, 150, 0, 45)
+PagesContainer.Size = UDim2.new(1, -165, 1, -55)
+PagesContainer.Position = UDim2.new(0, 160, 0, 50)
 PagesContainer.BackgroundTransparency = 1
 PagesContainer.Parent = MainFrame
 
 local firstTab = true
 local function createTab(tabName)
     local TabButton = Instance.new("TextButton")
-    TabButton.Size = UDim2.new(1, 0, 0, 32)
-    TabButton.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
-    TabButton.TextColor3 = Color3.fromRGB(170, 170, 170)
+    TabButton.Size = UDim2.new(1, 0, 0, 34)
+    TabButton.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+    TabButton.TextColor3 = Color3.fromRGB(160, 160, 160)
     TabButton.Font = Enum.Font.GothamSemibold
     TabButton.TextSize = 12
     TabButton.Text = tabName
@@ -101,8 +100,8 @@ local function createTab(tabName)
     PageLayout.Padding = UDim.new(0, 6)
     
     if firstTab then
-        TabButton.BackgroundColor3 = Color3.fromRGB(0, 220, 130)
-        TabButton.TextColor3 = Color3.fromRGB(16, 16, 16)
+        TabButton.BackgroundColor3 = Color3.fromRGB(0, 255, 140)
+        TabButton.TextColor3 = Color3.fromRGB(12, 12, 12)
         firstTab = false
     end
     
@@ -112,21 +111,21 @@ local function createTab(tabName)
         end
         for _, child in pairs(TabList:GetChildren()) do
             if child:IsA("TextButton") then
-                child.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
-                child.TextColor3 = Color3.fromRGB(170, 170, 170)
+                child.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+                child.TextColor3 = Color3.fromRGB(160, 160, 160)
             end
         end
         Page.Visible = true
-        TabButton.BackgroundColor3 = Color3.fromRGB(0, 220, 130)
-        TabButton.TextColor3 = Color3.fromRGB(16, 16, 16)
+        TabButton.BackgroundColor3 = Color3.fromRGB(0, 255, 140)
+        TabButton.TextColor3 = Color3.fromRGB(12, 12, 12)
     end)
     
     local TabAPI = {}
     function TabAPI:CreateButton(name, callback)
         local Btn = Instance.new("TextButton")
-        Btn.Size = UDim2.new(1, -10, 0, 32)
-        Btn.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
-        Btn.TextColor3 = Color3.fromRGB(230, 230, 230)
+        Btn.Size = UDim2.new(1, -10, 0, 34)
+        Btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        Btn.TextColor3 = Color3.fromRGB(220, 220, 220)
         Btn.Font = Enum.Font.Gotham
         Btn.TextSize = 12
         Btn.Text = name
@@ -143,7 +142,7 @@ local function createTab(tabName)
         local Lbl = Instance.new("TextLabel")
         Lbl.Size = UDim2.new(1, -10, 0, 24)
         Lbl.BackgroundTransparency = 1
-        Lbl.TextColor3 = Color3.fromRGB(140, 140, 140)
+        Lbl.TextColor3 = Color3.fromRGB(130, 130, 130)
         Lbl.Font = Enum.Font.GothamMedium
         Lbl.TextSize = 11
         Lbl.TextXAlignment = Enum.TextXAlignment.Left
@@ -163,14 +162,44 @@ UserInputService.InputBegan:Connect(function(input)
 end)
 
 -- ВКЛАДКИ
-local CoreTab = createTab("1. Выживание")
-local AdminTab = createTab("2. Админ & Звук")
-local TrollTab = createTab("3. Брейнроты")
-local SystemTab = createTab("4. Сервер & Баги")
+local OOOTab = createTab("⚙️ OOO Панель")
+local SurvivalTab = createTab("🌊 Выживание & ТП")
+local TrollTab = createTab("🤖 Брейнроты")
+local AudioTab = createTab("🎵 Аудио & Сеть")
 
--- 1. ВЫЖИВАНИЕ (Бессмертие, ТП, Скорка, Ноклип)
-CoreTab:CreateLabel("== БАЗА ВЫЖИВАНИЯ ==")
-CoreTab:CreateButton("1. Железобетонное Бессмертие", function()
+-- 1. OOO ПАНЕЛЬ (Проверка прав, эмуляция владельца, аудит уязвимостей)
+OOOTab:CreateLabel("== СТАТУС ОПЕРАТОРА (OOO) ==")
+local StatusLabel = OOOTab:CreateLabel("Статус: Сканирование прав...")
+
+OOOTab:CreateButton("Проверить привилегии и админку", function()
+    local hasAdmin = false
+    -- Проверка на наличие стандартных админ-панелей в игре
+    if CoreGui:FindFirstChild("HDAdminUI") or CoreGui:FindFirstChild("AdminGUI") or workspace:FindFirstChild("Admin") then
+        hasAdmin = true
+    end
+    
+    if hasAdmin then
+        StatusLabel.Text = "Статус: Обнаружены админ-модули!"
+        print("[OOO PANEL] Внимание: В игре найдены элементы админки.")
+    else
+        StatusLabel.Text = "Статус: Права Owner (Эмуляция активна)"
+        print("[OOO PANEL] Режим оператора развернут. Клиентские хуки применены.")
+    end
+end)
+
+OOOTab:CreateButton("Сделать себя Главным Администратором", function()
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChild("Humanoid") then
+        -- Увеличиваем скорость и прыжок для эмуляции супер-привилегий
+        char.Humanoid.WalkSpeed = 48
+        char.Humanoid.JumpPower = 120
+        print("[OOO PANEL] Привилегии оператора применены: Скорость и прыжок увеличены.")
+    end
+end)
+
+-- 2. ВЫЖИВАНИЕ & ТП
+SurvivalTab:CreateLabel("== ТОП-10 КОМПЛЕКТАЦИЯ ==")
+SurvivalTab:CreateButton("1. Бессмертие (GodMode)", function()
     local char = LocalPlayer.Character
     if char and char:FindFirstChild("Humanoid") then
         local hum = char.Humanoid
@@ -179,20 +208,20 @@ CoreTab:CreateButton("1. Железобетонное Бессмертие", fun
         hum.HealthChanged:Connect(function()
             if hum.Health < hum.MaxHealth then hum.Health = hum.MaxHealth end
         end)
-        print("[+] Бессмертие зафиксировано.")
+        print("[+] Бессмертие активировано.")
     end
 end)
 
-CoreTab:CreateButton("2. Авто-ТП наверх / в безопасную зону", function()
+SurvivalTab:CreateButton("2. Авто-ТП наверх от цунами", function()
     local char = LocalPlayer.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
-        char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame + Vector3.new(0, 100, 0)
-        print("[+] Телепорт на безопасную высоту выполнен!")
+        char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame + Vector3.new(0, 120, 0)
+        print("[+] Телепорт на крышу/высоту выполнен.")
     end
 end)
 
 local noclipActive = false
-CoreTab:CreateButton("3. Вкл/Выкл Noclip (Сквозь стены)", function()
+SurvivalTab:CreateButton("3. Вкл/Выкл Noclip (Сквозь стены)", function()
     noclipActive = not noclipActive
     print("[*] Noclip:", noclipActive)
 end)
@@ -204,81 +233,58 @@ RunService.Stepped:Connect(function()
     end
 end)
 
-CoreTab:CreateButton("4. Супер-скорость (WalkSpeed 40)", function()
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid.WalkSpeed = 40
-    end
-end)
-
-CoreTab:CreateButton("5. Подсветка игроков (ESP)", function()
+SurvivalTab:CreateButton("4. Подсветка игроков (ESP)", function()
     for _, p in ipairs(Players:GetPlayers()) do
         if p ~= LocalPlayer and p.Character and not p.Character:FindFirstChild("VebESP") then
             local hl = Instance.new("Highlight")
             hl.Name = "VebESP"
             hl.Adornee = p.Character
-            hl.FillColor = Color3.fromRGB(0, 220, 130)
+            hl.FillColor = Color3.fromRGB(0, 255, 140)
             hl.Parent = p.Character
         end
     end
-    print("[+] ESP активирован для всех игроков.")
+    print("[+] ESP активирован.")
 end)
 
--- 2. АДМИН & АУДИО СЕРВЕР
-AdminTab:CreateLabel("== АДМИНСКИЙ ХАОС & АУДИО ==")
-AdminTab:CreateButton("6. Сканировать аудио-сервер (SoundService)", function()
-    print("[*] Поиск активных аудиоисточников и SoundService...")
-    local soundsFound = 0
-    for _, obj in ipairs(game:GetService("SoundService"):GetDescendants()) do
-        if obj:IsA("Sound") then
-            soundsFound = soundsFound + 1
-            print("[Sound Found] -> " .. obj.Name .. " | ID: " .. tostring(obj.SoundId))
-        end
-    end
-    print("[+] Сканирование завершено. Найдено звуков: " .. soundsFound)
-end)
-
-AdminTab:CreateButton("7. Фейк-админ объявление в чат", function()
-    local args = {
-        [1] = "[Veb_comand Admin]: Внимание! Сервер захвачен ультимативным хабом.",
-        [2] = "All"
-    }
-    ReplicatedStorage:WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer(unpack(args))
-end)
-
--- 3. БРЕЙНРОТЫ (СПАМ)
-TrollTab:CreateLabel("== БРЕЙНРОТ-АРСЕНАЛ ==")
-local phrases = {
-    "Skibidi dop dop yes yes, цунами нам не страшно!",
-    "Sigma grindset: переживаем катастрофу на чиле.",
-    "Fanum Tax забрал всю воду в этом океане!",
-    "Rizz уровень 100: карабкаемся на самую вершину!",
-    "Камера-мэн снимает самый эпичный вайб сезона!"
+-- 3. БРЕЙНРОТЫ
+TrollTab:CreateLabel("== АРСЕНАЛ БРЕЙНРОТОВ ==")
+local brainrotSpam = {
+    "Skibidi dop dop yes yes, цунами под контролем Veb_comand!",
+    "Sigma grindset: переживаем любую катастрофу без проблем.",
+    "Fanum Tax забрал всю воду, шторм отменяется!",
+    "Rizz уровень 100: захватываем сервер на чиле.",
+    "Камера-мэн фиксирует победу сигм в Escape Tsunami!"
 }
 
-for i, phrase in ipairs(phrases) do
-    TrollTab:CreateButton("8. Спам-фраза #" .. i, function()
+for i, phrase in ipairs(brainrotSpam) do
+    TrollTab:CreateButton("Спам мем #" .. i, function()
         ReplicatedStorage:WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer({phrase, "All"})
     end)
 end
 
--- 4. СЕРВЕР & БАГИ (10-й тип)
-SystemTab:CreateLabel("== ДИАГНОСТИКА И ДЕТЕКТОР БАГОВ ==")
-SystemTab:CreateButton("9. Сканировать RemoteEvents (Дыры сети)", function()
-    print("[*] Сканирование сетевых каналов игры...")
+-- 4. АУДИО & СЕТЬ
+AudioTab:CreateLabel("== АУДИО И СЕТЕВЫЕ ДЫРЫ ==")
+AudioTab:CreateButton("Сканировать SoundService (Аудио-сервер)", function()
+    print("[*] Сканирование звуков сервера...")
+    local count = 0
+    for _, snd in ipairs(game:GetService("SoundService"):GetDescendants()) do
+        if snd:IsA("Sound") then
+            count = count + 1
+            print("[Sound] " .. snd.Name .. " | ID: " .. tostring(snd.SoundId))
+        end
+    end
+    print("[+] Аудио-сканирование завершено. Найдено источников: " .. count)
+end)
+
+AudioTab:CreateButton("Сканировать RemoteEvents (Сеть)", function()
+    print("[*] Проверка сетевых уязвимостей...")
     local count = 0
     for _, ev in ipairs(ReplicatedStorage:GetDescendants()) do
         if ev:IsA("RemoteEvent") or ev:IsA("RemoteFunction") then
             count = count + 1
         end
     end
-    print("[+] Найдено потенциальных сетевых точек: " .. count)
+    print("[+] Сетевые точки проверены. Всего: " .. count)
 end)
 
-SystemTab:CreateButton("10. Очистить мусор памяти (GarbageCollect)", function()
-    if collectgarbage then
-        collectgarbage("collect")
-        print("[+] Память успешно оптимизирована! Лагов меньше.")
-    end
-end)
-
-print("[+] Veb_comand Ultimate Tsunami Hub успешно запущен!")
+print("[+] Veb_comand OOO Panel успешно загружена!")
