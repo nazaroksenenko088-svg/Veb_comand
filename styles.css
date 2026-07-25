@@ -90,22 +90,23 @@ body, html {
     color: var(--accent);
     font-weight: bold;
     letter-spacing: 1px;
+    font-size: 0.9rem;
 }
 
 .macro-buttons {
     display: flex;
-    gap: 8px;
+    gap: 6px;
 }
 
 .cyber-btn {
     background: transparent;
     border: 1px solid var(--accent);
     color: var(--accent);
-    padding: 4px 10px;
+    padding: 4px 8px;
     cursor: pointer;
     border-radius: 3px;
     font-family: inherit;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     transition: 0.2s;
 }
 
@@ -168,7 +169,6 @@ body, html {
     outline: none;
 }
 
-/* Стили логов */
 .log-system { color: var(--text-dim); }
 .log-info { color: var(--accent); }
 .log-warn { color: var(--warning); }
