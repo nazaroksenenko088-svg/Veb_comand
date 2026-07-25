@@ -1,93 +1,64 @@
-/**
- * CYBER OS - ADMIN CORE MODULE
- * Файл: admin_panel.js
- */
-const AdminCore = {
-    state: {
-        lvl: 1,
-        xp: 0,
-        cpu: 12,
-        ram: 340
-    },
+let storedState = JSON.parse(localStorage.getItem('CYBER_OS_STATE')) || {};
+let cyberState = {
+    operator: storedState.operator || "Root",
+    keys: Array.isArray(storedState.keys) ? storedState.keys : [],
+    plugins: Array.isArray(storedState.plugins) ? storedState.plugins : []
+};
 
-    init() {
-        this.loadState();
-        this.startMetricsLoop();
-        console.log("[ADMIN_CORE] Initialized successfully.");
-    },
+function saveState() {
+    localStorage.setItem('CYBER_OS_STATE', JSON.stringify(cyberState));
+    CyberDevTools.updateStorage();
+}
 
-    toggle() {
-        const panel = document.getElementById('admin-panel');
-        if (panel) {
-            panel.style.display = (panel.style.display === 'flex') ? 'none' : 'flex';
+const CyberAI = {
+    renderUI() {
+        const nameInput = document.getElementById('account-name');
+        if(nameInput) nameInput.value = cyberState.operator;
+
+        const keysList = document.getElementById('keys-list');
+        if(keysList) {
+            keysList.innerHTML = cyberState.keys.map((k, i) => 
+                `<div class="list-item"><span>${k.prov} [***]</span><button class="cyber-btn danger btn-sm" onclick="CyberAI.delKey(${i})">X</button></div>`
+            ).join('') || '<span style="color:var(--text-dim)">No keys registered.</span>';
+        }
+
+        const pluginsList = document.getElementById('plugins-list');
+        if(pluginsList) {
+            pluginsList.innerHTML = cyberState.plugins.map((p, i) => 
+                `<div class="list-item"><span>${p.name}</span><button class="cyber-btn danger btn-sm" onclick="CyberAI.delPlugin(${i})">X</button></div>`
+            ).join('') || '<span style="color:var(--text-dim)">No plugins deployed.</span>';
         }
     },
-
-    addXP(amount) {
-        this.state.xp += amount;
-        if (this.state.xp >= 100) {
-            this.state.lvl += Math.floor(this.state.xp / 100);
-            this.state.xp = this.state.xp % 100;
-            console.log(`[LEVEL UP] Reached Level ${this.state.lvl}`);
-        }
-        this.saveState();
-        this.updateUI();
+    addKey() {
+        const p = document.getElementById('ai-provider').value;
+        const k = document.getElementById('api-key-input').value;
+        if(!k) return;
+        cyberState.keys.push({ prov: p, key: k });
+        document.getElementById('api-key-input').value = '';
+        saveState(); CyberAI.renderUI(); CyberUI.toast("API Key registered.");
     },
-
-    updateUI() {
-        const lvlEl = document.getElementById('lvl-txt');
-        const xpEl = document.getElementById('xp-txt');
-        if (lvlEl) lvlEl.innerText = `LVL ${this.state.lvl}`;
-        if (xpEl) xpEl.innerText = `${this.state.xp} XP`;
+    delKey(i) { cyberState.keys.splice(i, 1); saveState(); CyberAI.renderUI(); },
+    addPlugin() {
+        const n = document.getElementById('plugin-name').value;
+        if(!n) return;
+        cyberState.plugins.push({ name: n });
+        document.getElementById('plugin-name').value = '';
+        saveState(); CyberAI.renderUI(); CyberUI.toast("Plugin deployed.");
     },
-
-    saveState() {
-        localStorage.setItem('cyber_admin_state', JSON.stringify(this.state));
+    delPlugin(i) { cyberState.plugins.splice(i, 1); saveState(); CyberAI.renderUI(); },
+    saveSettings() {
+        const nameInput = document.getElementById('account-name');
+        if(nameInput) cyberState.operator = nameInput.value;
+        saveState(); CyberUI.toast("Settings saved.");
     },
-
-    loadState() {
-        const saved = localStorage.getItem('cyber_admin_state');
-        if (saved) {
-            this.state = { ...this.state, ...JSON.parse(saved) };
-        }
-        this.updateUI();
-    },
-
-    startMetricsLoop() {
-        setInterval(() => {
-            // Симуляция живых метрик
-            this.state.cpu = Math.floor(Math.random() * 25) + 5;
-            this.state.ram = 320 + Math.floor(Math.random() * 50);
-            
-            const cpuEl = document.getElementById('sys-cpu');
-            const ramEl = document.getElementById('sys-ram');
-            
-            if (cpuEl) cpuEl.innerText = `${this.state.cpu}%`;
-            if (ramEl) ramEl.innerText = `${this.state.ram}MB / 1024MB`;
-        }, 3000);
-    },
-
-    exportConfig() {
-        const configData = {
-            adminState: this.state,
-            vault: JSON.parse(localStorage.getItem('cyber_vault') || '[]'),
-            theme: localStorage.getItem('cyber_theme') || 'cyberpunk'
-        };
-        const blob = new Blob([JSON.stringify(configData, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `cyber_os_config_${Date.now()}.json`;
-        a.click();
-        console.log("[ADMIN_CORE] Config exported.");
-    },
-
-    hardReset() {
-        if (confirm("ВНИМАНИЕ: Сбросить все сохраненные данные, настройки и скрипты из Vault?")) {
-            localStorage.clear();
+    clearData() {
+        if(confirm("Wipe system state?")) {
+            localStorage.removeItem('CYBER_OS_STATE');
             location.reload();
         }
     }
 };
 
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', () => AdminCore.init());
+document.addEventListener('DOMContentLoaded', () => {
+    CyberAI.renderUI();
+});
