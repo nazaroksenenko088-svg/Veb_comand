@@ -23,10 +23,12 @@ function print(text, type = 'default') {
     output.scrollTop = output.scrollHeight;
 }
 
+// Скрещиваем старые скрипты (ldl.lua, admin-panel.js) и новые C++ модули в единую VFS
 let virtualFiles = {
-    'main.cpp': '#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Cyber OS Debian Kernel Initialized!" << endl;\n    return 0;\n}',
-    'styles.css': 'body { background: #0b0f19; color: #00ffcc; font-family: monospace; }',
-    'index.html': '<!DOCTYPE html>\n<html>\n<head><title>Cyber OS</title></head>\n<body><h1>Hello</h1></body>\n</html>'
+    'main.cpp': `#include <iostream>\n#include <vector>\n\nusing namespace std;\n\nint main() {\n    cout << "Cyber OS C++ Kernel Online!" << endl;\n    return 0;\n}`,
+    'ldl.lua': `-- LDL Scripting Engine Module (Old & New Integration)\nprint("Loading LDL core parameters...")\nfunction executeTask()\n    return "LDL Execution Status: OK"\nend`,
+    'admin-panel.js': `// Admin Panel Subsystem\nconsole.log("Admin privileges requested.");\nfunction verifyAccess(token) {\n    return token === "root_secure";\n}`,
+    'kernel.c': `#include <stdio.h>\nint main() {\n    printf("C Low-level Subsystem Active\\n");\n    return 0;\n}`
 };
 
 let activeFile = 'main.cpp';
@@ -57,22 +59,25 @@ window.CyberVFS = {
             editor.setValue(virtualFiles[filename]);
             const ext = filename.split('.').pop();
             let lang = 'cpp';
-            if (ext === 'css') lang = 'css';
-            if (ext === 'html') lang = 'html';
+            if (ext === 'c') lang = 'c';
+            else if (ext === 'js') lang = 'javascript';
+            else if (ext === 'lua') lang = 'lua';
+            
             monaco.editor.setModelLanguage(editor.getModel(), lang);
         }
         this.renderTree();
         print(`[VFS] Открыт файл: ${filename}`, 'system');
     },
     createNewFile: function() {
-        const name = prompt("Имя нового файла (например: test.cpp):");
+        const name = prompt("Имя нового файла (например: script.cpp, utils.h):");
         if (name && !virtualFiles[name]) {
-            virtualFiles[name] = '// Новый файл\n';
+            virtualFiles[name] = '// Новый исходный файл\n';
             this.openFile(name);
         }
     }
 };
 
+// Графический модуль Termux-X11
 window.CyberOSX11 = {
     active: false,
     toggleMode: function() {
@@ -83,7 +88,7 @@ window.CyberOSX11 = {
         if (this.active) {
             if (editorArea) editorArea.style.display = 'none';
             if (viewport) viewport.style.display = 'block';
-            print('[Termux-X11] Дисплей :0 активирован.', 'info');
+            print('[Termux-X11] Дисплей :0 активирован (XWayland).', 'info');
             
             const canvas = document.getElementById('x11-canvas');
             if (canvas) {
@@ -104,7 +109,7 @@ window.CyberOSX11 = {
                 ctx.stroke();
                 ctx.fillStyle = '#00ffcc';
                 ctx.font = '16px monospace';
-                ctx.fillText('X11 Window Manager [Debian XWayland]', 20, 30);
+                ctx.fillText('X11 Compositor [C++ Accelerated Viewport]', 20, 30);
             }
         } else {
             if (viewport) viewport.style.display = 'none';
@@ -139,19 +144,20 @@ CyberDevTools.runCmd = function() {
     try {
         switch(mainCmd) {
             case 'help':
-                print('Debian/Termux-X11 Shell - Команды:', 'info');
-                print('  uname -a              - Версия ядра', 'log');
-                print('  whoami                - Пользователь', 'log');
+                print('Cyber OS Shell - Доступные команды:', 'info');
+                print('  g++ <file.cpp>        - Компиляция и запуск C++', 'log');
+                print('  gcc / cc <file.c>     - Компиляция Си кода', 'log');
+                print('  lua <file.lua>        - Запуск LDL/Lua скрипта', 'log');
                 print('  ls                    - Список файлов VFS', 'log');
-                print('  cat <file>            - Чтение файла', 'log');
-                print('  g++ <file>            - Симуляция компиляции C++', 'log');
+                print('  cat <file>            - Чтение содержимого файла', 'log');
                 print('  x11 start / stop      - Управление графикой X11', 'log');
                 print('  apt / pip install     - Пакетный менеджер', 'log');
                 print('  clear                 - Очистить консоль', 'log');
-                print('  ver                   - Версия системы', 'log');
+                print('  uname -a              - Версия ядра', 'log');
+                print('  whoami                - Текущий пользователь', 'log');
                 break;
             case 'uname':
-                print('Linux cyber-os 6.8.0-kali-amd64 x86_64 GNU/Linux', 'log');
+                print('Linux cyber-os 6.8.0-kali-amd64 x86_64 GNU/Linux (C++ Enabled)', 'log');
                 break;
             case 'whoami':
                 print('root', 'log');
@@ -179,25 +185,38 @@ CyberDevTools.runCmd = function() {
             case 'pkg':
             case 'pip':
                 if (arg1 === 'install' && arg2) {
-                    print(`[${mainCmd.toUpperCase()}] Сборка и установка пакета ${arg2}... Готово`, 'info');
+                    print(`[${mainCmd.toUpperCase()}] Пакет ${arg2} успешно загружен и настроен.`, 'info');
                 } else {
                     print(`Использование: ${mainCmd} install <package>`, 'warn');
                 }
                 break;
             case 'g++':
-                print(`[C++ Compiler] Сборка файла ${arg1 || activeFile}...`, 'warn');
-                setTimeout(() => print(`[build] Успешно. Код выхода: 0`, 'info'), 800);
+            case 'gcc':
+            case 'cc':
+                const targetFile = arg1 || activeFile;
+                print(`[C++ Compiler] Вызов GNU toolchain для ${targetFile}...`, 'warn');
+                setTimeout(() => {
+                    print(`[build] Компиляция успешна. Создан исполняемый файл: a.out`, 'info');
+                    if (targetFile.endsWith('.cpp') || targetFile.endsWith('.c')) {
+                        print(`[exec] Запуск бинарника a.out:`, 'system');
+                        print(`-> Cyber OS C++ Kernel Online!`, 'info');
+                        print(`-> Код завершения процесса: 0`, 'system');
+                    }
+                }, 800);
+                break;
+            case 'lua':
+                print(`[LDL Engine] Интерпретация скрипта ${arg1 || activeFile}...`, 'warn');
+                setTimeout(() => print(`[lua] Скрипт выполнен. Результат: OK`, 'info'), 600);
                 break;
             case 'ver':
-                print('Cyber OS Core v3.0 [Termux-X11 Web Edition]', 'info');
+                print('Cyber OS Core v3.5 [Termux-X11 / C++ Edition]', 'info');
                 break;
             default:
-                // Безопасный вызов JS без падений при вводе системных слов
                 try {
                     const res = eval(cmd);
                     if(res !== undefined) print(JSON.stringify(res), 'log');
                 } catch (evalErr) {
-                    print(`bash: команда не найдена: ${mainCmd}. Введите 'help' для справки.`, 'error');
+                    print(`bash: команда не найдена: ${mainCmd}. Введите 'help'.`, 'error');
                 }
                 break;
         }
