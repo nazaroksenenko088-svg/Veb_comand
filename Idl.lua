@@ -1,12 +1,11 @@
 -- =====================================================================
--- ULTIMATE BERSERK & BODY HORROR SUITE: Clones, Mutation & Alien Burst
+-- ULTIMATE BERSERK & BODY HORROR MASTER SUITE: Final R15 Build
 -- Target Executor: Delta X / Custom Environments
 -- =====================================================================
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
-local SoundService = game:GetService("SoundService")
 local LocalPlayer = Players.LocalPlayer
 
 -- 1. Инфраструктура (Страшные анимации + VapeVoidware + Ringta)
@@ -28,18 +27,18 @@ task.spawn(function()
     end)
 end)
 
--- 2. Графический интерфейс управления (GUI Hub)
+-- 2. Продвинутый Графический Интерфейс (GUI Hub)
 local guiParent = gethui and gethui() or game:GetService("CoreGui")
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "BodyHorrorHub"
+screenGui.Name = "BerserkMasterHub"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = guiParent
 
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 240, 0, 340)
-mainFrame.Position = UDim2.new(0.05, 0, 0.15, 0)
-mainFrame.BackgroundColor3 = Color3.fromRGB(15, 12, 12)
+mainFrame.Size = UDim2.new(0, 240, 0, 390)
+mainFrame.Position = UDim2.new(0.05, 0, 0.12, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(12, 10, 10)
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
 mainFrame.Draggable = true
@@ -57,7 +56,7 @@ stroke.Parent = mainFrame
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 35)
 title.BackgroundTransparency = 1
-title.Text = "HORROR & CLONE SUITE"
+title.Text = "BERSERK MASTER SUITE"
 title.TextColor3 = Color3.fromRGB(255, 40, 40)
 title.TextScaled = true
 title.Font = Enum.Font.GothamBold
@@ -104,17 +103,19 @@ local function createActionBtn(name, posY, callback)
     btn.MouseButton1Click:Connect(callback)
 end
 
--- Переменные состояний
+-- Переменные состояний модулей
 local flightEnabled = false
+local speedEnabled = false
 local eyesEnabled = true
 local steamEnabled = true
 
 createBtn("Полет: ВЫКЛ / ВКЛ", 45, function(state) flightEnabled = state end)
-createBtn("Глаза-аура: ВКЛ / ВЫКЛ", 90, function(state) eyesEnabled = state end)
-createBtn("Пар Титана: ВКЛ / ВЫКЛ", 135, function(state) steamEnabled = state end)
+createBtn("Супер-Скорость: ВЫКЛ / ВКЛ", 90, function(state) speedEnabled = state end)
+createBtn("Глаза-аура: ВКЛ / ВЫКЛ", 135, function(state) eyesEnabled = state end)
+createBtn("Пар Титана: ВКЛ / ВЫКЛ", 180, function(state) steamEnabled = state end)
 
--- Функция: Спавн армии клонов со страшными звуками
-createActionBtn("СЗУВАТЬ: Армия Клонов (Скримы)", 185, function()
+-- Функция: Спавн точной копии армий (со всеми визуальными фичами и криками)
+createActionBtn("ПРИЗВАТЬ: Армия Клонов (Точные копии)", 230, function()
     local character = LocalPlayer.Character
     if not character then return end
     
@@ -122,48 +123,44 @@ createActionBtn("СЗУВАТЬ: Армия Клонов (Скримы)", 185, f
         task.spawn(function()
             local clone = character:Clone()
             clone.Name = "BerserkClone_" .. i
-            clone:PivotTo(character.PrimaryPart.CFrame * CFrame.new(math.random(-6, 6), 0, math.random(-6, 6)))
+            clone:PivotTo(character.PrimaryPart.CFrame * CFrame.new(math.random(-7, 7), 0, math.random(-7, 7)))
             
-            -- Убираем скрипты из клона, оставляем визуал
+            -- Удаляем скрипты, оставляем чистый мрачный визуал
             for _, child in ipairs(clone:GetDescendants()) do
                 if child:IsA("Script") or child:IsA("LocalScript") then
                     child:Destroy()
-                elseif child:IsA("Highlight") then
-                    child.FillColor = Color3.fromRGB(50, 0, 0)
                 end
             end
             
             clone.Parent = Workspace
             
-            -- Зловещий крик для каждого клона
+            -- Зловещий монструозный рев для клона
             local scream = Instance.new("Sound")
-            scream.SoundId = "rbxassetid://9069605280" -- Жуткий монструозный рев
-            scream.Volume = 2
+            scream.SoundId = "rbxassetid://9069605280"
+            scream.Volume = 2.5
             scream.Parent = clone.PrimaryPart or clone:FindFirstChild("HumanoidRootPart")
             scream:Play()
             
-            task.delay(15, function()
+            task.delay(18, function()
                 if clone then clone:Destroy() end
             end)
         end)
     end
 end)
 
--- Функция: Эффект "Чужой из груди" + Мутация в тварь
-createActionBtn("МУТАЦИЯ: Выход Чужого из Груди", 235, function()
+-- Функция: Эффект мутации (Выход Чужого из груди)
+createActionBtn("МУТАЦИЯ: Выход Чужого из Груди", 280, function()
     local character = LocalPlayer.Character
     if not character then return end
     local torso = character:FindFirstChild("UpperTorso") or character:FindFirstChild("Torso")
     if not torso then return end
 
-    -- Звук разрыва плоти и скрим
     local horrorSound = Instance.new("Sound")
-    horrorSound.SoundId = "rbxassetid://9114221372" -- Звук скримера/разрыва
+    horrorSound.SoundId = "rbxassetid://9114221372"
     horrorSound.Volume = 3
     horrorSound.Parent = torso
     horrorSound:Play()
 
-    -- Создание прорывающейся твари (Чужого/шипа) из груди
     local chestBurst = Instance.new("Part")
     chestBurst.Name = "AlienChestBurster"
     chestBurst.Size = Vector3.new(0.8, 1.8, 0.8)
@@ -180,7 +177,6 @@ createActionBtn("МУТАЦИЯ: Выход Чужого из Груди", 235, 
     chestBurst.CFrame = torso.CFrame * CFrame.new(0, 0.2, -0.8) * CFrame.Angles(math.rad(90), 0, 0)
     chestBurst.Parent = character
 
-    -- Кровавые частицы из груди
     local bloodAttach = Instance.new("Attachment", torso)
     local bloodParticles = Instance.new("ParticleEmitter")
     bloodParticles.Color = ColorSequence.new(Color3.fromRGB(150, 0, 0), Color3.fromRGB(50, 0, 0))
@@ -191,7 +187,6 @@ createActionBtn("МУТАЦИЯ: Выход Чужого из Груди", 235, 
     bloodParticles.Speed = NumberRange.new(5, 12)
     bloodParticles.Parent = bloodAttach
 
-    -- Трансформация формы персонажа (деформация / ломание тела)
     task.delay(1.5, function()
         bloodParticles.Enabled = false
         if chestBurst then
@@ -200,7 +195,7 @@ createActionBtn("МУТАЦИЯ: Выход Чужого из Груди", 235, 
     end)
 end)
 
--- 3. Основной движок эффектов и полета
+-- 3. Основной движок эффектов персонажа
 local function applyMasterSuite()
     local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
     local rootPart = character:WaitForChild("HumanoidRootPart")
@@ -208,11 +203,13 @@ local function applyMasterSuite()
     local head = character:WaitForChild("Head")
     local rightHand = character:FindFirstChild("RightHand") or character:FindFirstChild("Right Arm")
 
+    -- Зловещий оскал
     local face = head:FindFirstChildOfClass("Decal")
     if face then
         face.Texture = "rbxassetid://70747551"
     end
 
+    -- Красный ореол психопата
     if not character:FindFirstChild("PsychopathHighlight") then
         local highlight = Instance.new("Highlight")
         highlight.Name = "PsychopathHighlight"
@@ -224,6 +221,7 @@ local function applyMasterSuite()
         highlight.Parent = character
     end
 
+    -- Пар Титана
     local attachment = rootPart:FindFirstChild("TitanAttachment") or Instance.new("Attachment", rootPart)
     attachment.Name = "TitanAttachment"
     
@@ -237,6 +235,7 @@ local function applyMasterSuite()
     particles.Speed = NumberRange.new(6, 14)
     particles.Parent = attachment
 
+    -- Демоническая рука Гайца
     if rightHand and not character:FindFirstChild("GutsArmManifest") then
         local gutsArmPart = Instance.new("Part")
         gutsArmPart.Name = "GutsArmManifest"
@@ -255,6 +254,7 @@ local function applyMasterSuite()
         gutsArmPart.Parent = character
     end
 
+    -- Глаза-наблюдатели в ауре
     local eyesFolder = character:FindFirstChild("AuraEyesFolder") or Instance.new("Folder", character)
     eyesFolder.Name = "AuraEyesFolder"
     eyesFolder:ClearAllChildren()
@@ -272,6 +272,7 @@ local function applyMasterSuite()
         table.insert(eyeParts, eye)
     end
 
+    -- Рендер-цикл физики, полета, скорости и ауры
     local connection
     connection = RunService.RenderStepped:Connect(function()
         if not character or not humanoid or humanoid.Health <= 0 then
@@ -285,11 +286,15 @@ local function applyMasterSuite()
         particles.Enabled = steamEnabled
         eyesFolder.Parent = eyesEnabled and character or nil
 
+        -- Управление скоростью бега
+        humanoid.WalkSpeed = speedEnabled and 55 or 16
+
         if rootPart then
+            -- Логика полета
             if flightEnabled then
                 humanoid.PlatformStand = true
                 local moveDir = humanoid.MoveDirection
-                local flySpeed = 50
+                local flySpeed = 55
                 
                 local velocity = Vector3.new(0, 0, 0)
                 if moveDir.Magnitude > 0 then
@@ -300,6 +305,7 @@ local function applyMasterSuite()
                 humanoid.PlatformStand = false
             end
 
+            -- Орбита живых глаз
             if eyesEnabled then
                 for index, eyePart in ipairs(eyeParts) do
                     local angle = (timeVal * 3.5) + (index * (math.pi / 4))
@@ -323,4 +329,4 @@ if LocalPlayer.Character then
     task.spawn(applyMasterSuite)
 end
 
-print("[SYSTEM] Ultimate Horror & Clone Suite Deployed.")
+print("[SYSTEM] Ultimate Berserk Master Suite (V3) Deployed.")
