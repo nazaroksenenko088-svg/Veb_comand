@@ -1,5 +1,5 @@
 -- =====================================================================
--- ULTIMATE BERSERK GOD-TIER SUITE: True Levitation & Evil Grin
+-- ULTIMATE BERSERK & PSYCHOPATH MASTER SUITE: Final Build
 -- Target Executor: Delta X / Custom Environments
 -- =====================================================================
 
@@ -8,7 +8,13 @@ local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 
--- 1. Инициализация базовых инфраструктурных модулей
+-- 1. Загрузка базовых читов и скрипта страшных анимаций
+task.spawn(function()
+    pcall(function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Scary-animation-76752", true))()
+    end)
+end)
+
 task.spawn(function()
     pcall(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua", true))()
@@ -28,18 +34,18 @@ task.spawn(function()
     end)
 end)
 
--- 2. Модуль абсолютного визуального доминирования
-local function applyGodTierSuite()
+-- 2. Модуль визуального террора, левитации и демонической экипировки
+local function applyMasterSuite()
     local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
     local rootPart = character:WaitForChild("HumanoidRootPart")
     local humanoid = character:WaitForChild("Humanoid")
     local head = character:WaitForChild("Head")
     local rightArm = character:FindFirstChild("Right Arm") or character:FindFirstChild("RightHand")
 
-    -- Установка зловещей ухмылки на лице
+    -- Зловещая ухмылка на лице
     local face = head:FindFirstChildOfClass("Decal")
     if face then
-        face.Texture = "rbxassetid://70747551" -- Классический зловещий/хищный оскал
+        face.Texture = "rbxassetid://70747551"
     end
 
     -- Кроваво-красная подсветка психопата
@@ -68,7 +74,7 @@ local function applyGodTierSuite()
     particles.Speed = NumberRange.new(6, 14)
     particles.Parent = attachment
 
-    -- Правая рука Гайца (Проклятая демоническая арматура)
+    -- Правая рука Гайца (Проклятая демоническая пушка/протез)
     if rightArm and not character:FindFirstChild("GutsArmManifest") then
         local gutsArmPart = Instance.new("Part")
         gutsArmPart.Name = "GutsArmManifest"
@@ -107,7 +113,7 @@ local function applyGodTierSuite()
         holoScreen.Parent = character
     end
 
-    -- Аура с живыми глазами
+    -- Аура с живыми глазами-наблюдателями
     local eyesFolder = character:FindFirstChild("AuraEyesFolder") or Instance.new("Folder", character)
     eyesFolder.Name = "AuraEyesFolder"
     eyesFolder:ClearAllChildren()
@@ -138,17 +144,15 @@ local function applyGodTierSuite()
         local timeVal = tick()
         
         if rootPart then
-            -- Плавная истинная левитация (подъем над землей с синусоидальным покачиванием)
-            local currentPos = rootPart.Position
-            local targetHeightOffset = 3.5 + math.sin(timeVal * 4) * 0.8
+            -- Плавная левитация над поверхностью
             rootPart.Velocity = Vector3.new(0, 0, 0)
             
-            -- Мерцание терминала
+            -- Мерцание голограммы
             if holoScreen then
                 holoScreen.Transparency = 0.2 + math.sin(timeVal * 15) * 0.1
             end
 
-            -- Орбитальное движение наблюдающих глаз
+            -- Орбитальное движение живых глаз
             for index, eyePart in ipairs(eyeParts) do
                 local angle = (timeVal * 3.5) + (index * (math.pi / 4))
                 local radius = 4.0 + math.sin(timeVal * 2 + index) * 0.6
@@ -161,14 +165,14 @@ local function applyGodTierSuite()
     end)
 end
 
--- Хук на респаун
+-- Хук автоматического применения при респауне
 LocalPlayer.CharacterAdded:Connect(function()
     task.wait(1)
-    applyGodTierSuite()
+    applyMasterSuite()
 end)
 
 if LocalPlayer.Character then
-    task.spawn(applyGodTierSuite)
+    task.spawn(applyMasterSuite)
 end
 
-print("[SYSTEM] Ultimate Berserk God-Tier Suite successfully loaded.")
+print("[SYSTEM] Ultimate Berserk Master Suite successfully deployed.")
