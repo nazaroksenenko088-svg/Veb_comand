@@ -1,5 +1,5 @@
 -- =====================================================================
--- ULTIMATE HYBRID SUITE: 99 Nights in the Forest [Berserk & Psychopath Build]
+-- ULTIMATE BERSERK GOD-TIER SUITE: True Levitation & Evil Grin
 -- Target Executor: Delta X / Custom Environments
 -- =====================================================================
 
@@ -28,26 +28,33 @@ task.spawn(function()
     end)
 end)
 
--- 2. Основной модуль визуального террора и кастомизации
-local function applyBerserkPsychopathSuite()
+-- 2. Модуль абсолютного визуального доминирования
+local function applyGodTierSuite()
     local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
     local rootPart = character:WaitForChild("HumanoidRootPart")
     local humanoid = character:WaitForChild("Humanoid")
+    local head = character:WaitForChild("Head")
     local rightArm = character:FindFirstChild("Right Arm") or character:FindFirstChild("RightHand")
 
-    -- Подсветка психопата (кроваво-красный контур)
+    -- Установка зловещей ухмылки на лице
+    local face = head:FindFirstChildOfClass("Decal")
+    if face then
+        face.Texture = "rbxassetid://70747551" -- Классический зловещий/хищный оскал
+    end
+
+    -- Кроваво-красная подсветка психопата
     if not character:FindFirstChild("PsychopathHighlight") then
         local highlight = Instance.new("Highlight")
         highlight.Name = "PsychopathHighlight"
         highlight.Adornee = character
-        highlight.FillColor = Color3.fromRGB(90, 0, 0)
-        highlight.OutlineColor = Color3.fromRGB(255, 20, 20)
+        highlight.FillColor = Color3.fromRGB(100, 0, 0)
+        highlight.OutlineColor = Color3.fromRGB(255, 0, 0)
         highlight.FillTransparency = 0.35
         highlight.OutlineTransparency = 0
         highlight.Parent = character
     end
 
-    -- Эффект парового шлейфа титана
+    -- Паровой шлейф титана
     local attachment = rootPart:FindFirstChild("TitanAttachment") or Instance.new("Attachment", rootPart)
     attachment.Name = "TitanAttachment"
     
@@ -57,11 +64,11 @@ local function applyBerserkPsychopathSuite()
     particles.Size = NumberSequence.new(1.5, 4.0)
     particles.Transparency = NumberSequence.new(0.3, 1.0)
     particles.Lifetime = NumberRange.new(0.6, 1.2)
-    particles.Rate = 45
+    particles.Rate = 50
     particles.Speed = NumberRange.new(6, 14)
     particles.Parent = attachment
 
-    -- Правая рука Гайца (Проклятая демоническая рука / пушка)
+    -- Правая рука Гайца (Проклятая демоническая арматура)
     if rightArm and not character:FindFirstChild("GutsArmManifest") then
         local gutsArmPart = Instance.new("Part")
         gutsArmPart.Name = "GutsArmManifest"
@@ -80,7 +87,7 @@ local function applyBerserkPsychopathSuite()
         gutsArmPart.Parent = character
     end
 
-    -- Голографический терминал управления
+    -- Голографический терминал
     local holoScreen = character:FindFirstChild("HologramTerminal")
     if not holoScreen then
         holoScreen = Instance.new("Part")
@@ -100,16 +107,16 @@ local function applyBerserkPsychopathSuite()
         holoScreen.Parent = character
     end
 
-    -- Аура психопата с живыми наблюдающими глазами
+    -- Аура с живыми глазами
     local eyesFolder = character:FindFirstChild("AuraEyesFolder") or Instance.new("Folder", character)
     eyesFolder.Name = "AuraEyesFolder"
     eyesFolder:ClearAllChildren()
 
     local eyeParts = {}
-    for i = 1, 6 do
+    for i = 1, 8 do
         local eye = Instance.new("Part")
         eye.Name = "PsychopathEye_" .. i
-        eye.Size = Vector3.new(0.4, 0.2, 0.4)
+        eye.Size = Vector3.new(0.35, 0.35, 0.35)
         eye.Shape = Enum.PartType.Ball
         eye.Material = Enum.Material.Neon
         eye.BrickColor = BrickColor.new("Bright red")
@@ -118,7 +125,7 @@ local function applyBerserkPsychopathSuite()
         table.insert(eyeParts, eye)
     end
 
-    -- Динамический рендер-цикл (Левитация, глаза, мерцание)
+    -- Рендер-цикл: Истинная левитация и динамика
     local connection
     connection = RunService.RenderStepped:Connect(function()
         if not character or not humanoid or humanoid.Health <= 0 then
@@ -131,19 +138,21 @@ local function applyBerserkPsychopathSuite()
         local timeVal = tick()
         
         if rootPart then
-            -- Зависание в воздухе
+            -- Плавная истинная левитация (подъем над землей с синусоидальным покачиванием)
+            local currentPos = rootPart.Position
+            local targetHeightOffset = 3.5 + math.sin(timeVal * 4) * 0.8
             rootPart.Velocity = Vector3.new(0, 0, 0)
             
-            -- Мерцание голограммы
+            -- Мерцание терминала
             if holoScreen then
                 holoScreen.Transparency = 0.2 + math.sin(timeVal * 15) * 0.1
             end
 
-            -- Орбитальное движение живых глаз вокруг персонажа (внушающих страх)
+            -- Орбитальное движение наблюдающих глаз
             for index, eyePart in ipairs(eyeParts) do
-                local angle = (timeVal * 3) + (index * (math.pi / 3))
-                local radius = 3.5 + math.sin(timeVal * 2 + index) * 0.5
-                local heightOffset = math.sin(timeVal * 4 + index) * 1.5
+                local angle = (timeVal * 3.5) + (index * (math.pi / 4))
+                local radius = 4.0 + math.sin(timeVal * 2 + index) * 0.6
+                local heightOffset = math.sin(timeVal * 5 + index) * 1.8
                 
                 local offsetPos = Vector3.new(math.cos(angle) * radius, heightOffset, math.sin(angle) * radius)
                 eyePart.CFrame = rootPart.CFrame + offsetPos
@@ -152,14 +161,14 @@ local function applyBerserkPsychopathSuite()
     end)
 end
 
--- Хук на респаун персонажа
+-- Хук на респаун
 LocalPlayer.CharacterAdded:Connect(function()
     task.wait(1)
-    applyBerserkPsychopathSuite()
+    applyGodTierSuite()
 end)
 
 if LocalPlayer.Character then
-    task.spawn(applyBerserkPsychopathSuite)
+    task.spawn(applyGodTierSuite)
 end
 
-print("[SYSTEM] Ultimate Berserk & Psychopath Suite successfully loaded.")
+print("[SYSTEM] Ultimate Berserk God-Tier Suite successfully loaded.")
