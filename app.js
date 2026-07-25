@@ -1,61 +1,63 @@
-// Настройка загрузчика Monaco
-require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs' }});
-
-require(['vs/editor/editor.main'], function() {
-    // 1. Инициализация редактора
-    window.editor = monaco.editor.create(document.getElementById('editor-container'), {
-        value: '#include <iostream>\n\nint main() {\n    std::cout << "Hello, Cloud IDE V2!" << std::endl;\n    return 0;\n}',
-        language: 'cpp',
-        theme: 'vs-dark',
-        automaticLayout: true, // Важно для планшетов при повороте экрана
-        fontSize: 16
-    });
-
-    // 2. Логика кастомной консоли разработчика
-    const consoleOutput = document.getElementById('console-output');
-    const devConsole = document.getElementById('dev-console');
-    const toggleBtn = document.getElementById('toggle-console-btn');
-    const closeBtn = document.getElementById('close-console-btn');
-
-    // Функция для добавления строк в нашу панель
-    function printToConsole(message, type = 'log') {
-        const msgElement = document.createElement('div');
-        msgElement.className = `console-msg ${type}`;
-        // Преобразуем объекты в строку, чтобы они нормально читались
-        msgElement.textContent = typeof message === 'object' ? JSON.stringify(message, null, 2) : message;
-        consoleOutput.appendChild(msgElement);
-        // Автоматическая прокрутка вниз
-        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+const CyberUI = (() => {
+    try {
+        return {
+            switchTab(tabId, btn) {
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+                document.getElementById(tabId).classList.add('active');
+                btn.classList.add('active');
+                if (tabId === 'ide') CyberEditor.layout();
+            },
+            toast(msg) {
+                const container = document.getElementById('toast-container');
+                if(!container) return;
+                const toast = document.createElement('div');
+                toast.className = 'cyber-toast';
+                toast.innerText = `>> ${msg}`;
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 2500);
+            }
+        };
+    } catch(e) {
+        console.error("UI Module Error:", e);
+        return { switchTab(){}, toast(){} };
     }
+})();
 
-    // Перехватываем стандартный console.log
-    const originalLog = console.log;
-    console.log = function(...args) {
-        printToConsole(args.join(' '));
-        originalLog.apply(console, args);
-    };
+let editorInstance = null;
+const CyberEditor = (() => {
+    try {
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+        require(['vs/editor/editor.main'], function() {
+            try {
+                editorInstance = monaco.editor.create(document.getElementById('monaco-editor-container'), {
+                    value: '// Cyber OS Modular Core Ready\nint main() {\n    return 0;\n}',
+                    language: 'cpp',
+                    theme: 'vs-dark',
+                    automaticLayout: false,
+                    fontSize: 15,
+                    minimap: { enabled: false }
+                });
+            } catch(innerErr) {
+                console.error("Monaco create error:", innerErr);
+            }
+        });
 
-    // Перехватываем ошибки (очень поможет при разработке на планшете)
-    const originalError = console.error;
-    console.error = function(...args) {
-        printToConsole(args.join(' '), 'error');
-        originalError.apply(console, args);
-    };
-
-    // Перехватываем глобальные ошибки окна
-    window.onerror = function(message, source, lineno, colno, error) {
-        printToConsole(`${message} (Строка: ${lineno})`, 'error');
-    };
-
-    // 3. Управление видимостью консоли (тач-интерфейс)
-    toggleBtn.addEventListener('click', () => {
-        devConsole.classList.toggle('hidden');
-    });
-
-    closeBtn.addEventListener('click', () => {
-        devConsole.classList.add('hidden');
-    });
-
-    // Тестовый лог при запуске
-    console.log("Система инициализирована. Monaco Editor запущен.");
-});
+        return {
+            layout() {
+                if(editorInstance) {
+                    setTimeout(() => editorInstance.layout(), 50);
+                }
+            },
+            insert(text) {
+                if(!editorInstance) return;
+                const selection = editorInstance.getSelection();
+                editorInstance.executeEdits("macro", [{ range: selection, text: text, forceMoveMarkers: true }]);
+                editorInstance.focus();
+            }
+        };
+    } catch(e) {
+        console.error("Editor Module Error:", e);
+        return { layout(){}, insert(){} };
+    }
+})();
