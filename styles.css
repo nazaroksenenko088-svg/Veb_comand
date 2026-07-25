@@ -29,7 +29,7 @@ aside { width: 220px; background: var(--panel-bg); border-right: 1px solid var(-
 
 .content-area { flex: 1; background: var(--bg-color); display: flex; flex-direction: column; overflow: hidden; position: relative; }
 .tab-content { display: none; height: 100%; width: 100%; flex-direction: column; overflow-y: auto; padding: 20px; }
-#ide.tab-content { padding: 0; overflow: hidden; display: flex; }
+#ide.tab-content { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
 .tab-content.active { display: flex; }
 
 h2 { font-size: 1.1rem; margin-bottom: 12px; border-bottom: 1px dashed var(--border-color); padding-bottom: 5px; color: var(--info); }
