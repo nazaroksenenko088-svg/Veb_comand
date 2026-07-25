@@ -1,5 +1,5 @@
 -- =====================================================================
--- ULTIMATE BERSERK & BODY HORROR MASTER SUITE: Final R15 Build
+-- ULTIMATE BERSERK & BODY HORROR MASTER SUITE: Final Integrated Build
 -- Target Executor: Delta X / Custom Environments
 -- =====================================================================
 
@@ -8,7 +8,7 @@ local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 
--- 1. Инфраструктура (Страшные анимации + VapeVoidware + Ringta)
+-- 1. Инфраструктура и внешние модули анимаций
 task.spawn(function()
     pcall(function()
         loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Scary-animation-76752", true))()
@@ -27,7 +27,7 @@ task.spawn(function()
     end)
 end)
 
--- 2. Продвинутый Графический Интерфейс (GUI Hub)
+-- 2. Единый Графический Интерфейс (Master GUI Hub)
 local guiParent = gethui and gethui() or game:GetService("CoreGui")
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "BerserkMasterHub"
@@ -36,8 +36,8 @@ screenGui.Parent = guiParent
 
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 240, 0, 390)
-mainFrame.Position = UDim2.new(0.05, 0, 0.12, 0)
+mainFrame.Size = UDim2.new(0, 240, 0, 440)
+mainFrame.Position = UDim2.new(0.05, 0, 0.1, 0)
 mainFrame.BackgroundColor3 = Color3.fromRGB(12, 10, 10)
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
@@ -64,7 +64,7 @@ title.Parent = mainFrame
 
 local function createBtn(name, posY, callback)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.9, 0, 0, 35)
+    btn.Size = UDim2.new(0.9, 0, 0, 32)
     btn.Position = UDim2.new(0.05, 0, 0, posY)
     btn.BackgroundColor3 = Color3.fromRGB(35, 10, 10)
     btn.TextColor3 = Color3.fromRGB(240, 240, 240)
@@ -85,11 +85,11 @@ local function createBtn(name, posY, callback)
     end)
 end
 
-local function createActionBtn(name, posY, callback)
+local function createActionBtn(name, posY, color, callback)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.9, 0, 0, 35)
+    btn.Size = UDim2.new(0.9, 0, 0, 32)
     btn.Position = UDim2.new(0.05, 0, 0, posY)
-    btn.BackgroundColor3 = Color3.fromRGB(80, 10, 10)
+    btn.BackgroundColor3 = color or Color3.fromRGB(80, 10, 10)
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.Text = name
     btn.TextScaled = true
@@ -103,19 +103,46 @@ local function createActionBtn(name, posY, callback)
     btn.MouseButton1Click:Connect(callback)
 end
 
--- Переменные состояний модулей
+-- Состояния модулей
 local flightEnabled = false
 local speedEnabled = false
 local eyesEnabled = true
 local steamEnabled = true
+local crawlerAnimTrack = nil
 
-createBtn("Полет: ВЫКЛ / ВКЛ", 45, function(state) flightEnabled = state end)
-createBtn("Супер-Скорость: ВЫКЛ / ВКЛ", 90, function(state) speedEnabled = state end)
-createBtn("Глаза-аура: ВКЛ / ВЫКЛ", 135, function(state) eyesEnabled = state end)
-createBtn("Пар Титана: ВКЛ / ВЫКЛ", 180, function(state) steamEnabled = state end)
+createBtn("Полет: ВЫКЛ / ВКЛ", 40, function(state) flightEnabled = state end)
+createBtn("Супер-Скорость: ВЫКЛ / ВКЛ", 76, function(state) speedEnabled = state end)
+createBtn("Глаза-аура: ВКЛ / В ВКЛ", 112, function(state) eyesEnabled = state end)
+createBtn("Пар Титана: ВКЛ / ВЫКЛ", 148, function(state) steamEnabled = state end)
 
--- Функция: Спавн точной копии армий (со всеми визуальными фичами и криками)
-createActionBtn("ПРИЗВАТЬ: Армия Клонов (Точные копии)", 230, function()
+-- Анимация Crawler (Паук/Монстр) с подгрузкой ID из открытых источников
+createBtn("Анимация: Crawler (Паук)", 184, function(state)
+    local character = LocalPlayer.Character
+    if not character then return end
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
+    if state then
+        if not crawlerAnimTrack then
+            local anim = Instance.new("Animation")
+            anim.AnimationId = "rbxassetid://9083043135" -- Жуткая анимация ползания R15
+            pcall(function()
+                crawlerAnimTrack = humanoid:LoadAnimation(anim)
+                crawlerAnimTrack.Looped = true
+                crawlerAnimTrack:Play()
+            end)
+        else
+            crawlerAnimTrack:Play()
+        end
+    else
+        if crawlerAnimTrack then
+            crawlerAnimTrack:Stop()
+        end
+    end
+end)
+
+-- Функция: Спавн точной копии армии клонов со всеми эффектами и криками
+createActionBtn("ПРИЗВАТЬ: Армия Клонов", 220, Color3.fromRGB(90, 10, 10), function()
     local character = LocalPlayer.Character
     if not character then return end
     
@@ -123,9 +150,8 @@ createActionBtn("ПРИЗВАТЬ: Армия Клонов (Точные коп�
         task.spawn(function()
             local clone = character:Clone()
             clone.Name = "BerserkClone_" .. i
-            clone:PivotTo(character.PrimaryPart.CFrame * CFrame.new(math.random(-7, 7), 0, math.random(-7, 7)))
+            clone:PivotTo(character.PrimaryPart.CFrame * CFrame.new(math.random(-6, 6), 0, math.random(-6, 6)))
             
-            -- Удаляем скрипты, оставляем чистый мрачный визуал
             for _, child in ipairs(clone:GetDescendants()) do
                 if child:IsA("Script") or child:IsA("LocalScript") then
                     child:Destroy()
@@ -134,7 +160,6 @@ createActionBtn("ПРИЗВАТЬ: Армия Клонов (Точные коп�
             
             clone.Parent = Workspace
             
-            -- Зловещий монструозный рев для клона
             local scream = Instance.new("Sound")
             scream.SoundId = "rbxassetid://9069605280"
             scream.Volume = 2.5
@@ -148,8 +173,8 @@ createActionBtn("ПРИЗВАТЬ: Армия Клонов (Точные коп�
     end
 end)
 
--- Функция: Эффект мутации (Выход Чужого из груди)
-createActionBtn("МУТАЦИЯ: Выход Чужого из Груди", 280, function()
+-- Функция: Мутация (Выход Чужого из груди)
+createActionBtn("МУТАЦИЯ: Выход из Груди", 256, Color3.fromRGB(110, 10, 10), function()
     local character = LocalPlayer.Character
     if not character then return end
     local torso = character:FindFirstChild("UpperTorso") or character:FindFirstChild("Torso")
@@ -195,6 +220,43 @@ createActionBtn("МУТАЦИЯ: Выход Чужого из Груди", 280, 
     end)
 end)
 
+-- Функция: КИЛ (Уничтожение / Убийство ближайшей цели или телепорт-атака)
+createActionBtn("КИЛ: Казнь Ближайшей Цели", 292, Color3.fromRGB(140, 0, 0), function()
+    local character = LocalPlayer.Character
+    if not character or not character.PrimaryPart then return end
+    local myRoot = character.PrimaryPart
+
+    local targetPlayer = nil
+    local shortestDist = 35
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local tRoot = player.Character.HumanoidRootPart
+            local dist = (myRoot.Position - tRoot.Position).Magnitude
+            if dist < shortestDist then
+                shortestDist = dist
+                targetPlayer = player
+            end
+        end
+    end
+
+    if targetPlayer and targetPlayer.Character then
+        -- Телепорт к цели для мгновенной расправы и звуковой эффект
+        myRoot.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 2)
+        
+        local killSound = Instance.new("Sound")
+        killSound.SoundId = "rbxassetid://9069605280"
+        killSound.Volume = 3
+        killSound.Parent = myRoot
+        killSound:Play()
+
+        local hum = targetPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.Health = 0
+        end
+    end
+end)
+
 -- 3. Основной движок эффектов персонажа
 local function applyMasterSuite()
     local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
@@ -203,13 +265,11 @@ local function applyMasterSuite()
     local head = character:WaitForChild("Head")
     local rightHand = character:FindFirstChild("RightHand") or character:FindFirstChild("Right Arm")
 
-    -- Зловещий оскал
     local face = head:FindFirstChildOfClass("Decal")
     if face then
         face.Texture = "rbxassetid://70747551"
     end
 
-    -- Красный ореол психопата
     if not character:FindFirstChild("PsychopathHighlight") then
         local highlight = Instance.new("Highlight")
         highlight.Name = "PsychopathHighlight"
@@ -221,7 +281,6 @@ local function applyMasterSuite()
         highlight.Parent = character
     end
 
-    -- Пар Титана
     local attachment = rootPart:FindFirstChild("TitanAttachment") or Instance.new("Attachment", rootPart)
     attachment.Name = "TitanAttachment"
     
@@ -235,7 +294,6 @@ local function applyMasterSuite()
     particles.Speed = NumberRange.new(6, 14)
     particles.Parent = attachment
 
-    -- Демоническая рука Гайца
     if rightHand and not character:FindFirstChild("GutsArmManifest") then
         local gutsArmPart = Instance.new("Part")
         gutsArmPart.Name = "GutsArmManifest"
@@ -254,7 +312,6 @@ local function applyMasterSuite()
         gutsArmPart.Parent = character
     end
 
-    -- Глаза-наблюдатели в ауре
     local eyesFolder = character:FindFirstChild("AuraEyesFolder") or Instance.new("Folder", character)
     eyesFolder.Name = "AuraEyesFolder"
     eyesFolder:ClearAllChildren()
@@ -272,7 +329,6 @@ local function applyMasterSuite()
         table.insert(eyeParts, eye)
     end
 
-    -- Рендер-цикл физики, полета, скорости и ауры
     local connection
     connection = RunService.RenderStepped:Connect(function()
         if not character or not humanoid or humanoid.Health <= 0 then
@@ -286,11 +342,9 @@ local function applyMasterSuite()
         particles.Enabled = steamEnabled
         eyesFolder.Parent = eyesEnabled and character or nil
 
-        -- Управление скоростью бега
         humanoid.WalkSpeed = speedEnabled and 55 or 16
 
         if rootPart then
-            -- Логика полета
             if flightEnabled then
                 humanoid.PlatformStand = true
                 local moveDir = humanoid.MoveDirection
@@ -305,7 +359,6 @@ local function applyMasterSuite()
                 humanoid.PlatformStand = false
             end
 
-            -- Орбита живых глаз
             if eyesEnabled then
                 for index, eyePart in ipairs(eyeParts) do
                     local angle = (timeVal * 3.5) + (index * (math.pi / 4))
@@ -329,4 +382,4 @@ if LocalPlayer.Character then
     task.spawn(applyMasterSuite)
 end
 
-print("[SYSTEM] Ultimate Berserk Master Suite (V3) Deployed.")
+print("[SYSTEM] Ultimate Berserk Master Suite Complete Build Deployed.")
