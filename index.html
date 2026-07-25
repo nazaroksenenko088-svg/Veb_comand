@@ -2,115 +2,59 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cyber OS // Modular Core</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber OS - Termux X11 Edition</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Monaco Editor Loader -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    <!-- Подгружаем Monaco Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js"></script>
 </head>
 <body>
+    <div class="cyber-container">
+        <!-- Боковая панель: Виртуальное древо файлов (VFS) -->
+        <div class="cyber-sidebar">
+            <div class="sidebar-header">
+                <span>📁 WORKSPACE://root</span>
+                <button class="cyber-btn-xs" onclick="CyberVFS.createNewFile()">+</button>
+            </div>
+            <div id="vfs-file-tree" class="file-tree-container"></div>
+        </div>
 
-    <header>
-        <div class="logo">// CYBER_OS</div>
-        <div class="status-bar" id="sys-status">MODULES CONNECTED</div>
-    </header>
-
-    <div class="main-container">
-        <aside>
-            <button class="nav-btn active" onclick="CyberUI.switchTab('ide', this)">> IDE Core</button>
-            <button class="nav-btn" onclick="CyberUI.switchTab('ai', this)">> AI Core</button>
-            <button class="nav-btn" onclick="CyberUI.switchTab('plugins', this)">> Plugins</button>
-            <button class="nav-btn" onclick="CyberUI.switchTab('settings', this)">> Settings</button>
-        </aside>
-
-        <div class="content-area">
-            <!-- IDE TAB -->
-            <div id="ide" class="tab-content active">
-                <div id="monaco-editor-container"></div>
-                
-                <div id="touch-macro-bar">
-                    <button class="macro-key" onclick="CyberEditor.insert('{')">{ }</button>
-                    <button class="macro-key" onclick="CyberEditor.insert(';')">;</button>
-                    <button class="macro-key" onclick="CyberEditor.insert('->')">-&gt;</button>
-                    <button class="macro-key" onclick="CyberEditor.insert('::')">::</button>
-                    <button class="macro-key" onclick="CyberEditor.insert('\t')">TAB</button>
-                </div>
-
-                <!-- DEVTOOLS -->
-                <div id="custom-devtools">
-                    <div class="dt-tabs">
-                        <button class="dt-tab-btn active" onclick="CyberDevTools.switchTab('console', this)">Console</button>
-                        <button class="dt-tab-btn" onclick="CyberDevTools.switchTab('network', this)">Network</button>
-                        <button class="dt-tab-btn" onclick="CyberDevTools.switchTab('storage', this)">Storage</button>
-                        <button class="dt-tab-btn" style="margin-left:auto; color:var(--danger);" onclick="CyberDevTools.clearConsole()">Clear</button>
-                    </div>
-
-                    <div id="dt-panel-console" class="dt-panel-body active">
-                        <div id="dt-console-output"></div>
-                        <div class="dt-console-input-row">
-                            <span style="color:var(--accent); font-weight:bold; padding:0 8px;">></span>
-                            <input type="text" id="dt-js-input" placeholder="Evaluate JS...">
-                            <button class="cyber-btn btn-sm" onclick="CyberDevTools.runCmd()" style="margin-right:5px;">EXEC</button>
-                        </div>
-                    </div>
-
-                    <div id="dt-panel-network" class="dt-panel-body" style="padding: 10px;">
-                        <table class="dt-table" id="network-table">
-                            <tr><th>Time</th><th>Method</th><th>URL</th><th>Status</th></tr>
-                        </table>
-                    </div>
-
-                    <div id="dt-panel-storage" class="dt-panel-body" style="padding: 10px;">
-                        <table class="dt-table" id="storage-table">
-                            <tr><th>Key</th><th>Value</th></tr>
-                        </table>
-                    </div>
+        <!-- Основная рабочая область -->
+        <div class="cyber-main">
+            <div class="top-nav">
+                <span class="logo">CYBER-OS // v3.0</span>
+                <div class="macro-buttons">
+                    <button class="cyber-btn btn-sm" onclick="CyberDevTools.insertMacro('#include <iostream>')">#include</button>
+                    <button class="cyber-btn btn-sm" onclick="CyberDevTools.insertMacro('std::cout << &quot;&quot; << std::endl;')">cout</button>
+                    <button class="cyber-btn btn-sm" onclick="CyberOSX11.toggleMode()">X11 VIEW</button>
                 </div>
             </div>
 
-            <!-- AI TAB -->
-            <div id="ai" class="tab-content">
-                <h2>AI Engine Configuration</h2>
-                <div class="panel-card">
-                    <select id="ai-provider">
-                        <option value="OpenAI">OpenAI API</option>
-                        <option value="Anthropic">Anthropic Claude</option>
-                    </select>
-                    <input type="password" id="api-key-input" placeholder="API Key...">
-                    <button class="cyber-btn" onclick="CyberAI.addKey()">Register Key</button>
+            <!-- Редактор кода Monaco -->
+            <div id="editor" style="width: 100%; height: 50vh;"></div>
+
+            <!-- X11 Графический холст (скрыт по умолчанию) -->
+            <div id="x11-viewport-container" style="display:none; width:100%; height:50vh; background:#000; position:relative;">
+                <div class="x11-top-bar" style="background:#111; color:#00ffcc; padding:5px 10px; font-family:monospace; display:flex; justify-content:space-between;">
+                    <span>TERMUX-X11 [Display :0 Active]</span>
+                    <button onclick="CyberOSX11.toggleMode()" style="background:none; border:1px solid #00ffcc; color:#00ffcc; cursor:pointer;">CLOSE X11</button>
                 </div>
-                <div class="panel-card" id="keys-list"></div>
+                <canvas id="x11-canvas" style="width:100%; height:calc(100% - 30px); display:block;"></canvas>
             </div>
 
-            <!-- PLUGINS TAB -->
-            <div id="plugins" class="tab-content">
-                <h2>System Plugins</h2>
-                <div class="panel-card">
-                    <input type="text" id="plugin-name" placeholder="Plugin Name...">
-                    <button class="cyber-btn" onclick="CyberAI.addPlugin()">Deploy Plugin</button>
-                </div>
-                <div class="panel-card" id="plugins-list"></div>
-            </div>
-
-            <!-- SETTINGS TAB -->
-            <div id="settings" class="tab-content">
-                <h2>System Settings</h2>
-                <div class="panel-card">
-                    <label>Operator:</label>
-                    <input type="text" id="account-name" value="Root">
-                    <button class="cyber-btn" onclick="CyberAI.saveSettings()">Save Config</button>
-                    <button class="cyber-btn danger" style="margin-top: 15px; width: 100%;" onclick="CyberAI.clearData()">WIPE SYSTEM DATA</button>
+            <!-- Консоль терминала в стиле Debian / Termux -->
+            <div class="cyber-console">
+                <div id="dt-console-output" class="console-output"></div>
+                <div class="dt-console-input-row">
+                    <span class="prompt-label">root@cyber-os:~#</span>
+                    <input type="text" id="dt-js-input" placeholder="Введите команду (help, ls, g++, x11 start)...">
+                    <button class="cyber-btn btn-sm" onclick="CyberDevTools.runCmd()">RUN</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="toast-container"></div>
-
-    <!-- Подключаем скрипты по порядку -->
     <script src="app.js"></script>
     <script src="features.js"></script>
-    <script src="admin-panel.js"></script>
 </body>
 </html>
