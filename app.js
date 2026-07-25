@@ -8,7 +8,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (!editorContainer) return;
 
         editor = monaco.editor.create(editorContainer, {
-            value: `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Cyber OS Debian Kernel Initialized!" << endl;\n    return 0;\n}`,
+            value: `#include <iostream>\n#include <vector>\n\nusing namespace std;\n\nint main() {\n    cout << "Cyber OS C++ Kernel Online!" << endl;\n    vector<string> modules = {"VFS", "X11", "Termux-Shell"};\n    for(const auto& m : modules) {\n        cout << "Loaded module: " << m << endl;\n    }\n    return 0;\n}`,
             language: 'cpp',
             theme: 'vs-dark',
             automaticLayout: true,
@@ -17,7 +17,7 @@ window.addEventListener('DOMContentLoaded', () => {
         });
 
         CyberVFS.init();
-        print("Cyber OS Core v3.0 [Stable Termux-X11 Edition] запущен.", "info");
-        print("Введите 'help' для списка системных команд.", "system");
+        print("Cyber OS Core v3.5 [C++ & X11 Engine] запущен успешно.", "info");
+        print("Введите 'help' для просмотра доступных команд.", "system");
     });
 });
