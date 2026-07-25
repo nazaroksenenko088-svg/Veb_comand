@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber OS - Termux X11 Edition</title>
+    <title>Cyber OS - Termux X11 & C++ Edition</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Подгружаем Monaco Editor -->
+    <!-- Подгружаем Monaco Editor Loader -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js"></script>
 </head>
 <body>
     <div class="cyber-container">
-        <!-- Боковая панель: Виртуальное древо файлов (VFS) -->
+        <!-- Боковая панель: Виртуальная файловая система (VFS со старыми и новыми модулями) -->
         <div class="cyber-sidebar">
             <div class="sidebar-header">
                 <span>📁 WORKSPACE://root</span>
@@ -22,21 +22,22 @@
         <!-- Основная рабочая область -->
         <div class="cyber-main">
             <div class="top-nav">
-                <span class="logo">CYBER-OS // v3.0</span>
+                <span class="logo">CYBER-OS // v3.5 C++ ENGINE</span>
                 <div class="macro-buttons">
-                    <button class="cyber-btn btn-sm" onclick="CyberDevTools.insertMacro('#include <iostream>')">#include</button>
-                    <button class="cyber-btn btn-sm" onclick="CyberDevTools.insertMacro('std::cout << &quot;&quot; << std::endl;')">cout</button>
+                    <button class="cyber-btn btn-sm" onclick="CyberDevTools.insertMacro('#include <iostream>\nusing namespace std;\n\n')">#INCLUDE</button>
+                    <button class="cyber-btn btn-sm" onclick="CyberDevTools.insertMacro('std::cout << &quot;&quot; << std::endl;')">COUT</button>
+                    <button class="cyber-btn btn-sm" onclick="CyberDevTools.insertMacro('std::vector<string> ')">VECTOR</button>
                     <button class="cyber-btn btn-sm" onclick="CyberOSX11.toggleMode()">X11 VIEW</button>
                 </div>
             </div>
 
             <!-- Редактор кода Monaco -->
-            <div id="editor" style="width: 100%; height: 50vh;"></div>
+            <div id="editor" style="width: 100%; height: 45vh;"></div>
 
             <!-- X11 Графический холст (скрыт по умолчанию) -->
-            <div id="x11-viewport-container" style="display:none; width:100%; height:50vh; background:#000; position:relative;">
+            <div id="x11-viewport-container" style="display:none; width:100%; height:45vh; background:#000; position:relative;">
                 <div class="x11-top-bar" style="background:#111; color:#00ffcc; padding:5px 10px; font-family:monospace; display:flex; justify-content:space-between;">
-                    <span>TERMUX-X11 [Display :0 Active]</span>
+                    <span>TERMUX-X11 [Display :0 Active - C++ Accelerated]</span>
                     <button onclick="CyberOSX11.toggleMode()" style="background:none; border:1px solid #00ffcc; color:#00ffcc; cursor:pointer;">CLOSE X11</button>
                 </div>
                 <canvas id="x11-canvas" style="width:100%; height:calc(100% - 30px); display:block;"></canvas>
@@ -47,7 +48,7 @@
                 <div id="dt-console-output" class="console-output"></div>
                 <div class="dt-console-input-row">
                     <span class="prompt-label">root@cyber-os:~#</span>
-                    <input type="text" id="dt-js-input" placeholder="Введите команду (help, ls, g++, x11 start)...">
+                    <input type="text" id="dt-js-input" placeholder="Введите команду (help, g++ main.cpp, x11 start)...">
                     <button class="cyber-btn btn-sm" onclick="CyberDevTools.runCmd()">RUN</button>
                 </div>
             </div>
