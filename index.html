@@ -2,239 +2,60 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Berserk OS | Web Environment</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; user-select: none; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #0d0d0f; color: #fff; }
-
-        /* Рабочий стол */
-        #desktop {
-            width: 100vw;
-            height: calc(100vh - 45px);
-            position: relative;
-            background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
-            overflow: hidden;
-        }
-        .desktop-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(10, 10, 15, 0.6);
-            backdrop-filter: blur(4px);
-        }
-
-        /* Панель задач */
-        #taskbar {
-            width: 100vw; height: 45px;
-            background: rgba(15, 15, 20, 0.7);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 15px; position: absolute; bottom: 0; z-index: 9999;
-        }
-        .taskbar-left, .taskbar-right { display: flex; align-items: center; gap: 10px; }
-        
-        .btn-start {
-            background: linear-gradient(135deg, #58a6ff, #0056b3);
-            border: none; color: white; padding: 8px 16px; border-radius: 6px;
-            font-weight: bold; cursor: pointer; transition: 0.2s;
-        }
-        .btn-start:hover { transform: scale(1.05); }
-        
-        .taskbar-icon {
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff; padding: 8px 14px; border-radius: 6px; cursor: pointer; transition: 0.2s;
-        }
-        .taskbar-icon:hover { background: rgba(255, 255, 255, 0.15); }
-        
-        #clock { font-size: 13px; font-weight: 500; text-align: right; }
-
-        /* Окна (Windows) */
-        .window {
-            position: absolute; background: rgba(25, 25, 33, 0.85);
-            backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px; box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-            display: flex; flex-direction: column; overflow: hidden;
-            transform: scale(0.95); opacity: 0;
-            animation: windowOpen 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            min-width: 300px; min-height: 200px;
-        }
-        .window.minimized { display: none; }
-        
-        @keyframes windowOpen { to { transform: scale(1); opacity: 1; } }
-
-        .window-header {
-            height: 35px; background: rgba(0, 0, 0, 0.2); border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex; align-items: center; justify-content: space-between; padding: 0 12px; cursor: grab;
-        }
-        .window-header:active { cursor: grabbing; }
-        .window-title { font-size: 13px; font-weight: 600; color: #ccc; pointer-events: none; }
-
-        .window-controls { display: flex; gap: 8px; }
-        .win-btn { width: 13px; height: 13px; border-radius: 50%; border: none; cursor: pointer; transition: 0.2s; }
-        .win-btn:hover { filter: brightness(1.2); }
-        .win-close { background: #ff5f56; }
-        .win-minimize { background: #ffbd2e; }
-        .win-maximize { background: #27c93f; }
-
-        .window-body { flex: 1; display: flex; flex-direction: column; position: relative; }
-
-        /* Редактор Кода (Code Editor) */
-        .editor-container { flex: 1; display: flex; background: #1e1e1e; }
-        .editor-lines { width: 40px; background: #1e1e1e; color: #858585; text-align: right; padding: 10px 5px; font-family: Consolas, monospace; font-size: 14px; border-right: 1px solid #333; }
-        .editor-textarea { 
-            flex: 1; background: transparent; color: #d4d4d4; padding: 10px; font-family: Consolas, monospace; font-size: 14px; 
-            border: none; outline: none; resize: none; white-space: pre; tab-size: 4;
-        }
-        
-        .editor-toolbar { padding: 8px; background: #2d2d2d; border-bottom: 1px solid #1e1e1e; display: flex; gap: 10px; }
-        .toolbar-btn { background: #007acc; border: none; color: #fff; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-        .toolbar-btn:hover { background: #0098ff; }
-
-        /* Контекстное меню */
-        #contextMenu {
-            position: absolute; background: rgba(30, 30, 40, 0.95); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 5px 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: none; z-index: 10000; min-width: 150px;
-        }
-        .context-item { padding: 8px 15px; font-size: 13px; cursor: pointer; color: #ccc; transition: 0.1s; }
-        .context-item:hover { background: rgba(88, 166, 255, 0.2); color: #fff; }
-
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber OS - Termux X11 & C++ Edition</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Подгружаем Monaco Editor Loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js"></script>
 </head>
 <body>
+    <div class="cyber-container">
+        <!-- Боковая панель: Виртуальная файловая система (VFS со старыми и новыми модулями) -->
+        <div class="cyber-sidebar">
+            <div class="sidebar-header">
+                <span>📁 WORKSPACE://root</span>
+                <button class="cyber-btn-xs" onclick="CyberVFS.createNewFile()">+</button>
+            </div>
+            <div id="vfs-file-tree" class="file-tree-container"></div>
+        </div>
 
-    <div id="desktop">
-        <div class="desktop-overlay"></div>
-
-        <!-- Окно редактора скриптов -->
-        <div class="window" style="top: 10%; left: 10%; width: 700px; height: 450px;" id="editorWindow">
-            <div class="window-header" onmousedown="startDrag(event, 'editorWindow')">
-                <span class="window-title">Berserk Studio - ScriptEditor.lua</span>
-                <div class="window-controls">
-                    <button class="win-btn win-minimize" onclick="minimizeWindow('editorWindow')"></button>
-                    <button class="win-btn win-maximize" onclick="maximizeWindow('editorWindow')"></button>
-                    <button class="win-btn win-close" onclick="closeWindow('editorWindow')"></button>
+        <!-- Основная рабочая область -->
+        <div class="cyber-main">
+            <div class="top-nav">
+                <span class="logo">CYBER-OS // v3.5 C++ ENGINE</span>
+                <div class="macro-buttons">
+                    <button class="cyber-btn btn-sm" onclick="CyberDevTools.insertMacro('#include <iostream>\nusing namespace std;\n\n')">#INCLUDE</button>
+                    <button class="cyber-btn btn-sm" onclick="CyberDevTools.insertMacro('std::cout << &quot;&quot; << std::endl;')">COUT</button>
+                    <button class="cyber-btn btn-sm" onclick="CyberDevTools.insertMacro('std::vector<string> ')">VECTOR</button>
+                    <button class="cyber-btn btn-sm" onclick="CyberOSX11.toggleMode()">X11 VIEW</button>
                 </div>
             </div>
-            <div class="window-body">
-                <div class="editor-toolbar">
-                    <button class="toolbar-btn">▶ Inject & Execute</button>
-                    <button class="toolbar-btn" style="background: #444;">Save (Ctrl+S)</button>
-                    <button class="toolbar-btn" style="background: #444;">Clear</button>
-                </div>
-                <div class="editor-container">
-                    <div class="editor-lines" id="lineNumbers">1<br>2<br>3<br>4<br>5<br>6<br>7</div>
-                    <textarea class="editor-textarea" id="codeArea" spellcheck="false" oninput="updateLines()">
--- [Berserk Master Suite] 
--- Core Module Init for Delta X Environment
 
-task.spawn(function()
-    local VebEnv = getgenv and getgenv() or _G
-    print("[Berserk Hub]: Modular engine loaded.")
-    -- Place exploit server-side logic here
-end)</textarea>
+            <!-- Редактор кода Monaco -->
+            <div id="editor" style="width: 100%; height: 45vh;"></div>
+
+            <!-- X11 Графический холст (скрыт по умолчанию) -->
+            <div id="x11-viewport-container" style="display:none; width:100%; height:45vh; background:#000; position:relative;">
+                <div class="x11-top-bar" style="background:#111; color:#00ffcc; padding:5px 10px; font-family:monospace; display:flex; justify-content:space-between;">
+                    <span>TERMUX-X11 [Display :0 Active - C++ Accelerated]</span>
+                    <button onclick="CyberOSX11.toggleMode()" style="background:none; border:1px solid #00ffcc; color:#00ffcc; cursor:pointer;">CLOSE X11</button>
+                </div>
+                <canvas id="x11-canvas" style="width:100%; height:calc(100% - 30px); display:block;"></canvas>
+            </div>
+
+            <!-- Консоль терминала в стиле Debian / Termux -->
+            <div class="cyber-console">
+                <div id="dt-console-output" class="console-output"></div>
+                <div class="dt-console-input-row">
+                    <span class="prompt-label">root@cyber-os:~#</span>
+                    <input type="text" id="dt-js-input" placeholder="Введите команду (help, g++ main.cpp, x11 start)...">
+                    <button class="cyber-btn btn-sm" onclick="CyberDevTools.runCmd()">RUN</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Контекстное меню -->
-    <div id="contextMenu">
-        <div class="context-item" onclick="openWindow('editorWindow')">📝 Open Editor</div>
-        <div class="context-item">💻 Terminal (PRoot)</div>
-        <div class="context-item">⚙️ Settings</div>
-        <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>
-        <div class="context-item" onclick="location.reload()">🔄 Refresh UI</div>
-    </div>
-
-    <div id="taskbar">
-        <div class="taskbar-left">
-            <button class="btn-start">Berserk</button>
-            <button class="taskbar-icon" onclick="openWindow('editorWindow')">Studio</button>
-        </div>
-        <div class="taskbar-right">
-            <div id="clock">12:00<br>01.01.2026</div>
-        </div>
-    </div>
-
-<script>
-    // --- Часы ---
-    function updateClock() {
-        const now = new Date();
-        document.getElementById('clock').innerHTML = 
-            `${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}<br>` + 
-            `${now.toLocaleDateString()}`;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    // --- Управление окнами ---
-    let highestZ = 100;
-
-    function startDrag(e, windowId) {
-        const win = document.getElementById(windowId);
-        if (!win) return;
-        
-        win.style.zIndex = ++highestZ; // Вывод окна на передний план
-        
-        let startX = e.clientX, startY = e.clientY;
-        let initialX = win.offsetLeft, initialY = win.offsetTop;
-
-        function onMouseMove(e) {
-            win.style.left = `${initialX + (e.clientX - startX)}px`;
-            win.style.top = `${initialY + (e.clientY - startY)}px`;
-        }
-        function onMouseUp() {
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-        }
-        
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-    }
-
-    function closeWindow(id) { document.getElementById(id).style.display = 'none'; }
-    function openWindow(id) { 
-        const win = document.getElementById(id);
-        win.style.display = 'flex';
-        win.classList.remove('minimized');
-        win.style.zIndex = ++highestZ;
-    }
-    function minimizeWindow(id) { document.getElementById(id).classList.add('minimized'); }
-    
-    function maximizeWindow(id) {
-        const win = document.getElementById(id);
-        if (win.style.width === '100vw') {
-            win.style.width = '700px'; win.style.height = '450px';
-            win.style.top = '10%'; win.style.left = '10%';
-        } else {
-            win.style.width = '100vw'; win.style.height = 'calc(100vh - 45px)';
-            win.style.top = '0'; win.style.left = '0';
-        }
-    }
-
-    // --- Синхронизация строк в редакторе ---
-    function updateLines() {
-        const textarea = document.getElementById('codeArea');
-        const linesPanel = document.getElementById('lineNumbers');
-        const linesCount = textarea.value.split('\n').length;
-        linesPanel.innerHTML = Array.from({length: linesCount}, (_, i) => i + 1).join('<br>');
-    }
-
-    // --- Контекстное меню ---
-    const desktop = document.getElementById('desktop');
-    const contextMenu = document.getElementById('contextMenu');
-
-    desktop.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        contextMenu.style.display = 'block';
-        contextMenu.style.left = `${e.clientX}px`;
-        contextMenu.style.top = `${e.clientY}px`;
-    });
-
-    document.addEventListener('click', () => { contextMenu.style.display = 'none'; });
-
-    // Позволяем писать текст в textarea (т.к. user-select: none стоит глобально)
-    document.getElementById('codeArea').addEventListener('mousedown', (e) => e.stopPropagation());
-</script>
+    <script src="app.js"></script>
+    <script src="features.js"></script>
 </body>
 </html>
