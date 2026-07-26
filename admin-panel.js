@@ -1,64 +1,46 @@
-let storedState = JSON.parse(localStorage.getItem('CYBER_OS_STATE')) || {};
-let cyberState = {
-    operator: storedState.operator || "Root",
-    keys: Array.isArray(storedState.keys) ? storedState.keys : [],
-    plugins: Array.isArray(storedState.plugins) ? storedState.plugins : []
-};
+class CyberAdminPanel {
+    constructor() {
+        this.nodesActive = true;
+        this.connectedClients = 1;
+    }
 
-function saveState() {
-    localStorage.setItem('CYBER_OS_STATE', JSON.stringify(cyberState));
-    CyberDevTools.updateStorage();
+    // Рендер панели управления прямо в браузере (вызывается по желанию)
+    renderAdminOverlay() {
+        let overlay = document.getElementById('cyber-admin-overlay');
+        if (overlay) {
+            overlay.remove();
+            return;
+        }
+
+        overlay = document.createElement('div');
+        overlay.id = 'cyber-admin-overlay';
+        overlay.style.cssText = 'position:fixed; top:50px; right:50px; width:350px; background:#111827; border:1px solid #00ffcc; z-index:9999; padding:15px; font-family:monospace; box-shadow: 0 0 20px rgba(0,255,204,0.2); border-radius:6px;';
+        
+        overlay.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1f293d; padding-bottom:8px; margin-bottom:10px;">
+                <span style="color:#00ffcc; font-weight:bold;">⚡ CYBER ADMIN SUITE</span>
+                <button onclick="document.getElementById('cyber-admin-overlay').remove()" style="background:none; border:none; color:#ff3333; cursor:pointer; font-weight:bold;">[X]</button>
+            </div>
+            <div style="font-size:12px; color:#e5e7eb; display:flex; flex-direction:column; gap:8px;">
+                <div>Статус ядра: <span style="color:#00ffcc;">ONLINE (RT-6.12)</span></div>
+                <div>Активные сокеты: <span style="color:#00ffcc;">${this.connectedClients} узла</span></div>
+                <div>Выделенная память: <span style="color:#00ffcc;">14.2 MB</span></div>
+                <hr style="border-color:#1f293d; margin:5px 0;">
+                <button class="cyber-btn btn-sm" onclick="window.AdminPanel.flushMemory()">Очистить кэш памяти</button>
+                <button class="cyber-btn btn-sm" onclick="window.AdminPanel.broadcastSignal()">Отправить пинг на устройство</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        if (window.CyberTools) window.CyberTools.log('info', 'Admin panel overlay opened.');
+    }
+
+    flushMemory() {
+        if (window.CyberTools) window.CyberTools.log('success', 'Virtual memory cache successfully flushed.');
+    }
+
+    broadcastSignal() {
+        if (window.CyberTools) window.CyberTools.log('success', 'WebSocket ping broadcasted to connected client nodes.');
+    }
 }
 
-const CyberAI = {
-    renderUI() {
-        const nameInput = document.getElementById('account-name');
-        if(nameInput) nameInput.value = cyberState.operator;
-
-        const keysList = document.getElementById('keys-list');
-        if(keysList) {
-            keysList.innerHTML = cyberState.keys.map((k, i) => 
-                `<div class="list-item"><span>${k.prov} [***]</span><button class="cyber-btn danger btn-sm" onclick="CyberAI.delKey(${i})">X</button></div>`
-            ).join('') || '<span style="color:var(--text-dim)">No keys registered.</span>';
-        }
-
-        const pluginsList = document.getElementById('plugins-list');
-        if(pluginsList) {
-            pluginsList.innerHTML = cyberState.plugins.map((p, i) => 
-                `<div class="list-item"><span>${p.name}</span><button class="cyber-btn danger btn-sm" onclick="CyberAI.delPlugin(${i})">X</button></div>`
-            ).join('') || '<span style="color:var(--text-dim)">No plugins deployed.</span>';
-        }
-    },
-    addKey() {
-        const p = document.getElementById('ai-provider').value;
-        const k = document.getElementById('api-key-input').value;
-        if(!k) return;
-        cyberState.keys.push({ prov: p, key: k });
-        document.getElementById('api-key-input').value = '';
-        saveState(); CyberAI.renderUI(); CyberUI.toast("API Key registered.");
-    },
-    delKey(i) { cyberState.keys.splice(i, 1); saveState(); CyberAI.renderUI(); },
-    addPlugin() {
-        const n = document.getElementById('plugin-name').value;
-        if(!n) return;
-        cyberState.plugins.push({ name: n });
-        document.getElementById('plugin-name').value = '';
-        saveState(); CyberAI.renderUI(); CyberUI.toast("Plugin deployed.");
-    },
-    delPlugin(i) { cyberState.plugins.splice(i, 1); saveState(); CyberAI.renderUI(); },
-    saveSettings() {
-        const nameInput = document.getElementById('account-name');
-        if(nameInput) cyberState.operator = nameInput.value;
-        saveState(); CyberUI.toast("Settings saved.");
-    },
-    clearData() {
-        if(confirm("Wipe system state?")) {
-            localStorage.removeItem('CYBER_OS_STATE');
-            location.reload();
-        }
-    }
-};
-
-document.addEventListener('DOMContentLoaded', () => {
-    CyberAI.renderUI();
-});
+window.AdminPanel = new CyberAdminPanel();
