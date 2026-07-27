@@ -3,67 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber OS - Termux X11 & C++ Engine</title>
+    <title>Poly Hub | Web OS</title>
+    <!-- Подключаем наши стили -->
     <link rel="stylesheet" href="styles.css">
-    <!-- Подгружаем Monaco Editor Loader -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js"></script>
 </head>
 <body>
-    <div class="cyber-container">
-        <!-- Боковая панель: Виртуальная файловая система -->
-        <div class="cyber-sidebar">
-            <div class="sidebar-header">
-                <span>📁 WORKSPACE://root</span>
-                <button class="cyber-btn-xs" onclick="CyberVFS.createNewFile()">+</button>
-            </div>
-            <div id="vfs-file-tree" class="file-tree-container">
-                <div class="file-item" style="color:#00ffcc;">📄 Kernel.c</div>
-                <div class="file-item" style="color:#00ffcc;">📄 app.js</div>
-            </div>
-        </div>
+    <!-- Боковая панель навигации (Сайдбар) -->
+    <div class="sidebar">
+        <h2>POLY_HUB</h2>
+        <ul id="navigation">
+            <li><a href="#" id="nav-dashboard" class="active">Рабочий стол</a></li>
+            <li><a href="#" id="nav-features">Модули (features)</a></li>
+            <li><a href="#" id="nav-admin">Админ-панель</a></li>
+            <li><a href="#" id="nav-settings">Настройки</a></li>
+        </ul>
+    </div>
 
-        <!-- Основная рабочая область -->
-        <div class="cyber-main">
-            <div class="top-nav">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <!-- Индикаторная лампа (Зеленый = код есть, Красный = пусто) -->
-                    <div id="script-status-lamp" title="Статус скрипта" style="width: 12px; height: 12px; border-radius: 50%; background-color: #ff3333; box-shadow: 0 0 8px #ff3333; transition: all 0.3s ease;"></div>
-                    <span class="logo">CYBER-OS // v3.5 C++ ENGINE</span>
-                </div>
-                <div class="macro-buttons">
-                    <button class="cyber-btn btn-sm" onclick="window.AdminPanel.renderAdminOverlay()">ADMIN PANEL</button>
-                    <button class="cyber-btn btn-sm" onclick="CyberDevTools.insertMacro('#include <iostream>\nusing namespace std;\n\n')">#INCLUDE</button>
-                    <button class="cyber-btn btn-sm" onclick="CyberDevTools.insertMacro('std::cout << &quot;&quot; << std::endl;')">COUT</button>
-                    <button class="cyber-btn btn-sm" onclick="CyberOSX11.toggleMode()">X11 VIEW</button>
-                </div>
-            </div>
-
-            <!-- Редактор кода Monaco -->
-            <div id="editor" style="width: 100%; height: 45vh;"></div>
-
-            <!-- X11 Графический холст (скрыт по умолчанию) -->
-            <div id="x11-viewport-container" style="display:none; width:100%; height:45vh; background:#000; position:relative;">
-                <div class="x11-top-bar" style="background:#111; color:#00ffcc; padding:5px 10px; font-family:monospace; display:flex; justify-content:space-between;">
-                    <span>TERMUX-X11 [Display :0 Active - C++ Accelerated]</span>
-                    <button class="cyber-btn btn-sm" onclick="CyberOSX11.toggleMode()">CLOSE X11</button>
-                </div>
-                <canvas id="x11-canvas" style="width:100%; height:calc(100% - 30px); display:block;"></canvas>
-            </div>
-
-            <!-- Консоль терминала в стиле Debian / Termux -->
-            <div class="cyber-console">
-                <div id="dt-console-output" class="console-output"></div>
-                <div class="dt-console-input-row">
-                    <span class="prompt-label">root@cyber-os:~#</span>
-                    <input type="text" id="dt-js-input" placeholder="Введите команду (help, inspect, clear)...">
-                    <button class="cyber-btn btn-sm" onclick="CyberDevTools.runCmd()">RUN</button>
-                </div>
+    <!-- Основная рабочая зона -->
+    <div class="main-content">
+        <!-- Шапка полигона -->
+        <header>
+            <h1>Среда разработки Полигон</h1>
+            <!-- Кнопка, которая запускает наш JS-скрипт -->
+            <button id="run-btn" class="btn-primary">Запустить терминал</button>
+        </header>
+        
+        <div class="workspace">
+            <!-- ЗОНА СПАВНА ОКОН -->
+            <!-- Именно в этот контейнер наш WindowManager из app.js будет инжектить новые окна -->
+            <div id="custom-ui-container">
+                <!-- Окна будут появляться здесь. Изначально пусто. -->
             </div>
         </div>
     </div>
 
+    <!-- Подключаем скрипты в самом конце тела документа, чтобы HTML успел загрузиться -->
     <script src="app.js"></script>
-    <script src="features.js"></script>
-    <script src="admin-panel.js"></script>
 </body>
 </html>
