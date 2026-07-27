@@ -1,178 +1,160 @@
-:root {
-    --cyber-bg: #0b0f19;
-    --cyber-panel: #111827;
-    --cyber-border: #1f293d;
-    --cyber-accent: #00ffcc;
-    --cyber-accent-glow: rgba(0, 255, 204, 0.4);
-    --cyber-danger: #ff3333;
-    --cyber-text: #e5e7eb;
-}
-
+/* Базовые сбросы и тема */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-body, html {
-    width: 100%;
-    height: 100%;
-    background-color: var(--cyber-bg);
-    color: var(--cyber-text);
+body {
+    background-color: #0d0d12;
+    color: #e0e0e0;
     font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    height: 100vh;
     overflow: hidden;
 }
 
-.cyber-container {
+/* Сайдбар */
+.sidebar {
+    width: 240px;
+    background-color: #121218;
+    border-right: 1px solid #1f1f2e;
     display: flex;
-    width: 100vw;
-    height: 100vh;
+    flex-direction: column;
+    padding: 20px;
 }
 
-/* Боковая панель (VFS) */
-.cyber-sidebar {
-    width: 260px;
-    background-color: var(--cyber-panel);
-    border-right: 1px solid var(--cyber-border);
+.sidebar h2 {
+    color: #00ffcc;
+    font-size: 18px;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar ul li {
+    margin-bottom: 15px;
+}
+
+.sidebar ul li a {
+    color: #8888a0;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li a.active {
+    color: #00ffcc;
+}
+
+/* Главная зона */
+.main-content {
+    flex: 1;
     display: flex;
     flex-direction: column;
 }
 
-.sidebar-header {
-    padding: 12px 15px;
-    background: #0d131f;
-    border-bottom: 1px solid var(--cyber-border);
+header {
+    height: 60px;
+    background-color: #121218;
+    border-bottom: 1px solid #1f1f2e;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 13px;
-    color: var(--cyber-accent);
+    padding: 0 30px;
 }
 
-.file-tree-container {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
+header h1 {
+    font-size: 18px;
+    color: #fff;
 }
 
-.file-item {
-    padding: 6px 10px;
-    margin-bottom: 4px;
+.btn-primary {
+    background-color: transparent;
+    border: 1px solid #00ffcc;
+    color: #00ffcc;
+    padding: 8px 16px;
     border-radius: 4px;
-    font-size: 13px;
-    transition: background 0.2s;
+    cursor: pointer;
+    font-family: monospace;
+    transition: 0.2s;
 }
 
-.file-item:hover {
-    background: rgba(0, 255, 204, 0.1);
+.btn-primary:hover {
+    background-color: rgba(0, 255, 204, 0.1);
 }
 
-/* Основная рабочая область */
-.cyber-main {
+.workspace {
     flex: 1;
+    position: relative;
+    background: radial-gradient(circle at center, #151522 0%, #0d0d12 100%);
+    overflow: hidden;
+}
+
+/* Стили окон */
+.cyber-window {
+    position: absolute;
+    width: 450px;
+    background-color: #121218;
+    border: 1px solid #00ffcc;
+    border-radius: 6px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8);
     display: flex;
     flex-direction: column;
-    height: 100%;
-    background: var(--cyber-bg);
+    overflow: hidden;
+    z-index: 10;
 }
 
-.top-nav {
-    height: 45px;
-    background: var(--cyber-panel);
-    border-bottom: 1px solid var(--cyber-border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 15px;
-}
-
-.logo {
-    font-size: 14px;
+.window-header {
+    background-color: #1a1a24;
+    color: #00ffcc;
+    padding: 10px 15px;
     font-weight: bold;
-    color: var(--cyber-accent);
-    letter-spacing: 1px;
+    cursor: grab;
+    user-select: none;
+    border-bottom: 1px solid #00ffcc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.macro-buttons {
+.window-header:active {
+    cursor: grabbing;
+}
+
+.window-controls {
     display: flex;
     gap: 8px;
 }
 
-/* Кнопки */
-.cyber-btn {
-    background: transparent;
-    border: 1px solid var(--cyber-accent);
-    color: var(--cyber-accent);
-    padding: 5px 12px;
-    font-family: monospace;
-    font-size: 12px;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: all 0.3s ease;
-}
-
-.cyber-btn:hover {
-    background: var(--cyber-accent);
-    color: var(--cyber-bg);
-    box-shadow: 0 0 10px var(--cyber-accent-glow);
-}
-
-.cyber-btn-xs {
-    background: transparent;
-    border: 1px solid var(--cyber-accent);
-    color: var(--cyber-accent);
-    width: 24px;
-    height: 24px;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 3px;
-}
-
-.btn-sm {
-    padding: 3px 8px;
-    font-size: 11px;
-}
-
-/* Консоль терминала */
-.cyber-console {
-    height: calc(55vh - 45px);
-    background: #05070b;
-    border-top: 1px solid var(--cyber-border);
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-}
-
-.console-output {
-    flex: 1;
-    overflow-y: auto;
-    font-size: 12px;
-    line-height: 1.4;
-    margin-bottom: 8px;
-    padding-right: 5px;
-}
-
-.dt-console-input-row {
-    display: flex;
-    align-items: center;
-    background: #0d131f;
-    border: 1px solid var(--cyber-border);
-    border-radius: 4px;
-    padding: 5px 10px;
-}
-
-.prompt-label {
-    color: var(--cyber-accent);
-    font-size: 12px;
-    margin-right: 8px;
-}
-
-.dt-console-input-row input {
-    flex: 1;
-    background: transparent;
+.win-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
     border: none;
-    color: var(--cyber-text);
-    font-family: monospace;
-    font-size: 12px;
-    outline: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-min {
+    background-color: #ffb86c;
+}
+.btn-min:hover {
+    background-color: #ff9900;
+}
+
+.btn-close {
+    background-color: #ff5555;
+}
+.btn-close:hover {
+    background-color: #ff2222;
+}
+
+.window-content {
+    padding: 15px;
+    color: #e0e0e0;
+    font-family: 'Courier New', Courier, monospace;
 }
