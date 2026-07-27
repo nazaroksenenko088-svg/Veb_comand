@@ -1,127 +1,162 @@
-let editor;
-
-// Инициализация редактора Monaco при загрузке страницы
-require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min' }});
-require(['vs/editor/editor.main'], function() {
-    editor = monaco.editor.create(document.getElementById('editor'), {
-        value: '/* Напиши свой скрипт здесь */\n#include <iostream>\n\nint main() {\n    std::cout << "Cyber OS Active" << std::endl;\n    return 0;\n}',
-        language: 'cpp',
-        theme: 'vs-dark',
-        automaticLayout: true
-    });
-
-    // Отслеживаем изменения для индикаторной лампы
-    editor.onDidChangeModelContent(() => {
-        updateScriptStatusLamp(editor);
-    });
-    
-    updateScriptStatusLamp(editor);
-    
-    if (window.CyberTools) {
-        window.CyberTools.log('success', 'Monaco Editor initialized successfully.');
+class WindowManager {
+    constructor(containerId) {
+        this.container = document.getElementById(containerId) || document.body;
+        this.zIndexCounter = 10;
     }
-});
 
-// Логика индикаторной лампы (зеленый — есть код, красный — пусто)
-function updateScriptStatusLamp(editorInstance) {
-    const lamp = document.getElementById('script-status-lamp');
-    if (!lamp) return;
+    createWindow(title, contentHTML) {
+        // Создаем главный контейнер окна
+        const win = document.createElement('div');
+        win.className = 'cyber-window';
+        win.style.top = '120px';
+        win.style.left = '180px';
+        win.style.zIndex = ++this.zIndexCounter;
 
-    const content = editorInstance.getValue().trim();
-    if (content.length > 0) {
-        lamp.style.backgroundColor = '#00ffcc';
-        lamp.style.boxShadow = '0 0 10px #00ffcc, 0 0 20px #00ffcc';
-    } else {
-        lamp.style.backgroundColor = '#ff3333';
-        lamp.style.boxShadow = '0 0 10px #ff3333, 0 0 20px #ff3333';
-    }
-}
+        // Создаем шапку
+        const header = document.createElement('div');
+        header.className = 'window-header';
 
-// Управление X11 режимом
-class CyberOSX11 {
-    static toggleMode() {
-        const editorDiv = document.getElementById('editor');
-        const x11Div = document.getElementById('x11-viewport-container');
+        const titleSpan = document.createElement('span');
+        titleSpan.innerText = title;
+
+        const controls = document.createElement('div');
+        controls.className = 'window-controls';
+
+        const btnMin = document.createElement('button');
+        btnMin.className = 'win-btn btn-min';
         
-        if (x11Div.style.display === 'none') {
-            editorDiv.style.display = 'none';
-            x11Div.style.display = 'block';
-            if (window.CyberTools) window.CyberTools.log('info', 'Switched to Termux-X11 Display View.');
-        } else {
-            x11Div.style.display = 'none';
-            editorDiv.style.display = 'block';
-            if (window.CyberTools) window.CyberTools.log('info', 'Switched back to Code Editor.');
-        }
+        const btnClose = document.createElement('button');
+        btnClose.className = 'win-btn btn-close';
+
+        controls.appendChild(btnMin);
+        controls.appendChild(btnClose);
+
+        header.appendChild(titleSpan);
+        header.appendChild(controls);
+
+        // Создаем контентную часть
+        const content = document.createElement('div');
+        content.className = 'window-content';
+        content.innerHTML = contentHTML;
+
+        win.appendChild(header);
+        win.appendChild(content);
+        this.container.appendChild(win);
+
+        // Поведение по клику (фокус)
+        win.addEventListener('mousedown', () => {
+            win.style.zIndex = ++this.zIndexCounter;
+        });
+
+        // Перетаскивание за заголовок
+        this.makeDraggable(win, titleSpan);
+
+        // Закрытие окна
+        btnClose.addEventListener('click', () => {
+            win.remove();
+        });
+
+        // Сворачивание / разворачивание контента
+        btnMin.addEventListener('click', () => {
+            content.style.display = content.style.display === 'none' ? 'block' : 'none';
+        });
+    }
+
+    makeDraggable(windowElement, dragHandle) {
+        let isDragging = false;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        dragHandle.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            offsetX = e.clientX - windowElement.getBoundingClientRect().left;
+            offsetY = e.clientY - windowElement.getBoundingClientRect().top;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            windowElement.style.left = (e.clientX - offsetX) + 'px';
+            windowElement.style.top = (e.clientY - offsetY) + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
     }
 }
 
-// Виртуальная файловая система (VFS)
-class CyberVFS {
-    static createNewFile() {
-        const fileName = prompt("Введите имя нового файла (например: script.cpp / payload.lua):", "module.cpp");
-        if (fileName) {
-            const tree = document.getElementById('vfs-file-tree');
-            const item = document.createElement('div');
-            item.className = 'file-item';
-            item.style.padding = '5px 10px';
-            item.style.cursor = 'pointer';
-            item.style.color = '#00ffcc';
-            item.style.fontFamily = 'monospace';
-            item.textContent = `📄 ${fileName}`;
-            item.onclick = () => {
-                if (window.CyberTools) window.CyberTools.log('info', `Opened file: ${fileName}`);
-            };
-            tree.appendChild(item);
-            if (window.CyberTools) window.CyberTools.log('success', `File created: ${fileName}`);
-        }
+class TerminalUI {
+    constructor(windowManager) {
+        this.wm = windowManager;
     }
-}
 
-// Обработка ввода в кастомной консоли
-const CyberDevTools = {
-    insertMacro: function(text) {
-        if (editor) {
-            const position = editor.getPosition();
-            editor.executeEdits('', [{ range: new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column), text: text }]);
-            editor.focus();
-        }
-    },
-    runCmd: function() {
-        const input = document.getElementById('dt-js-input');
-        if (!input) return;
-        const cmd = input.value.trim();
-        if (!cmd) return;
+    openTerminal() {
+        const contentHTML = `
+            <div class="term-logs" style="height: 160px; overflow-y: auto; margin-bottom: 10px; font-size: 13px; line-height: 1.4;">
+                <div style="color: #00ffcc;">[Система] Оболочка инициализирована. Введите 'help' для справки.</div>
+            </div>
+            <div class="term-input-line" style="display: flex; align-items: center; color: #00ffcc; font-size: 13px;">
+                <span style="margin-right: 8px;">root@polygon:~#</span>
+                <input type="text" class="term-input" style="flex: 1; background: transparent; border: none; color: #fff; font-family: monospace; outline: none; font-size: 13px;" autocomplete="off" autofocus>
+            </div>
+        `;
 
-        if (window.CyberTools) {
-            window.CyberTools.log('info', `root@cyber-os:~# ${cmd}`);
-        }
+        this.wm.createWindow('Terminal_v0.1', contentHTML);
 
-        if (cmd === 'help') {
-            if (window.CyberTools) {
-                window.CyberTools.log('success', 'Available commands: g++, x11 start, inspect, clear, reboot');
-            }
-        } else if (cmd === 'inspect') {
-            if (window.CyberTools) window.CyberTools.inspectMemory();
-        } else if (cmd === 'clear') {
-            const consoleOut = document.getElementById('dt-console-output');
-            if (consoleOut) consoleOut.innerHTML = '';
-        } else {
-            if (window.CyberTools) {
-                window.CyberTools.executeActiveScript();
-            }
-        }
-        input.value = '';
-    }
-};
+        // Получаем свежесозданное окно для привязки логики ввода
+        const windows = document.querySelectorAll('.cyber-window');
+        const currentWindow = windows[windows.length - 1];
+        
+        const inputField = currentWindow.querySelector('.term-input');
+        const logsArea = currentWindow.querySelector('.term-logs');
 
-// Биндим Enter для консоли
-document.addEventListener('DOMContentLoaded', () => {
-    const input = document.getElementById('dt-js-input');
-    if (input) {
-        input.addEventListener('keypress', (e) => {
+        // Автофокус на поле ввода сразу после отрисовки
+        setTimeout(() => inputField.focus(), 50);
+
+        inputField.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                CyberDevTools.runCmd();
+                const command = inputField.value.trim();
+                if (command) {
+                    this.executeCommand(command, logsArea);
+                }
+                inputField.value = '';
+                logsArea.scrollTop = logsArea.scrollHeight;
             }
         });
     }
+
+    executeCommand(cmd, logsArea) {
+        logsArea.innerHTML += `<div><span style="color: #666;">root@polygon:~#</span> ${cmd}</div>`;
+
+        let response = '';
+        switch (cmd.toLowerCase()) {
+            case 'help':
+                response = 'Доступные команды: help, ls, clear, whoami, date';
+                break;
+            case 'ls':
+                response = '<span style="color: #ffb86c;">SIGMA_PROJECT/</span>  <span style="color: #ffb86c;">rust_security/</span>  HARVESTER_V3.0.py  Kernel.c';
+                break;
+            case 'whoami':
+                response = 'root (Polygon WebOS environment)';
+                break;
+            case 'date':
+                response = new Date().toUTCString();
+                break;
+            case 'clear':
+                logsArea.innerHTML = '';
+                return;
+            default:
+                response = `<span style="color: #ff5555;">bash: ${cmd}: команда не найдена</span>`;
+        }
+
+        logsArea.innerHTML += `<div>${response}</div>`;
+    }
+}
+
+// === ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ===
+const wm = new WindowManager('custom-ui-container');
+const terminal = new TerminalUI(wm);
+
+document.getElementById('run-btn').addEventListener('click', () => {
+    terminal.openTerminal();
 });
