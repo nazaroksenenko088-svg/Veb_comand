@@ -1,82 +1,62 @@
 class WindowManager {
     constructor(containerId) {
-        this.container = document.getElementById(containerId) || document.body;
-        this.zIndexCounter = 10;
+        this.container = document.getElementById(containerId);
+        this.highestZIndex = 100;
     }
 
     createWindow(title, contentHTML) {
-        // Создаем главный контейнер окна
         const win = document.createElement('div');
         win.className = 'cyber-window';
-        win.style.top = '120px';
-        win.style.left = '180px';
-        win.style.zIndex = ++this.zIndexCounter;
+        win.style.zIndex = ++this.highestZIndex;
+        win.style.top = '50px';
+        win.style.left = '50px';
 
-        // Создаем шапку
-        const header = document.createElement('div');
-        header.className = 'window-header';
+        win.innerHTML = `
+            <div class="window-header">
+                <span class="window-title">${title}</span>
+                <div class="window-controls">
+                    <button class="minimize-btn">_</button>
+                    <button class="close-btn">X</button>
+                </div>
+            </div>
+            <div class="window-body">
+                ${contentHTML}
+            </div>
+        `;
 
-        const titleSpan = document.createElement('span');
-        titleSpan.innerText = title;
-
-        const controls = document.createElement('div');
-        controls.className = 'window-controls';
-
-        const btnMin = document.createElement('button');
-        btnMin.className = 'win-btn btn-min';
-        
-        const btnClose = document.createElement('button');
-        btnClose.className = 'win-btn btn-close';
-
-        controls.appendChild(btnMin);
-        controls.appendChild(btnClose);
-
-        header.appendChild(titleSpan);
-        header.appendChild(controls);
-
-        // Создаем контентную часть
-        const content = document.createElement('div');
-        content.className = 'window-content';
-        content.innerHTML = contentHTML;
-
-        win.appendChild(header);
-        win.appendChild(content);
-        this.container.appendChild(win);
-
-        // Поведение по клику (фокус)
-        win.addEventListener('mousedown', () => {
-            win.style.zIndex = ++this.zIndexCounter;
-        });
-
-        // Перетаскивание за заголовок
-        this.makeDraggable(win, titleSpan);
-
-        // Закрытие окна
-        btnClose.addEventListener('click', () => {
+        // Логика закрытия окна
+        win.querySelector('.close-btn').addEventListener('click', () => {
             win.remove();
         });
 
-        // Сворачивание / разворачивание контента
-        btnMin.addEventListener('click', () => {
-            content.style.display = content.style.display === 'none' ? 'block' : 'none';
+        // Сделать окно перетаскиваемым
+        this.makeDraggable(win);
+
+        // Фокус при клике
+        win.addEventListener('mousedown', () => {
+            win.style.zIndex = ++this.highestZIndex;
         });
+
+        this.container.appendChild(win);
+        return win;
     }
 
-    makeDraggable(windowElement, dragHandle) {
+    makeDraggable(element) {
+        const header = element.querySelector('.window-header');
         let isDragging = false;
-        let offsetX = 0;
-        let offsetY = 0;
+        let startX, startY;
 
-        dragHandle.addEventListener('mousedown', (e) => {
+        header.addEventListener('mousedown', (e) => {
             isDragging = true;
-            offsetX = e.clientX - windowElement.getBoundingClientRect().left;
-            offsetY = e.clientY - windowElement.getBoundingClientRect().top;
+            startX = e.clientX - element.offsetLeft;
+            startY = e.clientY - element.offsetTop;
+            element.style.zIndex = ++this.highestZIndex;
         });
 
         document.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
-            windowElement.style.left = (e.clientX - offsetX) + 'px';
-            windowElement.style.top = (e.clientY - offsetY) + 'px';
+            element.style.left = `${e.clientX - startX}px`;
+            element.style.top = `${e.clientY - startY}px`;
         });
 
         document.addEventListener('mouseup', () => {
@@ -85,78 +65,78 @@ class WindowManager {
     }
 }
 
-class TerminalUI {
+class LinuxVM {
     constructor(windowManager) {
         this.wm = windowManager;
+        this.emulator = null;
     }
 
-    openTerminal() {
+    bootISO(isoUrl) {
         const contentHTML = `
-            <div class="term-logs" style="height: 160px; overflow-y: auto; margin-bottom: 10px; font-size: 13px; line-height: 1.4;">
-                <div style="color: #00ffcc;">[Система] Оболочка инициализирована. Введите 'help' для справки.</div>
-            </div>
-            <div class="term-input-line" style="display: flex; align-items: center; color: #00ffcc; font-size: 13px;">
-                <span style="margin-right: 8px;">root@polygon:~#</span>
-                <input type="text" class="term-input" style="flex: 1; background: transparent; border: none; color: #fff; font-family: monospace; outline: none; font-size: 13px;" autocomplete="off" autofocus>
+            <div id="vm-screen-container" style="width: 640px; height: 400px; background: #000; overflow: hidden; position: relative;">
+                <div style="color: #00ffcc; padding: 15px; font-family: monospace;">
+                    [Polygon Hypervisor] Запуск инициализации v86...<br>
+                    [Polygon Hypervisor] Подключение ISO образа: ${isoUrl}<br>
+                    [Polygon Hypervisor] Загрузка BIOS и выделение памяти...
+                </div>
             </div>
         `;
 
-        this.wm.createWindow('Terminal_v0.1', contentHTML);
+        this.wm.createWindow('Linux Virtual Machine (v86)', contentHTML);
 
-        // Получаем свежесозданное окно для привязки логики ввода
         const windows = document.querySelectorAll('.cyber-window');
         const currentWindow = windows[windows.length - 1];
-        
-        const inputField = currentWindow.querySelector('.term-input');
-        const logsArea = currentWindow.querySelector('.term-logs');
+        const screenContainer = currentWindow.querySelector('#vm-screen-container');
 
-        // Автофокус на поле ввода сразу после отрисовки
-        setTimeout(() => inputField.focus(), 50);
-
-        inputField.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const command = inputField.value.trim();
-                if (command) {
-                    this.executeCommand(command, logsArea);
-                }
-                inputField.value = '';
-                logsArea.scrollTop = logsArea.scrollHeight;
-            }
-        });
-    }
-
-    executeCommand(cmd, logsArea) {
-        logsArea.innerHTML += `<div><span style="color: #666;">root@polygon:~#</span> ${cmd}</div>`;
-
-        let response = '';
-        switch (cmd.toLowerCase()) {
-            case 'help':
-                response = 'Доступные команды: help, ls, clear, whoami, date';
-                break;
-            case 'ls':
-                response = '<span style="color: #ffb86c;">SIGMA_PROJECT/</span>  <span style="color: #ffb86c;">rust_security/</span>  HARVESTER_V3.0.py  Kernel.c';
-                break;
-            case 'whoami':
-                response = 'root (Polygon WebOS environment)';
-                break;
-            case 'date':
-                response = new Date().toUTCString();
-                break;
-            case 'clear':
-                logsArea.innerHTML = '';
-                return;
-            default:
-                response = `<span style="color: #ff5555;">bash: ${cmd}: команда не найдена</span>`;
+        // Инициализация эмулятора v86
+        try {
+            this.emulator = new V86Starter({
+                wasm_path: "https://cdn.jsdelivr.net/npm/v86@0.3/build/v86.wasm",
+                memory_size: 256 * 1024 * 1024, // 256 MB RAM
+                vga_memory_size: 8 * 1024 * 1024,
+                screen_container: screenContainer,
+                bios: {
+                    url: "https://cdn.jsdelivr.net/npm/v86@0.3/bios/seabios.bin",
+                },
+                vga_bios: {
+                    url: "https://cdn.jsdelivr.net/npm/v86@0.3/bios/vgabios.bin",
+                },
+                cdrom: {
+                    url: isoUrl,
+                },
+                autostart: true,
+            });
+        } catch (error) {
+            screenContainer.innerHTML = `<div style="color: #ff5555; padding: 15px;">Ошибка запуска эмулятора: ${error.message}</div>`;
         }
-
-        logsArea.innerHTML += `<div>${response}</div>`;
     }
 }
 
-// === ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ===
-const wm = new WindowManager('custom-ui-container');
-const terminal = new TerminalUI(wm);
+// === Инициализация системы при загрузке страницы ===
+window.addEventListener('DOMContentLoaded', () => {
+    const wm = new WindowManager('custom-ui-container');
+    const vm = new LinuxVM(wm);
 
-document.getElementById('run-btn').addEventListener('click', () => {
-    terminal.openTerminal();
+    // Кнопка запуска виртуальной машины с Linux
+    document.getElementById('run-btn').addEventListener('click', () => {
+        // Укажи здесь путь к твоему легковесному ISO (например, Alpine или Tiny Core)
+        vm.bootISO('./alpine.iso');
+    });
+
+    // Кнопка открытия админ-панели
+    document.getElementById('admin-btn').addEventListener('click', () => {
+        if (window.AdminPanel) {
+            const admin = new AdminPanel();
+            const win = wm.createWindow('Системная Панель', admin.renderPanel());
+            // Прикрепляем события внутри окна после его отрисовки
+            setTimeout(() => admin.attachEvents(), 100);
+        } else {
+            alert('Модуль AdminPanel не загружен!');
+        }
+    });
+
+    console.log("[Polygon OS] Окружение успешно инициализировано.");
+    if (window.SystemFeatures) {
+        window.SystemFeatures.listModules();
+    }
 });
