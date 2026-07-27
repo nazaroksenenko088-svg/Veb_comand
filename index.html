@@ -3,41 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poly Hub | Web OS</title>
-    <!-- Подключаем наши стили -->
+    <title>Polygon Web OS</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Боковая панель навигации (Сайдбар) -->
-    <div class="sidebar">
-        <h2>POLY_HUB</h2>
-        <ul id="navigation">
-            <li><a href="#" id="nav-dashboard" class="active">Рабочий стол</a></li>
-            <li><a href="#" id="nav-features">Модули (features)</a></li>
-            <li><a href="#" id="nav-admin">Админ-панель</a></li>
-            <li><a href="#" id="nav-settings">Настройки</a></li>
-        </ul>
-    </div>
 
-    <!-- Основная рабочая зона -->
-    <div class="main-content">
-        <!-- Шапка полигона -->
-        <header>
-            <h1>Среда разработки Полигон</h1>
-            <!-- Кнопка, которая запускает наш JS-скрипт -->
-            <button id="run-btn" class="btn-primary">Запустить терминал</button>
-        </header>
-        
-        <div class="workspace">
-            <!-- ЗОНА СПАВНА ОКОН -->
-            <!-- Именно в этот контейнер наш WindowManager из app.js будет инжектить новые окна -->
-            <div id="custom-ui-container">
-                <!-- Окна будут появляться здесь. Изначально пусто. -->
-            </div>
+    <!-- Рабочий стол / контейнер для окон -->
+    <div id="custom-ui-container">
+        <!-- Панель задач / Меню запуска -->
+        <div class="taskbar">
+            <button id="run-btn" class="taskbar-btn">🖥️ Запустить Linux VM</button>
+            <button id="admin-btn" class="taskbar-btn">⚙️ Админ-панель</button>
         </div>
     </div>
 
-    <!-- Подключаем скрипты в самом конце тела документа, чтобы HTML успел загрузиться -->
+    <!-- Подключаем библиотеку эмулятора v86 через CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/v86@0.3/build/libv86.js"></script>
+    
+    <!-- Подключаем наши скрипты -->
+    <script src="admin-panel.js"></script>
+    <script src="features.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
