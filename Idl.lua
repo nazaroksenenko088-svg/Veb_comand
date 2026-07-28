@@ -1,71 +1,169 @@
---[[
-    Domain V2 + Akbarshox Fly + Dex Explorer Hub
-    Optimized & Combined Admin Panel
-]]
-
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
+-- ==========================================
+-- DOMAIN HUB: OPEN-SOURCE LOADER ARCHITECTURE
+-- ==========================================
 local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
 
--- Защита GUI если поддерживается эксплойтом
-local function protectGui(gui)
-	if syn and syn.protect_gui then
-		syn.protect_gui(gui)
-		gui.Parent = CoreGui
-	elseif gethui then
-		gui.Parent = gethui()
-	else
-		gui.Parent = CoreGui
-	end
-end
-
--- Загрузка основного интерфейса Domain V2
-local Domain = {
-	Domain = Instance.new("ScreenGui"),
-	Main = Instance.new("Frame"),
-	UICorner = Instance.new("UICorner"),
-	Buttons = Instance.new("Frame"),
-	Pages = Instance.new("Frame"),
+-- Инициализация глобального окружения для модулей (как в лучших открытых либах)
+getgenv().DomainHub = {
+    Version = "3.0",
+    Settings = {
+        FlySpeed = 50,
+        AnimSpeed = 1,
+        TargetPlayer = ""
+    },
+    Modules = {}
 }
 
-Domain.Domain.Name = "DomainHub"
-Domain.Domain.ResetOnSpawn = false
-protectGui(Domain.Domain)
+local Hub = getgenv().DomainHub
 
-Domain.Main.Name = "Main"
-Domain.Main.Parent = Domain.Domain
-Domain.Main.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
-Domain.Main.BorderSizePixel = 0
-Domain.Main.Position = UDim2.new(0.85, 0, 0.25, 0)
-Domain.Main.Size = UDim2.new(0.05, 0, 0.45, 0)
-Domain.Main.ZIndex = 5
-
-Domain.UICorner.CornerRadius = UDim.new(0, 12)
-Domain.UICorner.Parent = Domain.Main
-
--- Функция загрузки Акбаршох Флай V3
-local function loadFly()
-	local success, err = pcall(function()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/Administration1boo/solid-octo-succotash/refs/heads/main/Akbarshox%20Fly%20V3%E2%9A%A1"))()
-	end)
-	if not success then
-		warn("Не удалось загрузить Fly: " .. tostring(err))
-	end
+-- Утилита создания элементов
+local function Create(className, properties, parent)
+    local element = Instance.new(className)
+    for i, v in pairs(properties) do
+        element[i] = v
+    end
+    if parent then element.Parent = parent end
+    return element
 end
 
--- Функция загрузки Dark Dex
-local function loadDex()
-	pcall(function()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
-	end)
+-- Безопасный вызов (защита от краша планшета)
+local function SafeExecute(name, func)
+    local success, err = pcall(func)
+    if not success then
+        warn("❌ [Domain Hub Error] " .. tostring(name) .. ": " .. tostring(err))
+    else
+        print("✅ [Domain Hub] Loaded: " .. tostring(name))
+    end
 end
 
--- Уведомление об успешной загрузке
-StarterGui = game:GetService("StarterGui")
-StarterGui:SetCore("SendNotification", {
-	Title = "Domain Hub Loaded",
-	Text = "Интерфейс и фичи успешно объединены!",
-	Duration = 5
-})
+-- Создание главного окна
+local ScreenGui = Create("ScreenGui", {Name = "DomainHubOpenSource", ResetOnSpawn = false})
+if syn and syn.protect_gui then syn.protect_gui(ScreenGui) end
+ScreenGui.Parent = CoreGui
 
--- Дополнительные элементы управления и кнопки можно вызывать через консоль или привязывать к UI элементам Domain V2[cite: 2]
+local Main = Create("Frame", {
+    BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+    Size = UDim2.new(0, 500, 0, 320),
+    Position = UDim2.new(0.5, -250, 0.5, -160)
+}, ScreenGui)
+Create("UICorner", {CornerRadius = UDim.new(0, 8)}, Main)
+
+-- Меню категорий (Слева)
+local CategoryContainer = Create("ScrollingFrame", {
+    Size = UDim2.new(0.28, 0, 1, 0),
+    BackgroundTransparency = 1,
+    CanvasSize = UDim2.new(0, 0, 1.5, 0)
+}, Main)
+
+-- Рабочая зона (Справа)
+local WorkspaceArea = Create("Frame", {
+    Size = UDim2.new(0.72, 0, 1, 0),
+    Position = UDim2.new(0.28, 0, 0, 0),
+    BackgroundTransparency = 1
+}, Main)
+
+local function MakeCategory(name)
+    local page = Create("ScrollingFrame", {
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundTransparency = 1,
+        Visible = false,
+        CanvasSize = UDim2.new(0, 0, 2, 0)
+    }, WorkspaceArea)
+    
+    local btn = Create("TextButton", {
+        Size = UDim2.new(0.9, 0, 0, 35),
+        BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+        TextColor3 = Color3.fromRGB(255, 255, 255),
+        Text = name,
+        Font = Enum.Font.SourceSansBold
+    }, CategoryContainer)
+    Create("UICorner", {CornerRadius = UDim.new(0, 6)}, btn)
+    
+    btn.MouseButton1Click:Connect(function()
+        for _, p in pairs(WorkspaceArea:GetChildren()) do
+            p.Visible = false
+        end
+        page.Visible = true
+    end)
+    
+    return page
+end
+
+-- Категории хаба
+local TabMain = MakeCategory("Главная")
+local TabScripts = MakeCategory("Скрипты & Читы")
+local TabConfig = MakeCategory("Тонкие настройки")
+TabMain.Visible = true
+
+-- Функция добавления кнопок
+local function AddAction(page, text, callback)
+    local btn = Create("TextButton", {
+        Size = UDim2.new(0.9, 0, 0, 35),
+        BackgroundColor3 = Color3.fromRGB(45, 45, 45),
+        TextColor3 = Color3.fromRGB(255, 255, 255),
+        Text = text,
+        Font = Enum.Font.SourceSansBold
+    }, page)
+    Create("UICorner", {CornerRadius = UDim.new(0, 6)}, btn)
+    btn.MouseButton1Click:Connect(function()
+        SafeExecute(text, callback)
+    end)
+end
+
+-- Функция добавления тонкой настройки (инпут для изменения параметров)
+local function AddConfigInput(page, labelText, settingKey)
+    Create("TextLabel", {
+        Size = UDim2.new(0.9, 0, 0, 20),
+        BackgroundTransparency = 1,
+        TextColor3 = Color3.fromRGB(180, 180, 180),
+        Text = labelText,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Font = Enum.Font.SourceSans
+    }, page)
+    
+    local box = Create("TextBox", {
+        Size = UDim2.new(0.9, 0, 0, 30),
+        BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+        TextColor3 = Color3.fromRGB(255, 255, 255),
+        Text = tostring(Hub.Settings[settingKey]),
+        Font = Enum.Font.SourceSansBold
+    }, page)
+    Create("UICorner", {CornerRadius = UDim.new(0, 6)}, box)
+    
+    box.FocusLost:Connect(function()
+        local val = tonumber(box.Text) or box.Text
+        Hub.Settings[settingKey] = val
+        print("⚙️ Обновлен параметр " .. settingKey .. " -> " .. tostring(val))
+    end)
+end
+
+-- ==========================================
+-- ИНТЕГРАЦИЯ БАЗЫ СКРИПТОВ ПОД ОПЕНСОРС ЛОГИКУ
+-- ==========================================
+
+-- 1. Fly[cite: 29]
+AddAction(TabScripts, "Запустить Fly V3", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Administration1boo/solid-octo-succotash/refs/heads/main/Akbarshox%20Fly%20V3%E2%9A%A1"))()
+end)
+
+-- 2. Анимация[cite: 31] с привязкой к настройке скорости
+AddAction(TabScripts, "Запустить ID Анимацию", function()
+    local Char = Player.Character or Player.CharacterAdded:Wait()
+    local Hum = Char:FindFirstChildOfClass("Humanoid")
+    local Anim = Instance.new("Animation")
+    Anim.AnimationId = "rbxassetid://72042024"
+    local track = Hum:WaitForChild("Animator"):LoadAnimation(Anim)
+    track:AdjustSpeed(Hub.Settings.AnimSpeed) -- Тонкая настройка из конфига!
+    track:Play()
+end)
+
+-- 3. Bang Script[cite: 30]
+AddAction(TabScripts, "Запустить Bang Script", function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/4gh9/Bang-Script-Gui/main/bang%20gui.lua'))()
+end)
+
+-- Наполняем вкладку настроек
+AddConfigInput(TabConfig, "Скорость анимации:", "AnimSpeed")
+AddConfigInput(TabConfig, "Скорость полета (Fly):", "FlySpeed")
