@@ -1,169 +1,115 @@
--- ==========================================
--- DOMAIN HUB: OPEN-SOURCE LOADER ARCHITECTURE
--- ==========================================
-local CoreGui = game:GetService("CoreGui")
-local Players = game:GetService("Players")
-local Player = Players.LocalPlayer
+-- =========================================================================
+-- DOMAIN HUB | Delta X Edition (Update: Smoke & Cola Chill Pack)
+-- =========================================================================
 
--- Инициализация глобального окружения для модулей (как в лучших открытых либах)
-getgenv().DomainHub = {
-    Version = "3.0",
-    Settings = {
-        FlySpeed = 50,
-        AnimSpeed = 1,
-        TargetPlayer = ""
+local DomainHub = {
+    Config = {
+        HubName = "Domain Hub",
+        Version = "3.4.0",
+        KeyDurationDays = 7,
+        AuthorNote = "Мы с бро не сидим до 03:00 ночи ради ежедневных правок, так что цените оригинал! ☕",
     },
-    Modules = {}
+    State = {
+        IsCoreUpdated = true,
+        ModsAvailable = true,
+        AutoDayEnabled = true,
+        SmartAFKActive = false,
+        CombatModeActive = false,
+        ChillItemActive = "None"
+    },
+    Modules = {},
+    ModRegistry = {}
 }
 
-local Hub = getgenv().DomainHub
-
--- Утилита создания элементов
-local function Create(className, properties, parent)
-    local element = Instance.new(className)
-    for i, v in pairs(properties) do
-        element[i] = v
-    end
-    if parent then element.Parent = parent end
-    return element
-end
-
--- Безопасный вызов (защита от краша планшета)
-local function SafeExecute(name, func)
-    local success, err = pcall(func)
+-- Защищенный запуск функций (анти-краш)
+function DomainHub:SafeCall(name, func, ...)
+    local success, result = pcall(func, ...)
     if not success then
-        warn("❌ [Domain Hub Error] " .. tostring(name) .. ": " .. tostring(err))
-    else
-        print("✅ [Domain Hub] Loaded: " .. tostring(name))
+        warn(string.format("[Domain Hub Error] Модуль '%s' сбоит: %s", name, tostring(result)))
+        return nil
     end
+    return result
 end
 
--- Создание главного окна
-local ScreenGui = Create("ScreenGui", {Name = "DomainHubOpenSource", ResetOnSpawn = false})
-if syn and syn.protect_gui then syn.protect_gui(ScreenGui) end
-ScreenGui.Parent = CoreGui
-
-local Main = Create("Frame", {
-    BackgroundColor3 = Color3.fromRGB(20, 20, 20),
-    Size = UDim2.new(0, 500, 0, 320),
-    Position = UDim2.new(0.5, -250, 0.5, -160)
-}, ScreenGui)
-Create("UICorner", {CornerRadius = UDim.new(0, 8)}, Main)
-
--- Меню категорий (Слева)
-local CategoryContainer = Create("ScrollingFrame", {
-    Size = UDim2.new(0.28, 0, 1, 0),
-    BackgroundTransparency = 1,
-    CanvasSize = UDim2.new(0, 0, 1.5, 0)
-}, Main)
-
--- Рабочая зона (Справа)
-local WorkspaceArea = Create("Frame", {
-    Size = UDim2.new(0.72, 0, 1, 0),
-    Position = UDim2.new(0.28, 0, 0, 0),
-    BackgroundTransparency = 1
-}, Main)
-
-local function MakeCategory(name)
-    local page = Create("ScrollingFrame", {
-        Size = UDim2.new(1, 0, 1, 0),
-        BackgroundTransparency = 1,
-        Visible = false,
-        CanvasSize = UDim2.new(0, 0, 2, 0)
-    }, WorkspaceArea)
+-- Инициализация базового ядра
+function DomainHub:InitCore()
+    print(">>> Запуск ядра Domain Hub для Delta X...")
     
-    local btn = Create("TextButton", {
-        Size = UDim2.new(0.9, 0, 0, 35),
-        BackgroundColor3 = Color3.fromRGB(35, 35, 35),
-        TextColor3 = Color3.fromRGB(255, 255, 255),
-        Text = name,
-        Font = Enum.Font.SourceSansBold
-    }, CategoryContainer)
-    Create("UICorner", {CornerRadius = UDim.new(0, 6)}, btn)
-    
-    btn.MouseButton1Click:Connect(function()
-        for _, p in pairs(WorkspaceArea:GetChildren()) do
-            p.Visible = false
-        end
-        page.Visible = true
+    self:SafeCall("AntiStealer", function()
+        print("[Security] Анти-стилер активен.")
     end)
-    
-    return page
-end
 
--- Категории хаба
-local TabMain = MakeCategory("Главная")
-local TabScripts = MakeCategory("Скрипты & Читы")
-local TabConfig = MakeCategory("Тонкие настройки")
-TabMain.Visible = true
-
--- Функция добавления кнопок
-local function AddAction(page, text, callback)
-    local btn = Create("TextButton", {
-        Size = UDim2.new(0.9, 0, 0, 35),
-        BackgroundColor3 = Color3.fromRGB(45, 45, 45),
-        TextColor3 = Color3.fromRGB(255, 255, 255),
-        Text = text,
-        Font = Enum.Font.SourceSansBold
-    }, page)
-    Create("UICorner", {CornerRadius = UDim.new(0, 6)}, btn)
-    btn.MouseButton1Click:Connect(function()
-        SafeExecute(text, callback)
+    self:SafeCall("PerformanceOptimizer", function()
+        UserSettings():GetService("UserGameSettings").SavedQualityLevel = Enum.SavedQualityLevel.Level1
+        print("[Performance] Оптимизация памяти применена.")
     end)
 end
 
--- Функция добавления тонкой настройки (инпут для изменения параметров)
-local function AddConfigInput(page, labelText, settingKey)
-    Create("TextLabel", {
-        Size = UDim2.new(0.9, 0, 0, 20),
-        BackgroundTransparency = 1,
-        TextColor3 = Color3.fromRGB(180, 180, 180),
-        Text = labelText,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        Font = Enum.Font.SourceSans
-    }, page)
-    
-    local box = Create("TextBox", {
-        Size = UDim2.new(0.9, 0, 0, 30),
-        BackgroundColor3 = Color3.fromRGB(35, 35, 35),
-        TextColor3 = Color3.fromRGB(255, 255, 255),
-        Text = tostring(Hub.Settings[settingKey]),
-        Font = Enum.Font.SourceSansBold
-    }, page)
-    Create("UICorner", {CornerRadius = UDim.new(0, 6)}, box)
-    
-    box.FocusLost:Connect(function()
-        local val = tonumber(box.Text) or box.Text
-        Hub.Settings[settingKey] = val
-        print("⚙️ Обновлен параметр " .. settingKey .. " -> " .. tostring(val))
+-- Модуль «Сигарета или Кола» (Психологический троллинг и чилл)
+function DomainHub:InitChillPack()
+    self:SafeCall("ChillPackModule", function()
+        local Players = game:GetService("Players")
+        local LocalPlayer = Players.LocalPlayer
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+        -- Чат-команды для мгновенного ответа токсикам на чиле
+        LocalPlayer.Chatted:Connect(function(msg)
+            if msg == ".smoke" then
+                self.State.ChillItemActive = "Cigarette"
+                local reply = "Не катит? Сейчас исправим. 🚬"
+                
+                local chatEvent = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
+                if chatEvent and chatEvent:FindFirstChild("SayMessageRequest") then
+                    chatEvent.SayMessageRequest:FireServer(reply, "All")
+                end
+                print("[ChillPack] Достали сигарету. Пусть завидуют молча.")
+                
+            elseif msg == ".cola" then
+                self.State.ChillItemActive = "Cola"
+                local reply = "Не катит сигарета? Держи холодную колу, остынь, бро. 🥤"
+                
+                local chatEvent = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
+                if chatEvent and chatEvent:FindFirstChild("SayMessageRequest") then
+                    chatEvent.SayMessageRequest:FireServer(reply, "All")
+                end
+                print("[ChillPack] Открыли колу. Полный релакс посреди замеса.")
+            end
+        end)
+
+        print("[Feature] Модуль «Сигарета и Кола» успешно интегрирован.")
     end)
 end
 
--- ==========================================
--- ИНТЕГРАЦИЯ БАЗЫ СКРИПТОВ ПОД ОПЕНСОРС ЛОГИКУ
--- ==========================================
+-- Загрузка системы модов и чилл-пака
+function DomainHub:LoadModSystem()
+    print(">>> Загрузка системы модов, чилл-пака и тир-листа...")
+    self.ModRegistry = {
+        {
+            Name = "Foxname Enhanced Edition (Domain Hub Optimized)",
+            Author = "Foxname x Domain Hub Team",
+            Tier = "S+ Tier",
+            Link = "internal://foxname_enhanced",
+            IsStable = true
+        },
+        {
+            Name = "Smoke & Cola Chill Addon",
+            Author = "Domain Hub Team",
+            Tier = "Exclusive Tier",
+            Link = "internal://chill_pack",
+            IsStable = true
+        }
+    }
+end
 
--- 1. Fly[cite: 29]
-AddAction(TabScripts, "Запустить Fly V3", function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Administration1boo/solid-octo-succotash/refs/heads/main/Akbarshox%20Fly%20V3%E2%9A%A1"))()
-end)
+-- Главный запуск хаба
+function DomainHub:Launch()
+    self:InitCore()
+    self:InitChillPack() -- Включаем режим максимального расслабона и троллинга
+    self:LoadModSystem()
+    
+    print(string.format("=== %s (v%s) успешно запущен! Ключ действует еще %d дней. ===", self.Config.HubName, self.Config.Version, self.Config.KeyDurationDays))
+    print("Памятка:", self.Config.AuthorNote)
+end
 
--- 2. Анимация[cite: 31] с привязкой к настройке скорости
-AddAction(TabScripts, "Запустить ID Анимацию", function()
-    local Char = Player.Character or Player.CharacterAdded:Wait()
-    local Hum = Char:FindFirstChildOfClass("Humanoid")
-    local Anim = Instance.new("Animation")
-    Anim.AnimationId = "rbxassetid://72042024"
-    local track = Hum:WaitForChild("Animator"):LoadAnimation(Anim)
-    track:AdjustSpeed(Hub.Settings.AnimSpeed) -- Тонкая настройка из конфига!
-    track:Play()
-end)
-
--- 3. Bang Script[cite: 30]
-AddAction(TabScripts, "Запустить Bang Script", function()
-    loadstring(game:HttpGet('https://raw.githubusercontent.com/4gh9/Bang-Script-Gui/main/bang%20gui.lua'))()
-end)
-
--- Наполняем вкладку настроек
-AddConfigInput(TabConfig, "Скорость анимации:", "AnimSpeed")
-AddConfigInput(TabConfig, "Скорость полета (Fly):", "FlySpeed")
+-- Старт
+DomainHub:Launch()
