@@ -1,54 +1,86 @@
--- Universal Script Loader Core (Modular Architecture)
-local Loader = {}
-Loader.Modules = {}
+-- Загружаем красивую библиотеку Rayfield
+local Rayfield = loadstring(game:HttpGet('https://sirblood.github.io/Rayfield/'))()
 
--- Конфигурация путей / репозиториев откуда тянем модули
-Loader.Config = {
-    RepoBase = "https://raw.githubusercontent.com/our-ecosystem/modules/main/",
-    DebugMode = true
-}
+-- Создаем главное окно
+local Window = Rayfield:CreateWindow({
+   Name = "Ultimate Hub | by Bro",
+   LoadingTitle = "Загрузка скриптов...",
+   LoadingSubtitle = "Подожди немного",
+   ConfigurationSaving = {
+      Enabled = false,
+   },
+   Discord = {
+      Enabled = false,
+   },
+   KeySystem = false, -- Можно включить, если захочешь добавить пароль
+})
 
--- Функция безопасной загрузки модуля
-function Loader:LoadModule(moduleName, url)
-    if self.Modules[moduleName] then
-        if self.Config.DebugMode then
-            print("[Loader]: Модуль " .. moduleName .. " уже загружен из кэша.")
-        end
-        return self.Modules[moduleName]
-    end
+-- ==========================================
+-- СОЗДАЕМ ВКЛАДКИ
+-- ==========================================
+local TabMain = Window:CreateTab("Главная", 4483362458) -- Иконка домика
+local TabAdmin = Window:CreateTab("Админка", 4483362458)
+local TabFun = Window:CreateTab("Фан", 4483362458)
 
-    local success, result = pcall(function()
-        -- Используем стандартный геттер для подгрузки «на лету»
-        return game:HttpGet(self.Config.RepoBase .. url)
-    end)
+-- ==========================================
+-- КНОПКИ ДЛЯ ГЛАВНОЙ ВКЛАДКИ
+-- ==========================================
+TabMain:CreateButton({
+   Name = "Запустить Akbarshox Fly V3",
+   Callback = function()
+       -- Скрипт на полет
+       loadstring(game:HttpGet("https://raw.githubusercontent.com/Administration1boo/solid-octo-succotash/refs/heads/main/Akbarshox%20Fly%20V3%E2%9A%A1"))()
+   end,
+})
 
-    if success and result then
-        local loadFunc, err = loadstring(result)
-        if loadFunc then
-            local moduleInstance = loadFunc()
-            self.Modules[moduleName] = moduleInstance
-            if self.Config.DebugMode then
-                print("[Loader]: Успешно инициализирован -> " .. moduleName)
-            end
-            return moduleInstance
-        else
-            warn("[Loader Error] Ошибка компиляции модуля " .. moduleName .. ": " .. tostring(err))
-        end
-    else
-        warn("[Loader Error] Не удалось стянуть модуль " .. moduleName)
-    end
-    return nil
-end
+TabMain:CreateButton({
+   Name = "Загрузить Caomod2077 Loader",
+   Callback = function()
+       -- Скрипт лоадера
+       loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/loader"))()
+   end,
+})
 
--- Инициализация нашего комбайна
-function Loader:Init()
-    print("[Loader]: Запуск универсального арсенала...")
-    
-    -- Подтягиваем базу (CoolGUI, Dex, Spy)
-    -- local CoolGUI = self:LoadModule("CoolGUI", "coolgui_modern.lua")
-    -- local DarkDex = self:LoadModule("DarkDex", "dark_dex_v3.lua")
-    
-    print("[Loader]: Все системы в норме. Готово к работе.")
-end
+-- ==========================================
+-- КНОПКИ ДЛЯ ВКЛАДКИ "АДМИНКА"
+-- ==========================================
+TabAdmin:CreateButton({
+   Name = "Запустить Rubo Admin",
+   Callback = function()
+       -- Твой скрипт для Rubo Admin
+       game:GetService("StarterGui"):SetCore("SendNotification", {
+           Title = "Rubo Admin Loaded",
+           Text = "Powered by Delta - All Commands Ready!",
+           Duration = 5
+       })
 
-return Loader
+       loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+
+       task.wait(1)
+       if game:GetService("CoreGui"):FindFirstChild("EdgeIY") then
+           local IY_UI = game:GetService("CoreGui").EdgeIY
+           if IY_UI:FindFirstChild("Frame") and IY_UI.Frame:FindFirstChild("Title") then
+               IY_UI.Frame.Title.Text = "Rubo Admin (Delta Edition)"
+           end
+       end
+   end,
+})
+
+-- ==========================================
+-- КНОПКИ ДЛЯ ВКЛАДКИ "ФАН"
+-- ==========================================
+TabFun:CreateButton({
+   Name = "Scary Animation Script",
+   Callback = function()
+       -- Скрипт на страшные анимации
+       loadstring(game:HttpGet("https://raw.githubusercontent.com/hailongcoding/Scary-animation-script/refs/heads/main/Scary-animation-script.lua", true))()
+   end,
+})
+
+-- Уведомление об успешной загрузке
+Rayfield:Notify({
+   Title = "Успешно!",
+   Content = "Хаб загружен, все скрипты готовы к работе.",
+   Duration = 5,
+   Image = 4483362458,
+})
