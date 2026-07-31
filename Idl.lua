@@ -1,115 +1,54 @@
--- =========================================================================
--- DOMAIN HUB | Delta X Edition (Update: Smoke & Cola Chill Pack)
--- =========================================================================
+-- Universal Script Loader Core (Modular Architecture)
+local Loader = {}
+Loader.Modules = {}
 
-local DomainHub = {
-    Config = {
-        HubName = "Domain Hub",
-        Version = "3.4.0",
-        KeyDurationDays = 7,
-        AuthorNote = "Мы с бро не сидим до 03:00 ночи ради ежедневных правок, так что цените оригинал! ☕",
-    },
-    State = {
-        IsCoreUpdated = true,
-        ModsAvailable = true,
-        AutoDayEnabled = true,
-        SmartAFKActive = false,
-        CombatModeActive = false,
-        ChillItemActive = "None"
-    },
-    Modules = {},
-    ModRegistry = {}
+-- Конфигурация путей / репозиториев откуда тянем модули
+Loader.Config = {
+    RepoBase = "https://raw.githubusercontent.com/our-ecosystem/modules/main/",
+    DebugMode = true
 }
 
--- Защищенный запуск функций (анти-краш)
-function DomainHub:SafeCall(name, func, ...)
-    local success, result = pcall(func, ...)
-    if not success then
-        warn(string.format("[Domain Hub Error] Модуль '%s' сбоит: %s", name, tostring(result)))
-        return nil
+-- Функция безопасной загрузки модуля
+function Loader:LoadModule(moduleName, url)
+    if self.Modules[moduleName] then
+        if self.Config.DebugMode then
+            print("[Loader]: Модуль " .. moduleName .. " уже загружен из кэша.")
+        end
+        return self.Modules[moduleName]
     end
-    return result
-end
 
--- Инициализация базового ядра
-function DomainHub:InitCore()
-    print(">>> Запуск ядра Domain Hub для Delta X...")
-    
-    self:SafeCall("AntiStealer", function()
-        print("[Security] Анти-стилер активен.")
+    local success, result = pcall(function()
+        -- Используем стандартный геттер для подгрузки «на лету»
+        return game:HttpGet(self.Config.RepoBase .. url)
     end)
 
-    self:SafeCall("PerformanceOptimizer", function()
-        UserSettings():GetService("UserGameSettings").SavedQualityLevel = Enum.SavedQualityLevel.Level1
-        print("[Performance] Оптимизация памяти применена.")
-    end)
-end
-
--- Модуль «Сигарета или Кола» (Психологический троллинг и чилл)
-function DomainHub:InitChillPack()
-    self:SafeCall("ChillPackModule", function()
-        local Players = game:GetService("Players")
-        local LocalPlayer = Players.LocalPlayer
-        local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-        -- Чат-команды для мгновенного ответа токсикам на чиле
-        LocalPlayer.Chatted:Connect(function(msg)
-            if msg == ".smoke" then
-                self.State.ChillItemActive = "Cigarette"
-                local reply = "Не катит? Сейчас исправим. 🚬"
-                
-                local chatEvent = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
-                if chatEvent and chatEvent:FindFirstChild("SayMessageRequest") then
-                    chatEvent.SayMessageRequest:FireServer(reply, "All")
-                end
-                print("[ChillPack] Достали сигарету. Пусть завидуют молча.")
-                
-            elseif msg == ".cola" then
-                self.State.ChillItemActive = "Cola"
-                local reply = "Не катит сигарета? Держи холодную колу, остынь, бро. 🥤"
-                
-                local chatEvent = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
-                if chatEvent and chatEvent:FindFirstChild("SayMessageRequest") then
-                    chatEvent.SayMessageRequest:FireServer(reply, "All")
-                end
-                print("[ChillPack] Открыли колу. Полный релакс посреди замеса.")
+    if success and result then
+        local loadFunc, err = loadstring(result)
+        if loadFunc then
+            local moduleInstance = loadFunc()
+            self.Modules[moduleName] = moduleInstance
+            if self.Config.DebugMode then
+                print("[Loader]: Успешно инициализирован -> " .. moduleName)
             end
-        end)
-
-        print("[Feature] Модуль «Сигарета и Кола» успешно интегрирован.")
-    end)
+            return moduleInstance
+        else
+            warn("[Loader Error] Ошибка компиляции модуля " .. moduleName .. ": " .. tostring(err))
+        end
+    else
+        warn("[Loader Error] Не удалось стянуть модуль " .. moduleName)
+    end
+    return nil
 end
 
--- Загрузка системы модов и чилл-пака
-function DomainHub:LoadModSystem()
-    print(">>> Загрузка системы модов, чилл-пака и тир-листа...")
-    self.ModRegistry = {
-        {
-            Name = "Foxname Enhanced Edition (Domain Hub Optimized)",
-            Author = "Foxname x Domain Hub Team",
-            Tier = "S+ Tier",
-            Link = "internal://foxname_enhanced",
-            IsStable = true
-        },
-        {
-            Name = "Smoke & Cola Chill Addon",
-            Author = "Domain Hub Team",
-            Tier = "Exclusive Tier",
-            Link = "internal://chill_pack",
-            IsStable = true
-        }
-    }
-end
-
--- Главный запуск хаба
-function DomainHub:Launch()
-    self:InitCore()
-    self:InitChillPack() -- Включаем режим максимального расслабона и троллинга
-    self:LoadModSystem()
+-- Инициализация нашего комбайна
+function Loader:Init()
+    print("[Loader]: Запуск универсального арсенала...")
     
-    print(string.format("=== %s (v%s) успешно запущен! Ключ действует еще %d дней. ===", self.Config.HubName, self.Config.Version, self.Config.KeyDurationDays))
-    print("Памятка:", self.Config.AuthorNote)
+    -- Подтягиваем базу (CoolGUI, Dex, Spy)
+    -- local CoolGUI = self:LoadModule("CoolGUI", "coolgui_modern.lua")
+    -- local DarkDex = self:LoadModule("DarkDex", "dark_dex_v3.lua")
+    
+    print("[Loader]: Все системы в норме. Готово к работе.")
 end
 
--- Старт
-DomainHub:Launch()
+return Loader
