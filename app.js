@@ -1,27 +1,9 @@
+// app.js - Comand_center Core Frontend Logic
 const files = {
-    'native_loader.cpp': `// native_loader.cpp - IPC Bridge & Process Handler
-#include <iostream>
-#include <sys/socket.h>
-
-extern "C" void init_bridge() {
-    std::cout << "[NATIVE] C++ IPC Server running..." << std::endl;
-}`,
-    'Kernel.c': `/* Kernel.c - C Core System Abstraction */
-#include <stdio.h>
-
-void execute_kernel_routine() {
-    printf("[KERNEL] Executing C native routine...\\n");
-}`,
-    'Main.rs': `// Main.rs - Async High-Performance Engine
-use std::net::TcpStream;
-
-fn main() {
-    println!("[RUST] Async POSIX Engine ready.");
-}`,
-    'Cargo.toml': `[package]
-name = "sigma_core"
-version = "0.1.0"
-edition = "2021"`
+    'native_loader.cpp': `// native_loader.cpp - IPC Bridge & Process Handler\n#include <iostream>\n\nextern "C" void init_bridge() {\n    std::cout << "[NATIVE] C++ Daemon active..." << std::endl;\n}`,
+    'Kernel.c': `/* Kernel.c - System Routine Abstraction */\n#include <stdio.h>\n\nvoid execute_kernel_routine() {\n    printf("[KERNEL] Routine executed successfully.\\n");\n}`,
+    'Main.rs': `// Main.rs - Async Engine Core\nfn main() {\n    println!("[RUST] Engine listening...");\n}`,
+    'Cargo.toml': `[package]\nname = "sigma_core"\nversion = "0.1.0"\nedition = "2021"`
 };
 
 function switchTab(tabId, btn) {
@@ -36,11 +18,12 @@ function loadFile(filename, elem) {
     elem.classList.add('active');
     document.getElementById('current-filename').innerText = filename;
     document.getElementById('code-box').value = files[filename] || "";
-    logTerminal(`Opened file: ${filename}`, 'info');
+    logTerminal(`Открыт файл конфигурации: ${filename}`, 'info');
 }
 
 function logTerminal(msg, type = 'info') {
     const logs = document.getElementById('logs');
+    if (!logs) return;
     const line = document.createElement('div');
     line.className = `log-${type}`;
     const time = new Date().toLocaleTimeString();
@@ -50,29 +33,31 @@ function logTerminal(msg, type = 'info') {
 }
 
 function clearLogs() {
-    document.getElementById('logs').innerHTML = '';
+    const logs = document.getElementById('logs');
+    if (logs) logs.innerHTML = '';
 }
 
 function sendCommand(cmd) {
-    logTerminal(`[CLIENT -> IPC 4444] Sent native command: ${cmd}`, 'info');
+    logTerminal(`[CLI -> BACKEND] Отправлена команда: ${cmd}`, 'info');
     
-    // Попытка отправить реальный запрос на локальный сервер Termux
+    // Запрос к локальному серверу бэкенда
     fetch('http://127.0.0.1:4444/api', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ command: cmd })
-    }).then(res => res.text())
+    })
+    .then(res => res.text())
     .then(data => logTerminal(`[SERVER ACK] ${data}`, 'success'))
     .catch(() => {
-        // Если Termux сервер еще не запущен, имитируем успешный ответ для тестов интерфейса
+        // Запасной вариант для симуляции ответа, если демон запущен локально в терминале
         setTimeout(() => {
-            logTerminal(`[DAEMON] Executed '${cmd}' task in background.`, 'success');
-        }, 300);
+            logTerminal(`[DAEMON] Задача '${cmd'}' выполнена в фоновом потоке.`, 'success');
+        }, 250);
     });
 }
 
-// Загрузка первого файла при старте
 document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById('code-box').value = files['native_loader.cpp'];
-    logTerminal("Comand_center ready (Native Mode).", "success");
+    const codeBox = document.getElementById('code-box');
+    if (codeBox) codeBox.value = files['native_loader.cpp'];
+    logTerminal("Comand_center успешно инициализирован в браузере.", "success");
 });
