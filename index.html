@@ -3,99 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comand_center v3.0</title>
+    <title>Command Center</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="brand">
-            <div class="brand-icon">⚡</div>
-            <div class="brand-title">Comand_center <span class="version">v3.0</span></div>
-        </div>
-        <div class="status-bar">
-            <div class="status-item"><div class="status-dot"></div><span>C++ IPC: 4444</span></div>
-            <div class="status-item"><div class="status-dot purple"></div><span>Rust: READY</span></div>
-            <div class="status-item"><div class="status-dot blue"></div><span>Kernel.c: LOADED</span></div>
-        </div>
-    </header>
-
-    <!-- Main Workspace -->
-    <div class="workspace">
-        <sidebar>
-            <button class="nav-btn active" onclick="switchTab('dashboard', this)">📊 Dashboard</button>
-            <button class="nav-btn" onclick="switchTab('editor', this)">💻 Code Workspace</button>
-            <button class="nav-btn" onclick="switchTab('admin', this)">⚙️ Admin Panel</button>
-            <button class="nav-btn" onclick="switchTab('features', this)">🧩 Modules</button>
-        </sidebar>
-
-        <main>
-            <!-- Dashboard Tab -->
-            <div id="dashboard" class="panel active">
-                <div class="grid-cards">
-                    <div class="card"><div class="card-title">C++ Daemon</div><div class="card-value green">LISTENING</div><span>Port 4444 (POSIX)</span></div>
-                    <div class="card"><div class="card-title">Core Thread</div><div class="card-value purple">Main.rs</div><span>Async Engine</span></div>
-                    <div class="card"><div class="card-title">Native Loader</div><div class="card-value blue">Kernel.c</div><span>System Bridge</span></div>
-                </div>
-                <div class="control-box">
-                    <h3>Быстрые действия</h3>
-                    <div class="btn-group">
-                        <button class="btn green" onclick="sendCommand('PING')">📡 Ping IPC</button>
-                        <button class="btn blue" onclick="sendCommand('START_SCANNER')">🔍 Launch Scanner</button>
-                        <button class="btn purple" onclick="sendCommand('EXEC_RUST_CORE')">🦀 Run Rust Core</button>
-                        <button class="btn red" onclick="sendCommand('STOP_DAEMON')">🛑 Stop Backend</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Code Workspace Tab -->
-            <div id="editor" class="panel">
-                <div class="editor-container">
-                    <div class="file-tree">
-                        <div class="tree-title">Project Files</div>
-                        <div class="file-item active" onclick="loadFile('native_loader.cpp', this)">📄 native_loader.cpp</div>
-                        <div class="file-item" onclick="loadFile('Main.rs', this)">🦀 Main.rs</div>
-                        <div class="file-item" onclick="loadFile('Kernel.c', this)">⚙️ Kernel.c</div>
-                        <div class="file-item" onclick="loadFile('Cargo.toml', this)">📦 Cargo.toml</div>
-                    </div>
-                    <div class="editor-main">
-                        <div class="editor-header">
-                            <span id="current-filename">native_loader.cpp</span>
-                            <button class="btn blue sm" onclick="logTerminal('Code saved and sent to IPC.', 'success')">💾 Save & Send</button>
-                        </div>
-                        <textarea id="code-box" class="code-area" spellcheck="false"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Admin Tab -->
-            <div id="admin" class="panel">
-                <div class="control-box" id="admin-container">
-                    <h3>Панель Администратора</h3>
-                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Настройки IPC-туннеля Termux.</p>
-                    <label style="font-size: 12px; color: var(--text-muted);">IPC Host: <input type="text" value="127.0.0.1" style="width: 100%; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: #fff; padding: 8px; border-radius: 4px; margin-top: 4px;"></label>
-                </div>
-            </div>
-
-            <!-- Features Tab -->
-            <div id="features" class="panel">
-                <div class="control-box" id="features-container">
-                    <h3>Подключенные Модули</h3>
-                    <p style="color: var(--text-muted); font-size: 13px;">Здесь будут отображаться активные сканеры и Roblox-вебхуки.</p>
-                </div>
-            </div>
-
-            <!-- Live Terminal -->
-            <div class="terminal-panel">
-                <div class="terminal-header">
-                    <span>LIVE TERMINAL LOGS (127.0.0.1:4444)</span>
-                    <span class="clear-btn" style="cursor: pointer; color: var(--text-muted);" onclick="clearLogs()">[ Clear ]</span>
-                </div>
-                <div id="logs" class="terminal-logs"></div>
-            </div>
-        </main>
+    <div class="sidebar">
+        <h3>Command Center</h3>
+        <div id="dns-status">DNS Shield: Инициализация...</div>
+        <ul>
+            <li onclick="switchTab('editor')">Код (Monaco)</li>
+            <li onclick="switchTab('vm')">Виртуализация (v86)</li>
+            <li onclick="switchTab('admin')">Админ-панель</li>
+        </ul>
     </div>
 
-    <script src="app.js"></script>
+    <div class="main">
+        <!-- Редактор кода -->
+        <div id="editor" class="tab-content active">
+            <div id="editor-container" style="height: 90vh;"></div>
+        </div>
+
+        <!-- Менеджер виртуалки и ISO -->
+        <div id="vm" class="tab-content">
+            <h2>ISO Manager & v86 Engine</h2>
+            <input type="file" id="iso-input" accept=".iso">
+            <div id="screen-container"></div>
+        </div>
+
+        <!-- Админка -->
+        <div id="admin" class="tab-content">
+            <h2>Системная панель</h2>
+            <div id="admin-output"></div>
+        </div>
+    </div>
+
+    <!-- Подключаем Monaco Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+
+    <!-- Скрипты ядра и модули -->
+    <script src="js/dns_bridge.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/features.js"></script>
+    <script src="js/admin-panel.js"></script>
+
+    <script>
+        // Инициализация DNS после загрузки
+        document.addEventListener('DOMContentLoaded', async () => {
+            const statusDiv = document.getElementById('dns-status');
+            const testResolve = await dnsShield.resolve('github.com');
+            if (testResolve) {
+                statusDiv.innerText = `DNS Shield: Активен (${testResolve})`;
+                statusDiv.style.color = '#4ade80';
+            } else {
+                statusDiv.innerText = 'DNS Shield: Ошибка';
+                statusDiv.style.color = '#f87171';
+            }
+        });
+    </script>
 </body>
 </html>
