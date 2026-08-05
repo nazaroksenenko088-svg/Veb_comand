@@ -10,17 +10,28 @@
     <div class="sidebar">
         <h3>Command Center</h3>
         <div id="dns-status">DNS Shield: Инициализация...</div>
-        <ul>
-            <li onclick="switchTab('editor')">Код (Monaco)</li>
-            <li onclick="switchTab('vm')">Виртуализация (v86)</li>
-            <li onclick="switchTab('admin')">Админ-панель</li>
+        <ul id="sidebar-menu">
+            <li class="menu-item active" data-tab="editor" tabindex="0">Код (Monaco)</li>
+            <li class="menu-item" data-tab="vm" tabindex="0">Виртуализация (v86)</li>
+            <li class="menu-item" data-tab="admin" tabindex="0">Админ-панель</li>
         </ul>
+        <button id="btn-devtools" onclick="toggleDevTools()">🛠 Открыть DevTools [F12]</button>
     </div>
 
     <div class="main">
         <!-- Редактор кода -->
         <div id="editor" class="tab-content active">
-            <div id="editor-container" style="height: 90vh;"></div>
+            <div class="editor-toolbar">
+                <label for="language-select">Язык:</label>
+                <select id="language-select" onchange="changeLanguage(this.value)">
+                    <option value="rust">Rust (.rs)</option>
+                    <option value="cpp">C++ (.cpp)</option>
+                    <option value="c">C (.c)</option>
+                    <option value="csharp">C# (.cs)</option>
+                    <option value="javascript">JavaScript (.js)</option>
+                </select>
+            </div>
+            <div id="editor-container"></div>
         </div>
 
         <!-- Менеджер виртуалки и ISO -->
@@ -37,17 +48,29 @@
         </div>
     </div>
 
-    <!-- Подключаем Monaco Editor -->
+    <!-- Встроенный DevTools (Консоль и Инспектор) -->
+    <div id="devtools-panel" class="devtools-hidden">
+        <div class="devtools-header">
+            <span>DevTools Console & REPL</span>
+            <button onclick="toggleDevTools()">✕</button>
+        </div>
+        <div id="devtools-logs"></div>
+        <div class="devtools-input-area">
+            <span>&gt;</span>
+            <input type="text" id="devtools-input" placeholder="Введите JS команду..." onkeydown="handleDevToolsExec(event)">
+        </div>
+    </div>
+
+    <!-- Monaco Editor -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
 
-    <!-- Скрипты ядра и модули -->
+    <!-- Скрипты -->
     <script src="js/dns_bridge.js"></script>
     <script src="js/app.js"></script>
     <script src="js/features.js"></script>
     <script src="js/admin-panel.js"></script>
 
     <script>
-        // Инициализация DNS после загрузки
         document.addEventListener('DOMContentLoaded', async () => {
             const statusDiv = document.getElementById('dns-status');
             const testResolve = await dnsShield.resolve('github.com');
