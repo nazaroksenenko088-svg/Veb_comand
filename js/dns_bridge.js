@@ -1,39 +1,28 @@
-// js/dns_bridge.js
-
-class SecureDNS {
-    constructor() {
-        // Тот самый защищенный сервер, который ты просил
-        this.endpoint = "https://security.cloudflare-dns.com/dns-query";
-    }
-
-    // Функция для безопасного резолва доменов
+// Мост для работы с Cloudflare DNS over HTTPS (DoH)
+const dnsShield = {
+    endpoint: 'https://security.cloudflare-dns.com/dns-query',
+    
     async resolve(domain) {
         try {
+            console.log(`[DNS Shield] Запрашиваю маршрут для: ${domain}`);
             const response = await fetch(`${this.endpoint}?name=${domain}&type=A`, {
-                headers: {
-                    "Accept": "application/dns-json"
-                }
+                headers: { 'Accept': 'application/dns-json' }
             });
             
-            const data = await response.json();
+            if (!response.ok) throw new Error('Ошибка сети при запросе к DNS');
             
-            if (data.Status === 0 && data.Answer) {
+            const data = await response.json();
+            if (data.Answer && data.Answer.length > 0) {
                 const ip = data.Answer[0].data;
-                console.log(`[DNS Shield] Успешно: ${domain} -> ${ip}`);
+                console.log(`[DNS Shield] Успешно. IP: ${ip}`);
                 return ip;
             } else {
-                console.warn(`[DNS Shield] Не удалось найти IP для ${domain}`);
+                console.warn(`[DNS Shield] Маршрут не найден для ${domain}`);
                 return null;
             }
         } catch (error) {
-            console.error("[DNS Shield] Ошибка соединения с DNS:", error);
+            console.error(`[DNS Shield] Ошибка резолва: ${error.message}`);
             return null;
         }
     }
-}
-
-// Инициализируем наш щит
-const dnsShield = new SecureDNS();
-
-// Тестовый запрос, чтобы проверить работу в консоли браузера
-// dnsShield.resolve("github.com").then(ip => console.log(ip));
+};
